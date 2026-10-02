@@ -1,7 +1,8 @@
 import type { Localized } from '../i18n/types';
 
 export interface Job {
-  readonly period: Localized<string>;
+  /** `end: null` means the job is ongoing; it renders up to the current year. */
+  readonly period: { readonly start: number; readonly end: number | null };
   readonly company: string;
   readonly role: Localized<string>;
   readonly text: Localized<string>;
@@ -9,7 +10,7 @@ export interface Job {
 
 export const JOBS: readonly Job[] = [
   {
-    period: { sk: '2026 - dnes', en: '2026 - now' },
+    period: { start: 2026, end: null },
     company: 'GrandPano',
     role: { sk: 'WordPress špecialista', en: 'WordPress specialist' },
     text: {
@@ -18,7 +19,7 @@ export const JOBS: readonly Job[] = [
     },
   },
   {
-    period: { sk: '2018 - dnes', en: '2018 - now' },
+    period: { start: 2018, end: null },
     company: 'Freelance',
     role: { sk: 'AI a fullstack developer', en: 'AI & fullstack developer' },
     text: {
@@ -27,7 +28,7 @@ export const JOBS: readonly Job[] = [
     },
   },
   {
-    period: { sk: '2017 - dnes', en: '2017 - now' },
+    period: { start: 2017, end: null },
     company: 'Vibration s.r.o.',
     role: { sk: 'Web developer', en: 'Web developer' },
     text: {
@@ -36,7 +37,7 @@ export const JOBS: readonly Job[] = [
     },
   },
   {
-    period: { sk: '2021 - 2025', en: '2021 - 2025' },
+    period: { start: 2021, end: 2025 },
     company: 'TENENET o.z.',
     role: { sk: 'Web developer a IT špecialista', en: 'Web developer & IT specialist' },
     text: {
@@ -45,7 +46,7 @@ export const JOBS: readonly Job[] = [
     },
   },
   {
-    period: { sk: '2016 - 2017', en: '2016 - 2017' },
+    period: { start: 2016, end: 2017 },
     company: 'Multimedia s.r.o.',
     role: { sk: 'Grafik a tlačiar', en: 'Designer & printer' },
     text: {
@@ -54,7 +55,7 @@ export const JOBS: readonly Job[] = [
     },
   },
   {
-    period: { sk: '2015 - 2016', en: '2015 - 2016' },
+    period: { start: 2015, end: 2016 },
     company: 'Comsultia s.r.o.',
     role: { sk: 'Stáž', en: 'Internship' },
     text: {

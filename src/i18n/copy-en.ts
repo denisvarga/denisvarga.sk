@@ -16,7 +16,7 @@ export const copyEn: Copy = {
     body: "I started in 2015 with an agency internship, went through graphic design and print, and since 2017 I've been building custom software - websites, stores, apps and internal tools. Today I work AI-first: I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. Whatever I don't know yet, I learn fast. I have yet to meet a reasonable problem that couldn't be solved with the right build.",
     facts: [
       { label: 'AI', value: 'Agents, MCP, Claude Code, Codex' },
-      { label: 'I build', value: 'React, Next.js, WordPress, Vue.js' },
+      { label: 'I build', value: 'Full-stack, from idea to production' },
       { label: 'Now', value: 'Open to projects and roles' },
     ],
   },
