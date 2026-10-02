@@ -32,6 +32,9 @@ export interface ContactCopy {
   readonly cvHref: string;
 }
 
+// Same-origin PDFs printed from this site's data by scripts/build-cv-pdf.ts.
+const CV_HREF: Localized<string> = { sk: '/cv/denis-varga-cv.pdf', en: '/cv/denis-varga-cv-en.pdf' };
+
 function contactCopy(lang: Lang): ContactCopy {
   const { email } = headCopy[lang];
   return {
@@ -39,7 +42,7 @@ function contactCopy(lang: Lang): ContactCopy {
     emailHref: `mailto:${email}`,
     phone: '+421 902 074 830',
     phoneHref: 'tel:+421902074830',
-    cvHref: 'https://resume.denva.sk/wp-content/uploads/cv/denis-varga-cv.pdf',
+    cvHref: CV_HREF[lang],
   };
 }
 

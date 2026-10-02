@@ -1,14 +1,23 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { Lang } from '../src/i18n/types';
+import sharp from 'sharp';
+import type { CvAssets } from '../src/cv/cv-html';
+import { LANGS, type Lang } from '../src/i18n/types';
 import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from '../src/seo/head-tags';
 import { buildSitemap } from '../src/seo/sitemap';
 
 const CLIENT_DIR = 'dist/client';
 const SSR_DIR = 'dist-ssr';
+// Outside dist/client, so the CV print sources never deploy; scripts/build-cv-pdf.ts reads them.
+const CV_DIR = 'dist/cv-src';
 const PRELOADED_FONTS = [/^manrope-latin-wght-normal-[\w-]+\.woff2$/, /^manrope-latin-ext-wght-normal-[\w-]+\.woff2$/];
 const PROFILE_PORTRAIT = /^denis-cutout-1024-[\w-]+\.webp$/;
+const CV_PORTRAIT = /^denis-cutout-640-[\w-]+\.webp$/;
+// 25 mm at about 360 dpi. Chromium passes a JPEG into the PDF as is, but re-encodes a WebP with
+// alpha losslessly (about 240 KB), so the portrait is flattened onto the site's --bg colour.
+const CV_PORTRAIT_PX = 360;
+const PORTRAIT_BG = '#ecece9';
 const HTML_LANG = /<html lang="[a-z]+">/;
 const MODULE_SCRIPT = /\s*<script type="module"[^>]*><\/script>/g;
 const MODULE_PRELOAD = /\s*<link rel="modulepreload"[^>]*>/g;
@@ -24,26 +33,24 @@ function fillTemplate(template: string, lang: Lang, head: string, body: string):
   return replaceOnce(replaceOnce(withLang, '<!--app-head-->', head), '<!--app-html-->', body);
 }
 
-// Hashed asset names exist only after the client build, so the head resolves them from dist.
-async function headAssets(): Promise<HeadAssets> {
-  const assets = await readdir(join(CLIENT_DIR, 'assets'));
-  const find = (pattern: RegExp) => {
-    const matches = assets.filter((name) => pattern.test(name));
-    if (matches.length !== 1) throw new Error(`Expected one asset for ${pattern}, found ${matches.length}`);
-    return `/assets/${matches[0]}`;
-  };
-  return { fonts: PRELOADED_FONTS.map(find), portrait: find(PROFILE_PORTRAIT) };
+// Hashed asset names exist only after the client build, so they are resolved from dist.
+const builtAssets = await readdir(join(CLIENT_DIR, 'assets'));
+function assetName(pattern: RegExp): string {
+  const matches = builtAssets.filter((name) => pattern.test(name));
+  if (matches.length !== 1) throw new Error(`Expected one asset for ${pattern}, found ${matches.length}`);
+  return `${matches[0]}`;
 }
 
 const entryFile = (await readdir(SSR_DIR)).find((f) => /^entry-prerender\.m?js$/.test(f));
 if (!entryFile) throw new Error(`No entry-prerender bundle in ${SSR_DIR}/`);
 
-const { renderApp, renderNotFound, buildLlmsTxt, buildLlmsFullTxt } = (await import(
+const { renderApp, renderNotFound, renderCvHtml, buildLlmsTxt, buildLlmsFullTxt } = (await import(
   pathToFileURL(join(SSR_DIR, entryFile)).href
 )) as typeof import('../src/entry-prerender');
 
 const template = await readFile(join(CLIENT_DIR, 'index.html'), 'utf8');
-const assets = await headAssets();
+const siteAsset = (pattern: RegExp) => `/assets/${assetName(pattern)}`;
+const assets: HeadAssets = { fonts: PRELOADED_FONTS.map(siteAsset), portrait: siteAsset(PROFILE_PORTRAIT) };
 
 const pages: ReadonlyArray<{ lang: Lang; file: string }> = [
   { lang: 'sk', file: 'index.html' },
@@ -74,5 +81,21 @@ console.log(`sitemap.xml: lastmod ${buildDate}`);
 await writeFile(join(CLIENT_DIR, 'llms.txt'), buildLlmsTxt());
 await writeFile(join(CLIENT_DIR, 'llms-full.txt'), buildLlmsFullTxt());
 console.log('llms.txt, llms-full.txt');
+
+// Self-contained, so the PDF generator can open the pages over file:// with relative URLs.
+const cvAssets: CvAssets = { fontDir: 'fonts', portrait: 'portrait.jpg' };
+await rm(CV_DIR, { recursive: true, force: true });
+await mkdir(CV_DIR, { recursive: true });
+await cp('src/cv/fonts', join(CV_DIR, cvAssets.fontDir), { recursive: true });
+await sharp(join(CLIENT_DIR, 'assets', assetName(CV_PORTRAIT)))
+  .flatten({ background: PORTRAIT_BG })
+  .resize(CV_PORTRAIT_PX, CV_PORTRAIT_PX)
+  .jpeg({ quality: 84 })
+  .toFile(join(CV_DIR, cvAssets.portrait));
+const generatedAt = new Date();
+for (const lang of LANGS) {
+  await writeFile(join(CV_DIR, `cv-${lang}.html`), await renderCvHtml(lang, cvAssets, generatedAt));
+}
+console.log(`cv-src: ${LANGS.map((lang) => `cv-${lang}.html`).join(', ')}`);
 
 await rm(SSR_DIR, { recursive: true, force: true });

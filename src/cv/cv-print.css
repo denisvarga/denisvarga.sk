@@ -1,0 +1,159 @@
+/* Print stylesheet of the PDF CV (dist/cv-src): page, tokens, header and the section frame; the
+   section contents are in cv-blocks.css. Never served by the site, so no CSP applies. Sized so
+   page 1 carries the header, profile, experience and AI, and page 2 skills and projects. */
+
+@page {
+  size: A4;
+  margin: 14mm 16mm 13mm;
+}
+
+:root {
+  --ink: #131416;
+  --grey-800: #2e3034;
+  --grey-600: #5a5c60;
+  --grey-500: #8a8c90;
+  --rule: #dcdcd8;
+  --portrait-bg: #ecece9;
+  --acc: #f2541b;
+  --label-col: 30mm;
+  --gap: 5mm;
+  --hairline: 0.6pt solid var(--rule);
+}
+
+html {
+  font-family: 'CV Manrope', 'CV Manrope Ext', sans-serif;
+  font-size: 9pt;
+  line-height: 1.45;
+  color: var(--grey-800);
+  font-kerning: normal;
+  print-color-adjust: exact;
+}
+
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, p, ul, ol, dl, dd {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+p {
+  text-wrap: pretty;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Header: portrait, name and title, contact column */
+
+.head {
+  position: relative;
+  display: grid;
+  grid-template-columns: 25mm 1fr auto;
+  align-items: center;
+  column-gap: 7mm;
+  padding-bottom: 6mm;
+  border-bottom: var(--hairline);
+}
+
+/* The accent rule under the header, as on the site's section heads. */
+.head::after {
+  content: '';
+  position: absolute;
+  bottom: -0.6pt;
+  left: 0;
+  width: 14mm;
+  height: 1.2pt;
+  background: var(--acc);
+}
+
+.portrait {
+  display: block;
+  width: 25mm;
+  height: 25mm;
+  border-radius: 50%;
+  background: var(--portrait-bg);
+  object-fit: cover;
+}
+
+.name {
+  font-size: 24pt;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.job-title {
+  margin-top: 1.8mm;
+  font-size: 11pt;
+  letter-spacing: -0.01em;
+  color: var(--grey-600);
+}
+
+.contact-list {
+  margin-top: 1.2mm;
+  font-size: 8.4pt;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* Sections: a label column and a content column. The rule closes a section rather than opening
+   it, so a section pushed to the next page leaves no orphaned rule at the foot of the previous one. */
+
+.sec {
+  display: grid;
+  grid-template-columns: var(--label-col) 1fr;
+  column-gap: var(--gap);
+  padding: 4.2mm 0;
+  border-bottom: var(--hairline);
+}
+
+.sec-label {
+  position: relative;
+  padding-left: 3.4mm;
+  font-size: 8.4pt;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.sec-label::before {
+  content: '';
+  position: absolute;
+  top: calc(0.675em - 0.7mm);
+  left: 0;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+.sec-body {
+  min-width: 0;
+}
+
+.sec-body > p + p {
+  margin-top: 1.8mm;
+}
+
+.lead {
+  font-size: 10.4pt;
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}

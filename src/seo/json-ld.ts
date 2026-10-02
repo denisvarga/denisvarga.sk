@@ -48,7 +48,7 @@ export function profileJsonLd(lang: Lang, portraitPath: string): Record<string, 
           description: head.description,
           email: `mailto:${head.email}`,
           telephone: '+421902074830',
-          sameAs: ['https://github.com/denisvarga'],
+          sameAs: ['https://github.com/denisvarga', 'https://www.linkedin.com/in/denisvarg/'],
           worksFor: [
             { '@type': 'Organization', name: 'GrandPano', url: 'https://grandpano.sk/' },
             { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
