@@ -3,9 +3,9 @@ import type { Copy } from './types';
 export const copyEn: Copy = {
   nav: { items: ['About', 'AI', 'Work'], contact: 'Contact' },
   hero: {
-    sub: 'AI developer, agents & automation',
+    sub: 'AI developer with a product mindset',
     title: "Hi, I'm *Denis.*",
-    lead: "Anything reasonable can be automated. I build AI agents, automations and custom software that takes the routine off people's hands.",
+    lead: 'Almost every problem has a solution you can build. Web apps, AI agents and internal tools - fast with AI, and with a sensible approach so they make business sense too.',
     cta1: 'My work',
     cta2: 'Ask my AI agent',
     badge: 'Open to projects and roles',
@@ -13,7 +13,7 @@ export const copyEn: Copy = {
   about: {
     label: 'About',
     title: 'Over ten years of development. Now with AI in *every step.*',
-    body: "I started in 2015 with an agency internship, went through graphic design and print, and since 2017 I've been building custom software - websites, stores, apps and internal tools. Today I work AI-first: I write code with Claude Code and Codex, put agents wherever work repeats, and whatever I don't know yet, I learn fast. I have yet to meet a reasonable problem that can't be solved.",
+    body: "I started in 2015 with an agency internship, went through graphic design and print, and since 2017 I've been building custom software - websites, stores, apps and internal tools. Today I work AI-first: I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. Whatever I don't know yet, I learn fast. I have yet to meet a reasonable problem that couldn't be solved with the right build.",
     facts: [
       { label: 'AI', value: 'Agents, MCP, Claude Code, Codex' },
       { label: 'I build', value: 'React, Next.js, WordPress, Vue.js' },
@@ -23,8 +23,8 @@ export const copyEn: Copy = {
   exp: { label: 'Experience', title: 'My *path*' },
   ai: {
     label: 'AI',
-    title: 'I leave the routine *to agents.*',
-    lead: "I look for work someone does by hand every week. If it makes sense, I automate it. If it doesn't, I suggest simplifying or dropping it - that saves time too. After that, a person only checks the result.",
+    title: 'AI writes, I *decide.*',
+    lead: 'I hand agents what they do faster: code, tests, research and repetitive work. I decide what the product should do, how to build it and whether it makes business sense. I always check the result myself.',
     tools: [
       {
         name: 'Claude Code & Codex',
