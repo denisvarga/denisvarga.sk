@@ -1,0 +1,48 @@
+.contact {
+  position: relative;
+  padding: 14vh var(--side) 28px;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.title {
+  max-width: 980px;
+  font-size: clamp(42px, 6.4vw, 104px);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.body {
+  max-width: 540px;
+  margin: 0;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.55;
+  color: var(--grey-800);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.link {
+  padding: 18px 28px;
+  font-size: 17px;
+}

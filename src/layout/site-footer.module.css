@@ -1,0 +1,25 @@
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid rgb(19 20 22 / 0.14);
+  font-size: 13px;
+  color: var(--grey-600);
+}
+
+.top {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--grey-600);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .top:hover {
+    color: var(--ink);
+  }
+}

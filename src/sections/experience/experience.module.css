@@ -1,0 +1,78 @@
+.experience {
+  position: relative;
+  padding: 10vh var(--side);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--grey-600);
+}
+
+.card {
+  padding: 8px clamp(20px, 3vw, 40px);
+  border: 1px solid rgb(19 20 22 / 0.07);
+  border-radius: 22px;
+  background: rgb(255 255 255 / 0.6);
+}
+
+.job {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  padding: 26px 0;
+  border-top: 1px solid rgb(19 20 22 / 0.1);
+}
+
+.job:first-child {
+  border-top: 0;
+}
+
+.period {
+  flex: 0 0 130px;
+  padding-top: 5px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey-600);
+}
+
+.who {
+  display: flex;
+  flex: 1 1 240px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.company {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.role {
+  font-size: 14px;
+  color: var(--grey-600);
+}
+
+.text {
+  flex: 1.6 1 340px;
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--grey-800);
+  text-wrap: pretty;
+}
