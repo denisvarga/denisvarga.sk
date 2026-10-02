@@ -3,9 +3,9 @@ import type { Copy } from './types';
 export const copySk: Copy = {
   nav: { items: ['O mne', 'AI', 'Projekty'], contact: 'Kontakt' },
   hero: {
-    sub: 'AI developer, agenti a automatizácie',
+    sub: 'AI developer s produktovým myslením',
     title: 'Ahoj, som *Denis.*',
-    lead: 'Všetko rozumné sa dá zautomatizovať. Staviam AI agentov, automatizácie a softvér na mieru, ktorý robí rutinu za ľudí.',
+    lead: 'Na takmer každý problém sa dá postaviť riešenie. Webové aplikácie, AI agenti aj interné nástroje - s AI rýchlo, s rozumným prístupom tak, aby dávali zmysel aj biznisu.',
     cta1: 'Moja práca',
     cta2: 'Spýtať sa môjho AI agenta',
     badge: 'Otvorený projektom aj pozíciám',
@@ -13,7 +13,7 @@ export const copySk: Copy = {
   about: {
     label: 'O mne',
     title: 'Vyše desať rokov vývoja. Dnes s AI v *každom kroku.*',
-    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru - weby, e-shopy, aplikácie aj interné nástroje. Dnes robím AI-first: kód píšem s Claude Code a Codexom, agentov nasadzujem všade, kde sa práca opakuje, a čo ešte neviem, rýchlo sa doučím. Rozumný problém, ktorý sa nedá vyriešiť, som zatiaľ nestretol.',
+    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru - weby, e-shopy, aplikácie aj interné nástroje. Dnes robím AI-first: kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a biznisu. Čo ešte neviem, rýchlo sa doučím. Rozumný problém, na ktorý by sa nedalo postaviť riešenie, som zatiaľ nestretol.',
     facts: [
       { label: 'AI', value: 'Agenti, MCP, Claude Code, Codex' },
       { label: 'Vyvíjam', value: 'React, Next.js, WordPress, Vue.js' },
@@ -23,8 +23,8 @@ export const copySk: Copy = {
   exp: { label: 'Skúsenosti', title: 'Moja *cesta*' },
   ai: {
     label: 'AI',
-    title: 'Rutinu nechávam *agentom.*',
-    lead: 'Hľadám prácu, ktorú niekto každý týždeň robí ručne. Ak dáva zmysel, zautomatizujem ju. Ak nie, navrhnem ju zjednodušiť alebo zrušiť - aj to šetrí čas. Človek potom už len kontroluje výsledok.',
+    title: 'AI píše, ja *rozhodujem.*',
+    lead: 'Agentom nechávam, čo zvládnu rýchlejšie: kód, testy, rešerše a opakujúcu sa prácu. Ja riešim, čo má produkt robiť, ako ho postaviť a či dáva zmysel pre biznis. Výsledok vždy kontrolujem sám.',
     tools: [
       {
         name: 'Claude Code a Codex',

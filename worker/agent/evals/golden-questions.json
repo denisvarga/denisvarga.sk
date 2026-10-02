@@ -163,6 +163,17 @@
     }
   },
   {
+    "id": "product-mindset",
+    "lang": "en",
+    "question": "Is Denis just a coder, or does he think about the product and the business too?",
+    "expect": {
+      "mustInclude": [
+        "product"
+      ],
+      "note": "Product and business thinking: what the solution should bring and whether it makes sense; AI for speed, decisions his."
+    }
+  },
+  {
     "id": "contact-sk",
     "lang": "sk",
     "question": "Ako môžem Denisa kontaktovať?",
