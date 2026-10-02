@@ -1,0 +1,42 @@
+.not-found {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  min-height: 100svh;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 48px var(--side);
+}
+
+.not-found-code {
+  margin: 0 0 8px;
+  font-size: clamp(96px, 18vw, 220px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.not-found-message {
+  margin: 0;
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.not-found-message + .not-found-message {
+  color: var(--grey-600);
+}
+
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.not-found-link {
+  padding: 16px 26px;
+  font-size: 15px;
+}
