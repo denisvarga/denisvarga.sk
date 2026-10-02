@@ -17,6 +17,13 @@ function expectApiHeaders(res: Response) {
   expect(res.headers.get('Permissions-Policy')).toContain('camera=()');
 }
 
+describe('worker module', () => {
+  // workerd refuses a main module whose exports are not handlers, so constants must stay private.
+  it('exports only the default handler', async () => {
+    expect(Object.keys(await import('./index'))).toEqual(['default']);
+  });
+});
+
 describe('worker app', () => {
   it('sets API security headers on success, client errors and 404s', async () => {
     const { env } = makeEnv();

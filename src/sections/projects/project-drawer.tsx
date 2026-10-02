@@ -125,6 +125,7 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
               alt={project.name}
               width={PROJECT_IMAGE_SIZE.width}
               height={PROJECT_IMAGE_SIZE.height}
+              loading="lazy"
               decoding="async"
             />
           </div>

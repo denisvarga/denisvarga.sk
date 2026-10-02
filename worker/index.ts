@@ -4,7 +4,7 @@ import { secureHeaders } from 'hono/secure-headers';
 import { askError, logEvent } from './ask/errors';
 import { askRoute } from './routes/ask';
 
-export const MAX_BODY_BYTES = 48 * 1024;
+const MAX_BODY_BYTES = 48 * 1024;
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
