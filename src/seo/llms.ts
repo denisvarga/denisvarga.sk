@@ -14,6 +14,7 @@ function contactLines(): string[] {
     `- Email (English): ${EN.email}`,
     `- Email (Slovak): ${SK.email}`,
     `- Phone: ${contact.en.phone}`,
+    '- LinkedIn: https://www.linkedin.com/in/denisvarg/',
     `- Source code of this site: ${SOURCE_URL}`,
   ];
 }

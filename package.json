@@ -24,6 +24,7 @@
     "images": "tsx scripts/build-images.ts",
     "og": "tsx scripts/build-og-image.ts",
     "ascii": "tsx scripts/build-ascii-portrait.ts",
+    "cv": "pnpm build && tsx scripts/build-cv-pdf.ts",
     "icons": "tsx scripts/build-icons.ts",
     "db:migrate:local": "wrangler d1 migrations apply cv-chat --local",
     "db:migrate:remote": "wrangler d1 migrations apply cv-chat --remote",

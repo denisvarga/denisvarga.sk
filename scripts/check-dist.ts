@@ -23,6 +23,8 @@ const REQUIRED_ARTIFACTS = [
   'og-image-en.jpg',
   'favicon.svg',
   'apple-touch-icon.png',
+  'cv/denis-varga-cv.pdf',
+  'cv/denis-varga-cv-en.pdf',
 ];
 const PAGES = [
   { file: 'index.html', lang: 'sk', canonical: 'https://denisvarga.sk/' },
