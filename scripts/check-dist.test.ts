@@ -42,6 +42,8 @@ const FIXTURE: Record<string, string> = {
   'client/_headers': '',
   'client/robots.txt': '',
   'client/sitemap.xml': '',
+  'client/llms.txt': '',
+  'client/llms-full.txt': '',
   'client/humans.txt': '',
   'client/.well-known/security.txt': '',
   'client/og-image.jpg': '',

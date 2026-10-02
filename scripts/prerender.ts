@@ -38,7 +38,7 @@ async function headAssets(): Promise<HeadAssets> {
 const entryFile = (await readdir(SSR_DIR)).find((f) => /^entry-prerender\.m?js$/.test(f));
 if (!entryFile) throw new Error(`No entry-prerender bundle in ${SSR_DIR}/`);
 
-const { renderApp, renderNotFound } = (await import(
+const { renderApp, renderNotFound, buildLlmsTxt, buildLlmsFullTxt } = (await import(
   pathToFileURL(join(SSR_DIR, entryFile)).href
 )) as typeof import('../src/entry-prerender');
 
@@ -70,5 +70,9 @@ console.log('prerendered: 404.html');
 const buildDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Bratislava' }).format(new Date());
 await writeFile(join(CLIENT_DIR, 'sitemap.xml'), buildSitemap(buildDate));
 console.log(`sitemap.xml: lastmod ${buildDate}`);
+
+await writeFile(join(CLIENT_DIR, 'llms.txt'), buildLlmsTxt());
+await writeFile(join(CLIENT_DIR, 'llms-full.txt'), buildLlmsFullTxt());
+console.log('llms.txt, llms-full.txt');
 
 await rm(SSR_DIR, { recursive: true, force: true });

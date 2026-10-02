@@ -15,6 +15,8 @@ const REQUIRED_ARTIFACTS = [
   '_headers',
   'robots.txt',
   'sitemap.xml',
+  'llms.txt',
+  'llms-full.txt',
   'humans.txt',
   '.well-known/security.txt',
   'og-image.jpg',
