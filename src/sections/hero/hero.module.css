@@ -134,4 +134,15 @@
   .overlay {
     display: none;
   }
+
+  /* Below 900px the portrait sits under the text, so the design's side-by-side width cap only
+     squeezed the column; the text takes the full width instead. */
+  .text {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .title {
+    font-size: clamp(48px, 14vw, 96px);
+  }
 }

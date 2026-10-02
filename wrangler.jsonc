@@ -6,6 +6,7 @@
   "compatibility_date": "2026-10-02",
   "workers_dev": true,
   "preview_urls": false,
+  "routes": [{ "pattern": "denisvarga.sk", "custom_domain": true }],
   "assets": {
     "not_found_handling": "404-page",
     "run_worker_first": ["/api/*"]
