@@ -11,10 +11,10 @@ export const JOBS: readonly Job[] = [
   {
     period: { sk: '2018 - dnes', en: '2018 - now' },
     company: 'Freelance',
-    role: { sk: 'Fullstack a AI developer', en: 'Fullstack & AI developer' },
+    role: { sk: 'AI a fullstack developer', en: 'AI & fullstack developer' },
     text: {
-      sk: 'Pod menom Denva robím priamo pre klientov. Weby a e-shopy od prvého náčrtu po server, automatizácie, AI agenti a vlastné MCP servery.',
-      en: 'Under the name Denva I work directly with clients. Sites and stores from the first sketch to the server, automations, AI agents and custom MCP servers.',
+      sk: 'Pod menom Denva robím priamo pre klientov: AI agenti, automatizácie a vlastné MCP servery, k tomu weby, e-shopy a aplikácie od prvého náčrtu po server.',
+      en: 'Under the name Denva I work directly with clients: AI agents, automations and custom MCP servers, plus websites, stores and apps from the first sketch to the server.',
     },
   },
   {
