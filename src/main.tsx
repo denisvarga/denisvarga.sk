@@ -6,7 +6,6 @@ import './styles/reveal.css';
 import './not-found/not-found.css';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { App } from './app';
-import { logConsoleGreeting } from './lib/console-greeting';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root is missing from index.html');
@@ -23,4 +22,5 @@ if (root.firstElementChild) {
   createRoot(root).render(app);
 }
 
-logConsoleGreeting(lang);
+// The greeting carries the ASCII portrait, so it loads as its own chunk after hydration.
+void import('./lib/console-greeting').then(({ logConsoleGreeting }) => logConsoleGreeting(lang));

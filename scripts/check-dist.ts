@@ -13,6 +13,7 @@ const REQUIRED_ARTIFACTS = [
   'humans.txt',
   '.well-known/security.txt',
   'og-image.jpg',
+  'og-image-en.jpg',
   'favicon.svg',
   'apple-touch-icon.png',
 ];

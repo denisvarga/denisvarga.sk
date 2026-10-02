@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#ECECE9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5.75 4 56 56">
+  <style>.f{fill:#131416}.s{fill:none;stroke:#131416}@media (prefers-color-scheme:dark){.f{fill:#ECECE9}.s{stroke:#ECECE9}}</style>
   <g transform="translate(-3.5 0)">
-    <path d="M13 21V43H19A11 11 0 0 0 19 21Z" fill="none" stroke="#131416" stroke-width="6"/>
-    <path d="M35 18H41.2L44.5 32.2L47.8 18H54L47.5 46H41.5Z" fill="#131416"/>
+    <path class="s" d="M13 21V43H19A11 11 0 0 0 19 21Z" stroke-width="6"/>
+    <path class="f" d="M35 18H41.2L44.5 32.2L47.8 18H54L47.5 46H41.5Z"/>
     <circle cx="58.5" cy="43" r="3" fill="#F2541B"/>
   </g>
 </svg>

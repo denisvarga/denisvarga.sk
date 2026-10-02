@@ -34,17 +34,33 @@ describe('buildHeadTags', () => {
     expect(attrs(doc, 'meta[property="og:locale:alternate"]', 'content')).toEqual([alternate]);
   });
 
-  it('emits the approved copy, icons, OG image and both font preloads, but no charset or viewport', () => {
+  it.each([
+    ['sk', 'https://denisvarga.sk/og-image.jpg', /^Denis Varga, AI developer s produktovým myslením\./],
+    ['en', 'https://denisvarga.sk/og-image-en.jpg', /^Denis Varga, AI developer with a product mindset\./],
+  ] as const)('%s: its own share image for Open Graph and X, with size and alt text', (lang, url, alt) => {
+    const doc = parseHead(buildHeadTags(lang, FONTS));
+    expect(attrs(doc, 'meta[property="og:image"]', 'content')).toEqual([url]);
+    expect(attrs(doc, 'meta[name="twitter:image"]', 'content')).toEqual([url]);
+    expect(attrs(doc, 'meta[property="og:image:width"]', 'content')).toEqual(['1200']);
+    expect(attrs(doc, 'meta[property="og:image:height"]', 'content')).toEqual(['630']);
+    const alts = [...attrs(doc, 'meta[property="og:image:alt"]', 'content'), ...attrs(doc, 'meta[name="twitter:image:alt"]', 'content')];
+    expect(alts).toHaveLength(2);
+    expect(new Set(alts).size).toBe(1);
+    expect(alts[0]).toMatch(alt);
+  });
+
+  it('emits the approved copy, icons and both font preloads, but no charset or viewport', () => {
     const html = buildHeadTags('sk', FONTS);
     const doc = parseHead(html);
     expect(doc.title).toBe('Denis Varga | AI developer a WordPress špecialista');
-    expect(attrs(doc, 'meta[property="og:image"]', 'content')).toEqual(['https://denisvarga.sk/og-image.jpg']);
     expect(attrs(doc, 'meta[name="twitter:card"]', 'content')).toEqual(['summary_large_image']);
     expect(attrs(doc, 'meta[name="theme-color"]', 'content')).toEqual(['#ECECE9']);
     expect(attrs(doc, 'link[rel="icon"]', 'href')).toEqual(['/favicon.svg']);
     expect(attrs(doc, 'link[rel="apple-touch-icon"]', 'href')).toEqual(['/apple-touch-icon.png']);
     expect(attrs(doc, 'link[rel="preload"][as="font"][crossorigin]', 'href')).toEqual(FONTS);
-    expect(html).toMatch(/^<!-- Ahoj, zvedavec\. \/ Hi, curious one\./);
+    expect(html).toMatch(/^<!--/);
+    expect(html).toContain('Ahoj, zvedavec. / Hi, curious one.');
+    expect(html).toContain('sudo hire denis');
     expect(html).not.toMatch(/charset|viewport/);
   });
 

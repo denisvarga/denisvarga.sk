@@ -36,9 +36,6 @@ export const headCopy: Localized<HeadCopy> = {
   },
 };
 
-export const HEAD_COMMENT =
-  '<!-- Ahoj, zvedavec. / Hi, curious one. Source: https://github.com/denisvarga/denisvarga.sk - try "sudo hire denis" in the chat. -->';
-
 export const notFoundCopy = {
   code: '404',
   title: '404 | Denis Varga',
