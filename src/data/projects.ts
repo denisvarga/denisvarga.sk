@@ -20,7 +20,7 @@ export interface Project {
   readonly image: string;
 }
 
-export const PROJECT_IMAGE_SIZE = { width: 768, height: 480 } as const;
+export const PROJECT_IMAGE_SIZE = { width: 1280, height: 800 } as const;
 
 export const PROJECTS: readonly Project[] = [
   {
