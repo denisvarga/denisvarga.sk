@@ -1,0 +1,11 @@
+/* TEAM */
+Developer: Denis Varga
+Contact: hello@denisvarga.sk
+From: Slovakia
+
+/* SITE */
+Language: Slovak / English
+Standards: HTML, CSS, TypeScript
+Components: React, Vite, Hono, Three.js, Lenis, zod
+Hosting: Cloudflare Workers
+Source: https://github.com/denisvarga/denisvarga.sk

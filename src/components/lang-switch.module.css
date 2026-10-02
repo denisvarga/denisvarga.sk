@@ -1,0 +1,17 @@
+/* Dark tone (menu overlay footer): active #ECECE9, inactive #5A5C60. */
+.switch {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--grey-600);
+}
+
+.link,
+.link:hover {
+  padding: 8px 4px;
+  color: var(--grey-600);
+}
+
+.link[aria-current='true'] {
+  color: var(--bg);
+}

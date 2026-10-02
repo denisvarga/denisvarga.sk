@@ -1,0 +1,19 @@
+.heading {
+  margin: 0;
+  font-weight: 500;
+}
+
+.light {
+  font-weight: 300;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+/* Shared h2 style of every section except Kontakt. */
+.section-title {
+  font-size: clamp(38px, 5vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}

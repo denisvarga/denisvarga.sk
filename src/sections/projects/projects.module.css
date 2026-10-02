@@ -1,0 +1,194 @@
+.section {
+  position: relative;
+  padding: 14vh var(--side) 10vh;
+}
+
+.inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 64px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.head-text {
+  flex: 1 1 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--grey-600);
+}
+
+.title {
+  text-wrap: balance;
+}
+
+.body {
+  flex: 0 1 420px;
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--grey-800);
+  text-wrap: pretty;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Full bleed; the side padding aligns the first card with the 1240px column. */
+.track {
+  --rail-pad: max(var(--side), calc(50vw - 620px));
+
+  display: flex;
+  gap: 20px;
+  margin: 0 calc(50% - 50vw);
+  padding: 0 var(--rail-pad) 6px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--rail-pad);
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: 0 0 min(82vw, 540px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-snap-align: start;
+}
+
+.media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  background: #dcdcd8;
+  cursor: pointer;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s var(--ease);
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.num {
+  font-family: var(--ff-mono), monospace;
+  font-size: 12px;
+  color: var(--grey-600);
+}
+
+.name {
+  margin: 0;
+  font-size: clamp(26px, 2.6vw, 36px);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.desc {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--grey-700);
+  text-wrap: pretty;
+}
+
+.more,
+.arrow {
+  border: 1px solid rgb(19 20 22 / 0.2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+
+.more {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(19 20 22 / 0.12);
+}
+
+.progress-bar {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: scaleX(0.1);
+  transform-origin: 0 50%;
+}
+
+.arrow {
+  width: 48px;
+  height: 48px;
+  font-size: 18px;
+}
+
+@media (hover: hover) {
+  .media:hover .img {
+    transform: scale(1.04);
+  }
+
+  .more:hover,
+  .arrow:hover {
+    background: var(--ink);
+    color: #fff;
+  }
+}

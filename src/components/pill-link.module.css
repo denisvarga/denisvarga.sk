@@ -1,0 +1,38 @@
+/* Pill buttons and links (hero CTAs, contact links). Padding and font size come from the consumer. */
+.pill {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform 0.6s var(--ease),
+    background 0.3s,
+    border-color 0.3s;
+}
+
+.dark,
+.dark:hover {
+  border: 0;
+  background: var(--ink);
+  color: #fff;
+}
+
+.outline {
+  border: 1px solid rgb(19 20 22 / 0.22);
+  background: rgb(255 255 255 / 0.4);
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .dark:hover {
+    background: var(--acc);
+  }
+
+  .outline:hover {
+    border-color: var(--ink);
+    background: #fff;
+  }
+}
