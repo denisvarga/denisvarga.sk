@@ -1,7 +1,6 @@
 import { prerender } from 'react-dom/static';
 import { App } from './app';
-
-export type Lang = 'sk' | 'en';
+import type { Lang } from './i18n/types';
 
 export async function renderApp(lang: Lang): Promise<string> {
   const { prelude } = await prerender(<App lang={lang} />);

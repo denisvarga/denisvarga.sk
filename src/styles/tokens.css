@@ -1,0 +1,22 @@
+:root {
+  --ink: #131416;
+  --bg: #ecece9;
+  --paper: #f4f4f2;
+  --grey-800: #2e3034;
+  --grey-750: #3a3b3e;
+  --grey-700: #3e4044;
+  --grey-600: #5a5c60;
+  --grey-500: #8a8c90;
+  --grey-450: #9a9ca0;
+  --grey-400: #a3a5a9;
+  --grey-300: #b8babe;
+  --grey-200: #d6d6d3;
+  --acc: #f2541b;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-menu: cubic-bezier(0.76, 0, 0.24, 1);
+  --side: clamp(20px, 4.4vw, 64px);
+  --max: 1240px;
+  --max-hero: 1560px;
+  --ff: 'Manrope';
+  --ff-mono: 'JetBrains Mono';
+}
