@@ -8,8 +8,8 @@ const EGGS: Readonly<Record<string, EggCopy>> = {
     en: "Commands: help, whoami, sudo hire denis. Otherwise ask me about Denis's work, experience or projects.",
   },
   whoami: {
-    sk: 'visitor@denisvarga.sk - zvedavý návštevník. Presne takých Denis rád stretáva.',
-    en: 'visitor@denisvarga.sk - a curious visitor. Exactly the kind Denis likes to meet.',
+    sk: 'Zvedavý návštevník. Presne takých Denis rád stretáva - napíšte mu na hello@denisvarga.sk.',
+    en: 'A curious visitor. Exactly the kind Denis likes to meet - write to him at hello@denisvarga.dev.',
   },
   'hire denis': {
     sk: 'Permission denied. Skúste to so sudo.',
