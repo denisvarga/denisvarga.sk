@@ -71,7 +71,7 @@ export const copySk: Copy = {
   stack: { label: 'Nástroje', title: 'S čím *pracujem*' },
   contact: {
     title: 'Zaujal som vás? *Ozvite sa mi.*',
-    body: 'Chceli by ste ma vo svojom tíme alebo spolupracovať na projekte? Napíšte mi, rád sa porozprávame.',
+    body: 'Chceli by ste ma vo svojom tíme alebo spolupracovať na projekte? Napíšte mi, rád sa porozprávam.',
     cv: 'Stiahnuť CV',
     top: 'Späť hore',
   },
