@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { askSchema, cleanContent, lastUserMessage } from './schema';
+import { askSchema, lastUserMessage } from './schema';
 
 const user = (content: string) => ({ role: 'user', content });
 const assistant = (content: string) => ({ role: 'assistant', content });
@@ -9,6 +9,13 @@ const body = (messages: unknown[], extra: Record<string, unknown> = {}) => ({
   turnstileToken: 't',
   ...extra,
 });
+
+/** The parsed sig of the middle assistant turn, or 'rejected' when the whole request fails. */
+function sigOf(sig: unknown): string | undefined {
+  const parsed = askSchema.safeParse(body([user('a'), { ...assistant('b'), sig }, user('c')]));
+  const turn = parsed.success ? parsed.data.messages[1] : undefined;
+  return turn?.role === 'assistant' ? turn.sig : 'rejected';
+}
 
 describe('askSchema', () => {
   it('accepts a single user question', () => {
@@ -50,16 +57,17 @@ describe('askSchema', () => {
     expect(askSchema.safeParse(body([user('a')], { turnstileToken: 't'.repeat(2049) })).success).toBe(false);
   });
 
+  it('keeps a string sig on assistant turns and turns a malformed one into a missing one', () => {
+    expect(sigOf('abc_-')).toBe('abc_-');
+    expect(sigOf(undefined)).toBeUndefined();
+    expect(sigOf(42)).toBeUndefined();
+    expect(sigOf('s'.repeat(129))).toBeUndefined();
+  });
+
   it('measures content after trimming and stripping control characters', () => {
     expect(askSchema.safeParse(body([user(' \u0000\u0007 ')])).success).toBe(false);
     const padded = askSchema.safeParse(body([user(`  ${'x'.repeat(500)}\u0000  `)]));
     expect(padded.success).toBe(true);
     if (padded.success) expect(lastUserMessage(padded.data)).toBe('x'.repeat(500));
-  });
-});
-
-describe('cleanContent', () => {
-  it('keeps newlines and tabs, normalises CRLF and drops other controls', () => {
-    expect(cleanContent('a\r\nb\tc\u0000\u001b\u009fd')).toBe('a\nb\tcd');
   });
 });

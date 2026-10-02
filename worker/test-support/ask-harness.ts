@@ -80,6 +80,7 @@ interface AskCall {
   readonly rawBody?: string;
   /** `null` removes a default header. */
   readonly headers?: Record<string, string | null>;
+  /** A path on http://localhost, or a full URL to pick the host. */
   readonly path?: string;
   readonly method?: string;
 }

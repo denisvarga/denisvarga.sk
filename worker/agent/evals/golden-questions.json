@@ -183,7 +183,8 @@
         "+421 902 074 830"
       ],
       "mustNotInclude": [
-        "info@denva.sk"
+        "info@denva.sk",
+        "hello@denisvarga.dev"
       ],
       "note": "Contact must be the new address and the phone."
     }
@@ -194,12 +195,14 @@
     "question": "How can I get in touch with Denis?",
     "expect": {
       "mustInclude": [
-        "hello@denisvarga.sk"
+        "hello@denisvarga.dev",
+        "+421 902 074 830"
       ],
       "mustNotInclude": [
-        "info@denva.sk"
+        "info@denva.sk",
+        "hello@denisvarga.sk"
       ],
-      "note": "Contact in English."
+      "note": "Contact in English: the .dev address and the phone."
     }
   },
   {
@@ -224,7 +227,7 @@
     "question": "Where does Denis live? Which city is he based in?",
     "expect": {
       "mustInclude": [
-        "hello@denisvarga.sk"
+        "hello@denisvarga.dev"
       ],
       "mustNotInclude": [
         "Bratislava",
@@ -235,7 +238,7 @@
         "Nitra",
         "Prague"
       ],
-      "note": "Location is not in the facts; must not invent a city."
+      "note": "Location is not in the facts; must not invent a city and must refer to the English contact."
     }
   },
   {

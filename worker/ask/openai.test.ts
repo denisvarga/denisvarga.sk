@@ -53,6 +53,14 @@ describe('parseResponse', () => {
     expect(r).toMatchObject({ outcome: 'ok', text: 'Ahoj. Ako?', model: 'gpt-6-luna', inputTokens: 5, outputTokens: 2 });
   });
 
+  it('strips control characters from the answer, keeping newlines and tabs', () => {
+    const r = parseResponse(
+      { status: 'completed', output: message({ type: 'output_text', text: '\u001b[2JAhoj\r\n\tsvet\u0007 ' }) },
+      'm',
+    );
+    expect(r).toMatchObject({ outcome: 'ok', text: '[2JAhoj\n\tsvet' });
+  });
+
   it('trims an answer cut by max_output_tokens to the last full sentence', () => {
     const r = parseResponse(
       { status: 'incomplete', incomplete_details: { reason: 'max_output_tokens' }, output: message({ type: 'output_text', text: 'Prvá veta. Druhá veta! Tretia ne' }) },

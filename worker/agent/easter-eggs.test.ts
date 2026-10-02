@@ -8,7 +8,9 @@ describe('easterEgg', () => {
     expect(easterEgg('whoami', 'en')).toBe('visitor@denisvarga.sk - a curious visitor. Exactly the kind Denis likes to meet.');
     expect(easterEgg('hire denis', 'sk')).toBe('Permission denied. Skúste to so sudo.');
     expect(easterEgg('sudo hire denis', 'sk')).toContain('hello@denisvarga.sk alebo zavoláte na +421 902 074 830');
-    expect(easterEgg('sudo hire denis', 'en')).toContain('email hello@denisvarga.sk or call +421 902 074 830');
+    expect(easterEgg('sudo hire denis', 'en')).toContain('email hello@denisvarga.dev or call +421 902 074 830');
+    expect(easterEgg('sudo hire denis', 'en')).not.toContain('denisvarga.sk');
+    expect(easterEgg('sudo hire denis', 'sk')).not.toContain('denisvarga.dev');
   });
 
   it('normalises case, whitespace and trailing punctuation', () => {

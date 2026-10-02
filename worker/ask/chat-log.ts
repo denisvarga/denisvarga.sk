@@ -1,3 +1,4 @@
+import { cleanContent } from './clean-text';
 import type { ModelResult } from './openai';
 
 export const FINALIZE_SQL =
@@ -5,11 +6,12 @@ export const FINALIZE_SQL =
 
 /**
  * Completes the reserved row. If this write fails the row stays `pending` and keeps counting
- * toward the daily cap, which is the safe direction.
+ * toward the daily cap, which is the safe direction. The answer is cleaned again here because
+ * `pnpm logs:recent` prints it to a terminal.
  */
 export async function finalizeRow(db: D1Database, id: number, result: ModelResult, latencyMs: number): Promise<void> {
   await db
     .prepare(FINALIZE_SQL)
-    .bind(result.text, result.model, latencyMs, result.inputTokens, result.outputTokens, result.outcome, id)
+    .bind(result.text === null ? null : cleanContent(result.text), result.model, latencyMs, result.inputTokens, result.outputTokens, result.outcome, id)
     .run();
 }

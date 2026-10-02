@@ -17,7 +17,7 @@ const EGGS: Readonly<Record<string, EggCopy>> = {
   },
   'sudo hire denis': {
     sk: '[sudo] heslo pre visitor: ******** Prístup povolený. Denis sa ozve hneď, ako mu napíšete na hello@denisvarga.sk alebo zavoláte na +421 902 074 830.',
-    en: '[sudo] password for visitor: ******** Access granted. Denis will get back to you as soon as you email hello@denisvarga.sk or call +421 902 074 830.',
+    en: '[sudo] password for visitor: ******** Access granted. Denis will get back to you as soon as you email hello@denisvarga.dev or call +421 902 074 830.',
   },
 };
 

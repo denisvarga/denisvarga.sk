@@ -1,25 +1,17 @@
 // zod/mini instead of the classic API: the classic build adds about 120 KB to the Worker bundle.
 import * as z from 'zod/mini';
 import { MAX_ASSISTANT_CONTENT, MAX_MESSAGES, MAX_TOTAL, MAX_USER_CONTENT } from '../../shared/ask-contract';
-
-// C0 controls except tab and newline, DEL and C1 controls.
-function isControl(code: number): boolean {
-  return (code < 0x20 && code !== 0x09 && code !== 0x0a) || (code >= 0x7f && code <= 0x9f);
-}
-
-export function cleanContent(value: string): string {
-  const normalized = value.replace(/\r\n?/g, '\n');
-  let out = '';
-  for (const ch of normalized) if (!isControl(ch.codePointAt(0) ?? 0)) out += ch;
-  return out.trim();
-}
+import { cleanContent } from './clean-text';
 
 const content = (max: number) =>
   z.pipe(z.pipe(z.string(), z.transform(cleanContent)), z.string().check(z.minLength(1), z.maxLength(max)));
 
+// A malformed signature only costs the turn (dropped later), never the whole request.
+const signature = z.catch(z.optional(z.string().check(z.maxLength(128))), undefined);
+
 const message = z.discriminatedUnion('role', [
   z.object({ role: z.literal('user'), content: content(MAX_USER_CONTENT) }),
-  z.object({ role: z.literal('assistant'), content: content(MAX_ASSISTANT_CONTENT) }),
+  z.object({ role: z.literal('assistant'), content: content(MAX_ASSISTANT_CONTENT), sig: signature }),
 ]);
 
 export const askSchema = z.object({
