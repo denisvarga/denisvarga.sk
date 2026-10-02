@@ -1,0 +1,176 @@
+/*
+ * Reveal contract (D-19):
+ * - [data-reveal] / [data-reveal='fade'] / [data-split] are hidden here and shown when
+ *   use-reveal sets data-in from its IntersectionObserver. React never renders data-in.
+ * - Split headings: <h2 data-split><span class="word-mask"><span class="word">..</span></span>..</h2>.
+ *   --i comes from the mask's position, so stagger needs no inline style.
+ * - [data-enter], [data-enter='fade'], [data-enter-split] are the hero's first-paint keyframes;
+ *   an ancestor with data-in switches them off so a language switch does not replay them.
+ * - Without data-js on <html> (JS failed or never loaded) a one-shot failsafe shows everything
+ *   after 3 s; use-reveal sets data-js once its observer exists, which cancels it.
+ */
+
+[data-reveal],
+[data-split],
+[data-enter],
+[data-enter-split] {
+  --d: 0ms;
+}
+
+[data-delay='0'] { --d: 0ms; }
+[data-delay='90'] { --d: 90ms; }
+[data-delay='100'] { --d: 100ms; }
+[data-delay='180'] { --d: 180ms; }
+[data-delay='200'] { --d: 200ms; }
+[data-delay='350'] { --d: 350ms; }
+[data-delay='550'] { --d: 550ms; }
+[data-delay='700'] { --d: 700ms; }
+[data-delay='800'] { --d: 800ms; }
+
+[data-reveal] {
+  opacity: 0;
+}
+
+[data-reveal]:not([data-reveal='fade']) {
+  transform: translateY(32px);
+}
+
+[data-reveal][data-in] {
+  opacity: 1;
+  transition:
+    opacity 1s var(--ease) var(--d),
+    transform 1.3s var(--ease) var(--d);
+}
+
+[data-reveal]:not([data-reveal='fade'])[data-in] {
+  transform: none;
+}
+
+/* Fade targets keep their own transform (the hero image is positioned with one). */
+[data-reveal='fade'][data-in] {
+  transition: opacity 1.6s ease var(--d);
+}
+
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.06em 0.04em 0.16em 0;
+  margin: -0.06em 0.2em -0.16em 0;
+}
+
+.word {
+  display: inline-block;
+}
+
+[data-split] .word {
+  transform: translateY(115%);
+}
+
+[data-split][data-in] .word {
+  transform: none;
+  transition: transform 1.25s var(--ease) calc(var(--d) + var(--i, 0) * 55ms);
+}
+
+.word-mask:nth-child(1) { --i: 0; }
+.word-mask:nth-child(2) { --i: 1; }
+.word-mask:nth-child(3) { --i: 2; }
+.word-mask:nth-child(4) { --i: 3; }
+.word-mask:nth-child(5) { --i: 4; }
+.word-mask:nth-child(6) { --i: 5; }
+.word-mask:nth-child(7) { --i: 6; }
+.word-mask:nth-child(8) { --i: 7; }
+.word-mask:nth-child(9) { --i: 8; }
+.word-mask:nth-child(10) { --i: 9; }
+.word-mask:nth-child(11) { --i: 10; }
+.word-mask:nth-child(12) { --i: 11; }
+.word-mask:nth-child(13) { --i: 12; }
+.word-mask:nth-child(14) { --i: 13; }
+.word-mask:nth-child(15) { --i: 14; }
+.word-mask:nth-child(16) { --i: 15; }
+.word-mask:nth-child(17) { --i: 16; }
+.word-mask:nth-child(18) { --i: 17; }
+.word-mask:nth-child(19) { --i: 18; }
+.word-mask:nth-child(20) { --i: 19; }
+.word-mask:nth-child(21) { --i: 20; }
+.word-mask:nth-child(22) { --i: 21; }
+.word-mask:nth-child(23) { --i: 22; }
+.word-mask:nth-child(24) { --i: 23; }
+
+[data-pulse] {
+  animation: pulse 1600ms linear infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes enter-rise {
+  from {
+    transform: translateY(32px);
+  }
+}
+
+@keyframes enter-word {
+  from {
+    transform: translateY(115%);
+  }
+}
+
+[data-enter] {
+  animation:
+    enter-fade 1s var(--ease) var(--d) both,
+    enter-rise 1.3s var(--ease) var(--d) both;
+}
+
+[data-enter='fade'] {
+  animation: enter-fade 1.6s ease var(--d) both;
+}
+
+[data-enter-split] .word {
+  animation: enter-word 1.25s var(--ease) calc(var(--d) + var(--i, 0) * 55ms) both;
+}
+
+[data-in][data-enter],
+[data-in] [data-enter],
+[data-in] [data-enter-split] .word {
+  animation: none;
+}
+
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-failsafe-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+html:not([data-js]) [data-reveal]:not([data-in]) {
+  animation: reveal-failsafe 1s var(--ease) 3s forwards;
+}
+
+html:not([data-js]) [data-reveal='fade']:not([data-in]) {
+  animation-name: reveal-failsafe-fade;
+}
+
+html:not([data-js]) [data-split]:not([data-in]) .word {
+  animation: reveal-failsafe 1s var(--ease) 3s forwards;
+}
