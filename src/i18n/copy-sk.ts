@@ -16,7 +16,7 @@ export const copySk: Copy = {
     body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru - weby, e-shopy, aplikácie aj interné nástroje. Dnes robím AI-first: kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a biznisu. Čo ešte neviem, rýchlo sa doučím. Rozumný problém, na ktorý by sa nedalo postaviť riešenie, som zatiaľ nestretol.',
     facts: [
       { label: 'AI', value: 'Agenti, MCP, Claude Code, Codex' },
-      { label: 'Vyvíjam', value: 'React, Next.js, WordPress, Vue.js' },
+      { label: 'Vyvíjam', value: 'Full-stack, od nápadu po produkciu' },
       { label: 'Teraz', value: 'Otvorený projektom aj pozíciám' },
     ],
   },
