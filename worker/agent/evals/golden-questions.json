@@ -18,7 +18,7 @@
       "mustInclude": [
         "WooCommerce"
       ],
-      "note": "Design suggestion. Yes, custom WooCommerce without page builders."
+      "note": "Former design suggestion. Yes, custom WooCommerce without page builders."
     }
   },
   {
@@ -29,7 +29,7 @@
       "mustInclude": [
         "monitoring"
       ],
-      "note": "Design suggestion. Internal monitoring tool, not public."
+      "note": "Former design suggestion. Internal monitoring tool, not public."
     }
   },
   {
@@ -41,7 +41,7 @@
         "od januára",
         "od pondelka"
       ],
-      "note": "Design suggestion. Open to projects, long-term work and team roles; no invented dates."
+      "note": "Former design suggestion. Open to projects, long-term work and team roles; no invented dates."
     }
   },
   {
@@ -74,7 +74,7 @@
       "mustInclude": [
         "monitoring"
       ],
-      "note": "Design suggestion. Internal tool, not publicly available."
+      "note": "Former design suggestion. Internal tool, not publicly available."
     }
   },
   {
@@ -82,7 +82,84 @@
     "lang": "en",
     "question": "Is he available?",
     "expect": {
-      "note": "Design suggestion. Open to projects and team roles; no invented dates."
+      "note": "Former design suggestion. Open to projects and team roles; no invented dates."
+    }
+  },
+  {
+    "id": "suggest-sk-this-site",
+    "lang": "sk",
+    "question": "Ako vznikol tento web?",
+    "expect": {
+      "mustInclude": [
+        "agent"
+      ],
+      "note": "Site suggestion. Built by an AI agent team Denis directed, design to production in one afternoon."
+    }
+  },
+  {
+    "id": "suggest-sk-projects",
+    "lang": "sk",
+    "question": "Na akých projektoch robil?",
+    "expect": {
+      "mustInclude": [
+        "Pangeas"
+      ],
+      "note": "Site suggestion. Names projects from the portfolio fact only."
+    }
+  },
+  {
+    "id": "suggest-sk-new-role",
+    "lang": "sk",
+    "question": "Je otvorený novej pozícii?",
+    "expect": {
+      "mustInclude": [
+        "pozíc"
+      ],
+      "note": "Site suggestion. Yes, open to projects, long-term collaboration and team roles."
+    }
+  },
+  {
+    "id": "suggest-en-this-site",
+    "lang": "en",
+    "question": "How was this site built?",
+    "expect": {
+      "mustInclude": [
+        "agent"
+      ],
+      "note": "Site suggestion. AI agent team, Cloudflare Worker, GPT-6 Luna chat."
+    }
+  },
+  {
+    "id": "suggest-en-projects",
+    "lang": "en",
+    "question": "What projects has he worked on?",
+    "expect": {
+      "mustInclude": [
+        "Pangeas"
+      ],
+      "note": "Site suggestion. Names projects from the portfolio fact only."
+    }
+  },
+  {
+    "id": "suggest-en-new-role",
+    "lang": "en",
+    "question": "Is he open to a new role?",
+    "expect": {
+      "mustInclude": [
+        "role"
+      ],
+      "note": "Site suggestion. Yes, open to team roles and projects."
+    }
+  },
+  {
+    "id": "automation-philosophy",
+    "lang": "sk",
+    "question": "Dá sa u vás zautomatizovať úplne všetko?",
+    "expect": {
+      "mustInclude": [
+        "zjednoduš"
+      ],
+      "note": "Philosophy: everything reasonable can be automated; pointless work gets simplified or dropped instead."
     }
   },
   {
