@@ -63,4 +63,23 @@ describe('postAsk', () => {
     controller.abort();
     await expect(pending).resolves.toEqual({ ok: false, error: 'network' });
   });
+
+  it('combines the signals without AbortSignal.any (Safari before 17.4)', async () => {
+    const original = AbortSignal.any;
+    Reflect.deleteProperty(AbortSignal, 'any');
+    try {
+      const controller = new AbortController();
+      const fetchImpl = vi.fn<typeof fetch>(
+        (_url, init) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(new Error('aborted')));
+          }),
+      );
+      const pending = postAsk(request, { fetchImpl, signal: controller.signal });
+      controller.abort();
+      await expect(pending).resolves.toEqual({ ok: false, error: 'network' });
+    } finally {
+      AbortSignal.any = original;
+    }
+  });
 });

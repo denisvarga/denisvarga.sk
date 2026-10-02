@@ -64,9 +64,9 @@ describe('requestMessages', () => {
     expect(payload[0]).toEqual({ role: 'assistant', content: 'a2' });
   });
 
-  it('excludes failed replies', () => {
+  it('excludes failed replies together with their questions', () => {
     const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy' }]).messages;
-    expect(requestMessages(history, 'q3').map((m) => m.content)).toEqual(['q1', 'a1', 'q2', 'q3']);
+    expect(requestMessages(history, 'q2').map((m) => m.content)).toEqual(['q1', 'a1', 'q2']);
   });
 
   it('clamps each turn to its role limit', () => {

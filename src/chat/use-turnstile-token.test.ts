@@ -90,6 +90,21 @@ describe('createTokenSource', () => {
     expect(fake.api.reset).toHaveBeenCalledWith('widget-1');
   });
 
+  it('does not execute a solved widget again when the input is refocused', async () => {
+    const fake = fakeTurnstile();
+    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    source.warmUp();
+    await flush();
+    fake.options().callback?.('warm');
+    source.warmUp();
+    await flush();
+    expect(fake.api.execute).toHaveBeenCalledTimes(1);
+    await expect(source.getToken()).resolves.toBe('warm');
+    source.refresh();
+    fake.options().callback?.('next');
+    await expect(source.getToken()).resolves.toBe('next');
+  });
+
   it('stops the deadline while an interactive challenge is on screen', async () => {
     vi.useFakeTimers();
     const fake = fakeTurnstile();
@@ -126,7 +141,7 @@ describe('createTokenSource', () => {
     await expect(source.getToken()).resolves.toBe('early');
 
     source.refresh();
-    expect(fake.api.reset).toHaveBeenCalledTimes(1);
+    expect(fake.api.reset).toHaveBeenCalledTimes(2);
     fake.options().callback?.('stale');
     now += TOKEN_MAX_AGE_MS;
     const fresh = source.getToken();

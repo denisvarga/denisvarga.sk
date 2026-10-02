@@ -144,8 +144,11 @@ export function createTokenSource(container: HTMLElement, options: TokenSourceOp
 
   return {
     warmUp() {
+      // A stored token is still usable; executing again on a solved widget is undefined behaviour.
       ensureWidget().then(
-        () => execute(false),
+        () => {
+          if (!stored) execute(true);
+        },
         () => {},
       );
     },

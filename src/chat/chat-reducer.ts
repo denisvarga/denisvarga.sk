@@ -84,7 +84,8 @@ function clamp(message: ChatMessage): AskMessage {
  * The question itself is always the last entry.
  */
 export function requestMessages(history: readonly ChatMessage[], question: string): AskMessage[] {
-  const turns = history.filter((m) => !m.failed).map(clamp);
+  // A failed reply takes its question with it, so retries are not sent twice.
+  const turns = history.filter((m, i) => !m.failed && !(m.role === 'user' && history[i + 1]?.failed)).map(clamp);
   turns.push({ role: 'user', content: question.trim().slice(0, MAX_USER_CONTENT) });
   const recent = turns.slice(-MAX_MESSAGES);
   let total = recent.reduce((sum, m) => sum + m.content.length, 0);

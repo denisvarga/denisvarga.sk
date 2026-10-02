@@ -33,12 +33,22 @@ function readBody(body: unknown, httpOk: boolean): AskOutcome {
   return { ok: false, error: 'bad_response' };
 }
 
+// AbortSignal.any is missing before Safari 17.4, which the build target still covers.
+function anySignal(a: AbortSignal, b: AbortSignal): AbortSignal {
+  if (typeof AbortSignal.any === 'function') return AbortSignal.any([a, b]);
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  a.addEventListener('abort', abort, { once: true });
+  b.addEventListener('abort', abort, { once: true });
+  return controller.signal;
+}
+
 /** Never throws: every failure (HTTP, network, timeout, unexpected body) becomes an outcome. */
 export async function postAsk(request: AskRequest, options: PostAskOptions = {}): Promise<AskOutcome> {
   const { signal, timeoutMs = ASK_TIMEOUT_MS, fetchImpl = fetch } = options;
   const timeout = AbortSignal.timeout(timeoutMs);
-  const combined = signal ? AbortSignal.any([signal, timeout]) : timeout;
   try {
+    const combined = signal ? anySignal(signal, timeout) : timeout;
     const response = await fetchImpl(ASK_ENDPOINT, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },

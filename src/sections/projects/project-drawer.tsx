@@ -77,7 +77,13 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
         body.style.transform = 'none';
       });
     });
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      // Closing mid-step must not leave the hidden state behind for the next open.
+      body.style.transition = '';
+      body.style.opacity = '';
+      body.style.transform = '';
+    };
   }, [open, last]);
 
   const project = PROJECTS[last] ?? PROJECTS[0];
