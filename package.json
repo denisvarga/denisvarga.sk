@@ -23,6 +23,7 @@
     "images:fetch": "tsx scripts/fetch-project-images.ts",
     "images": "tsx scripts/build-images.ts",
     "og": "tsx scripts/build-og-image.ts",
+    "ascii": "tsx scripts/build-ascii-portrait.ts",
     "icons": "tsx scripts/build-icons.ts",
     "db:migrate:local": "wrangler d1 migrations apply cv-chat --local",
     "db:migrate:remote": "wrangler d1 migrations apply cv-chat --remote",

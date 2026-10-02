@@ -1,8 +1,20 @@
-import { HEAD_COMMENT, SITE_URL, canonicalUrl, headCopy, notFoundCopy } from '../i18n/head-copy';
-import { LANGS, type Lang } from '../i18n/types';
+import { SITE_URL, canonicalUrl, headCopy, notFoundCopy } from '../i18n/head-copy';
+import { HEAD_COMMENT } from './head-comment';
+import { LANGS, type Lang, type Localized } from '../i18n/types';
 import { personJsonLd, serializeJsonLd } from './json-ld';
 
-export const OG_IMAGE = { url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630 } as const;
+// Share cards from scripts/build-og-image.ts, one per language; the paths are files in public/.
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
+export const OG_IMAGES: Localized<{ readonly path: `/${string}.jpg`; readonly alt: string }> = {
+  sk: {
+    path: '/og-image.jpg',
+    alt: 'Denis Varga, AI developer s produktovým myslením. Webové aplikácie, AI agenti a interné nástroje.',
+  },
+  en: {
+    path: '/og-image-en.jpg',
+    alt: 'Denis Varga, AI developer with a product mindset. Web apps, AI agents and internal tools.',
+  },
+};
 export const THEME_COLOR = '#ECECE9';
 
 export function escapeHtml(value: string): string {
@@ -31,6 +43,7 @@ export function hreflangAlternates(): ReadonlyArray<readonly [hreflang: string, 
 export function buildHeadTags(lang: Lang, fontPreloads: readonly string[]): string {
   const copy = headCopy[lang];
   const other = LANGS.find((l) => l !== lang) ?? 'sk';
+  const image = { url: SITE_URL + OG_IMAGES[lang].path, alt: OG_IMAGES[lang].alt };
   return [
     HEAD_COMMENT,
     `<title>${escapeHtml(copy.title)}</title>`,
@@ -43,10 +56,13 @@ export function buildHeadTags(lang: Lang, fontPreloads: readonly string[]): stri
     meta('property', 'og:description', copy.description),
     meta('property', 'og:locale', copy.ogLocale),
     meta('property', 'og:locale:alternate', headCopy[other].ogLocale),
-    meta('property', 'og:image', OG_IMAGE.url),
-    meta('property', 'og:image:width', String(OG_IMAGE.width)),
-    meta('property', 'og:image:height', String(OG_IMAGE.height)),
+    meta('property', 'og:image', image.url),
+    meta('property', 'og:image:width', String(OG_IMAGE_SIZE.width)),
+    meta('property', 'og:image:height', String(OG_IMAGE_SIZE.height)),
+    meta('property', 'og:image:alt', image.alt),
     meta('name', 'twitter:card', 'summary_large_image'),
+    meta('name', 'twitter:image', image.url),
+    meta('name', 'twitter:image:alt', image.alt),
     ...sharedTags(fontPreloads),
     `<script type="application/ld+json">${serializeJsonLd(personJsonLd(lang))}</script>`,
   ].join('\n    ');
