@@ -2,12 +2,13 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Lang } from '../src/i18n/types';
-import { buildHeadTags, buildNotFoundHeadTags } from '../src/seo/head-tags';
+import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from '../src/seo/head-tags';
 import { buildSitemap } from '../src/seo/sitemap';
 
 const CLIENT_DIR = 'dist/client';
 const SSR_DIR = 'dist-ssr';
 const PRELOADED_FONTS = [/^manrope-latin-wght-normal-[\w-]+\.woff2$/, /^manrope-latin-ext-wght-normal-[\w-]+\.woff2$/];
+const PROFILE_PORTRAIT = /^denis-cutout-1024-[\w-]+\.webp$/;
 const HTML_LANG = /<html lang="[a-z]+">/;
 const MODULE_SCRIPT = /\s*<script type="module"[^>]*><\/script>/g;
 const MODULE_PRELOAD = /\s*<link rel="modulepreload"[^>]*>/g;
@@ -23,13 +24,15 @@ function fillTemplate(template: string, lang: Lang, head: string, body: string):
   return replaceOnce(replaceOnce(withLang, '<!--app-head-->', head), '<!--app-html-->', body);
 }
 
-async function fontPreloads(): Promise<string[]> {
+// Hashed asset names exist only after the client build, so the head resolves them from dist.
+async function headAssets(): Promise<HeadAssets> {
   const assets = await readdir(join(CLIENT_DIR, 'assets'));
-  return PRELOADED_FONTS.map((pattern) => {
+  const find = (pattern: RegExp) => {
     const matches = assets.filter((name) => pattern.test(name));
-    if (matches.length !== 1) throw new Error(`Expected one font asset for ${pattern}, found ${matches.length}`);
+    if (matches.length !== 1) throw new Error(`Expected one asset for ${pattern}, found ${matches.length}`);
     return `/assets/${matches[0]}`;
-  });
+  };
+  return { fonts: PRELOADED_FONTS.map(find), portrait: find(PROFILE_PORTRAIT) };
 }
 
 const entryFile = (await readdir(SSR_DIR)).find((f) => /^entry-prerender\.m?js$/.test(f));
@@ -40,14 +43,14 @@ const { renderApp, renderNotFound } = (await import(
 )) as typeof import('../src/entry-prerender');
 
 const template = await readFile(join(CLIENT_DIR, 'index.html'), 'utf8');
-const fonts = await fontPreloads();
+const assets = await headAssets();
 
 const pages: ReadonlyArray<{ lang: Lang; file: string }> = [
   { lang: 'sk', file: 'index.html' },
   { lang: 'en', file: 'en/index.html' },
 ];
 for (const { lang, file } of pages) {
-  const html = fillTemplate(template, lang, buildHeadTags(lang, fonts), await renderApp(lang));
+  const html = fillTemplate(template, lang, buildHeadTags(lang, assets), await renderApp(lang));
   await mkdir(join(CLIENT_DIR, file, '..'), { recursive: true });
   await writeFile(join(CLIENT_DIR, file), html);
   console.log(`prerendered: ${file}`);
@@ -59,7 +62,7 @@ if (scriptCount !== 1) throw new Error(`Expected one module script in the templa
 const staticTemplate = template.replace(MODULE_SCRIPT, '').replace(MODULE_PRELOAD, '');
 await writeFile(
   join(CLIENT_DIR, '404.html'),
-  fillTemplate(staticTemplate, 'sk', buildNotFoundHeadTags(fonts), await renderNotFound()),
+  fillTemplate(staticTemplate, 'sk', buildNotFoundHeadTags(assets.fonts), await renderNotFound()),
 );
 console.log('prerendered: 404.html');
 

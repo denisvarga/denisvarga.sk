@@ -16,7 +16,8 @@ interface MenuOverlayProps {
 }
 
 export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
-  const { t, ui } = useLang();
+  const { lang, t, ui } = useLang();
+  const links = contact[lang];
 
   return (
     <div
@@ -43,8 +44,8 @@ export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
       </nav>
       <div className={styles.footer}>
         <div className={styles.links}>
-          <a href={contact.emailHref}>{contact.email}</a>
-          <a href={contact.phoneHref}>{contact.phone}</a>
+          <a href={links.emailHref}>{links.email}</a>
+          <a href={links.phoneHref}>{links.phone}</a>
         </div>
         <LangSwitch />
       </div>

@@ -1,11 +1,13 @@
 import type { Lang, Localized } from './types';
 
-export const SITE_URL = 'https://denisvarga.sk';
 export const SOURCE_URL = 'https://github.com/denisvarga/denisvarga.sk';
-export const CONTACT_EMAIL = 'hello@denisvarga.sk';
 
 export interface HeadCopy {
+  /** Each language has its own domain; its page is served at the domain root. */
+  readonly origin: 'https://denisvarga.sk' | 'https://denisvarga.dev';
+  /** Where the prerendered page lives in dist/client, and its URL on localhost and workers.dev. */
   readonly path: '/' | '/en/';
+  readonly email: string;
   readonly title: string;
   readonly description: string;
   readonly jobTitle: string;
@@ -15,24 +17,28 @@ export interface HeadCopy {
 
 export const headCopy: Localized<HeadCopy> = {
   sk: {
+    origin: 'https://denisvarga.sk',
     path: '/',
-    title: 'Denis Varga | AI developer a WordPress špecialista',
+    email: 'hello@denisvarga.sk',
+    title: 'Denis Varga | AI developer s produktovým myslením',
     description:
-      'Denis Varga, AI developer a WordPress špecialista. Weby a e-shopy na mieru, WooCommerce, Vue.js, AI agenti, MCP servery a automatizácie.',
-    jobTitle: 'AI developer a WordPress špecialista',
+      'Webové aplikácie, AI agenti a interné nástroje. Vyše desať rokov vývoja, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
+    jobTitle: 'AI developer s produktovým myslením',
     ogLocale: 'sk_SK',
     consoleGreeting:
       'Ahoj, vidím, že sa pozeráte pod kapotu. Tento web beží na React 19, TypeScripte a Vite, servíruje ho jeden Cloudflare Worker s Hono a AI chat odpovedá cez OpenAI. Zdrojový kód: https://github.com/denisvarga/denisvarga.sk. Napíšte na hello@denisvarga.sk alebo skúste v chate: sudo hire denis',
   },
   en: {
+    origin: 'https://denisvarga.dev',
     path: '/en/',
-    title: 'Denis Varga | AI developer and WordPress specialist',
+    email: 'hello@denisvarga.dev',
+    title: 'Denis Varga | AI developer with a product mindset',
     description:
-      'Denis Varga, AI developer and WordPress specialist. Custom websites and stores, WooCommerce, Vue.js, AI agents, MCP servers and automations.',
-    jobTitle: 'AI developer and WordPress specialist',
+      'Web apps, AI agents and internal tools. Over ten years of development, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
+    jobTitle: 'AI developer with a product mindset',
     ogLocale: 'en_US',
     consoleGreeting:
-      'Hi, I see you are looking under the hood. This site runs on React 19, TypeScript and Vite, is served by a single Cloudflare Worker with Hono, and the AI chat answers through OpenAI. Source: https://github.com/denisvarga/denisvarga.sk. Write to hello@denisvarga.sk or try in the chat: sudo hire denis',
+      'Hi, I see you are looking under the hood. This site runs on React 19, TypeScript and Vite, is served by a single Cloudflare Worker with Hono, and the AI chat answers through OpenAI. Source: https://github.com/denisvarga/denisvarga.sk. Write to hello@denisvarga.dev or try in the chat: sudo hire denis',
   },
 };
 
@@ -44,5 +50,5 @@ export const notFoundCopy = {
 } as const;
 
 export function canonicalUrl(lang: Lang): string {
-  return SITE_URL + headCopy[lang].path;
+  return `${headCopy[lang].origin}/`;
 }

@@ -28,7 +28,7 @@ beforeEach(() => {
   root = createRoot(container);
   act(() =>
     root.render(
-      <LangProvider initialLang="sk">
+      <LangProvider lang="sk">
         <SiteChrome />
         <main id="top">
           <button type="button">inside main</button>
@@ -98,12 +98,16 @@ describe('menu overlay', () => {
     expect(goTo).toHaveBeenCalledWith(6);
   });
 
-  it('SK/EN links switch the language without navigating', () => {
-    const en = overlay().querySelector<HTMLAnchorElement>('a[hreflang="en"]')!;
-    expect(en.getAttribute('href')).toBe('/en/');
-    click(en);
-    expect(en.getAttribute('aria-current')).toBe('true');
-    expect(toggle().textContent).toContain('Menu');
+  it('SK/EN are plain links to the language pages, the current one marked', () => {
+    // jsdom runs on localhost, a single-host preview, so the links stay relative there.
+    const links = [...overlay().querySelectorAll<HTMLAnchorElement>('a[hreflang]')];
+    expect(links.map((a) => [a.hreflang, a.getAttribute('href'), a.getAttribute('aria-current')])).toEqual([
+      ['sk', '/', 'page'],
+      ['en', '/en/', null],
+    ]);
+    const navigate = new MouseEvent('click', { bubbles: true, cancelable: true });
+    act(() => links[1]!.dispatchEvent(navigate));
+    expect(navigate.defaultPrevented).toBe(false);
   });
 });
 
@@ -111,7 +115,7 @@ describe('prerendered markup', () => {
   it('has no style attributes or data-in in either language', () => {
     for (const lang of ['sk', 'en'] as const) {
       const html = renderToString(
-        <LangProvider initialLang={lang}>
+        <LangProvider lang={lang}>
           <ProgressBar />
           <SiteChrome />
           <HeroSection />
@@ -122,7 +126,9 @@ describe('prerendered markup', () => {
       );
       expect(html).not.toContain(' style=');
       expect(html).not.toContain('data-in');
-      expect(html).toContain('href="mailto:hello@denisvarga.sk"');
+      expect(html).toContain(lang === 'sk' ? 'href="mailto:hello@denisvarga.sk"' : 'href="mailto:hello@denisvarga.dev"');
+      expect(html).toContain('href="https://denisvarga.sk/" hrefLang="sk"');
+      expect(html).toContain('href="https://denisvarga.dev/" hrefLang="en"');
       expect(html).toContain('href="tel:+421902074830"');
       expect(html).toContain('rel="noopener"');
       expect(html.match(/data-heroimg/g)).toHaveLength(2);

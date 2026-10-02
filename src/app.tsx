@@ -18,7 +18,7 @@ export function App({ lang }: { lang: Lang }) {
   useEffect(() => retainLayoutCache(), []);
 
   return (
-    <LangProvider initialLang={lang}>
+    <LangProvider lang={lang}>
       <ProgressBar />
       <SiteChrome />
       <MotionLayer />

@@ -49,7 +49,7 @@ function stillRunning(el: Element, name: string): boolean {
 
 /**
  * Sets data-in on the host once the hero entrance has fully played, which switches the keyframes
- * off so a language switch cannot replay them. Only the animation that ends last is watched, so
+ * off so a remount cannot replay them. Only the animation that ends last is watched, so
  * an earlier child's animationend (bubbling or not) never marks the hero done. Runs once: the
  * entrance plays only at first paint.
  */

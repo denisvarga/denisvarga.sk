@@ -1,4 +1,5 @@
 import * as z from 'zod/mini';
+import { parseEnvList } from './env-list';
 
 export const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 export const TURNSTILE_TIMEOUT_MS = 3_000;
@@ -16,11 +17,14 @@ export interface TurnstileConfig {
   readonly action: string | undefined;
 }
 
-/** Fails closed: a real secret without an expected hostname would accept tokens minted for any site. */
+/**
+ * Fails closed: a real secret without an expected hostname would accept tokens minted for any site.
+ * `hostname` is a comma-separated allow list.
+ */
 export function isTurnstileConfigValid(config: TurnstileConfig): boolean {
   const secret = config.secret?.trim();
   if (!secret) return false;
-  return Boolean(config.hostname?.trim()) || TEST_SECRETS.has(secret);
+  return parseEnvList(config.hostname).length > 0 || TEST_SECRETS.has(secret);
 }
 
 const siteverifySchema = z.object({
@@ -60,10 +64,10 @@ export async function verifyTurnstile(check: TurnstileCheck): Promise<TurnstileV
   const parsed = siteverifySchema.safeParse(body);
   if (!parsed.success) return { ok: false, httpStatus: res.status };
   const { success, hostname, action } = parsed.data;
-  const expectedHost = check.hostname?.trim();
+  const expectedHosts = parseEnvList(check.hostname);
   const expectedAction = check.action?.trim();
   if (!success) return { ok: false, httpStatus: null };
-  if (expectedHost && hostname !== expectedHost) return { ok: false, httpStatus: null };
+  if (expectedHosts.length > 0 && !expectedHosts.includes(hostname ?? '')) return { ok: false, httpStatus: null };
   if (expectedAction && action !== expectedAction) return { ok: false, httpStatus: null };
   return { ok: true };
 }

@@ -10,7 +10,7 @@ interface TerminalDemoProps {
   readonly id: string;
   readonly demo: Demo;
   readonly tool: number;
-  /** Changes on every tool pick and language switch; each change restarts the timing. */
+  /** Changes on every tool pick; each change restarts the timing. */
   readonly runKey: string;
   readonly barRefs: RefObject<(HTMLElement | null)[]>;
   readonly onDone: () => void;

@@ -54,7 +54,7 @@ export const copyEn: Copy = {
     you: 'You',
     agent: 'Agent',
     note: "The agent knows my CV. When it isn't sure, it says so and gives you my contact.",
-    error: "I couldn't answer right now. Email Denis at hello@denisvarga.sk or call +421 902 074 830.",
+    error: "I couldn't answer right now. Email Denis at hello@denisvarga.dev or call +421 902 074 830.",
     suggestions: [
       'Which AI tools does he use?',
       'How was this site built?',

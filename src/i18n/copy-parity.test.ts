@@ -7,7 +7,7 @@ import { SKILLS } from '../data/skills';
 import { copyEn } from './copy-en';
 import { copySk } from './copy-sk';
 import { headCopy } from './head-copy';
-import { ui } from './ui-copy';
+import { contact, ui } from './ui-copy';
 
 // Shape with every string replaced by its type, so SK and EN must match key for key and
 // array for array.
@@ -25,7 +25,7 @@ function strings(value: unknown): string[] {
   return [];
 }
 
-const everything = { copySk, copyEn, ui, headCopy, JOBS, PROJECTS, SKILLS, demosSk, demosEn };
+const everything = { copySk, copyEn, ui, contact, headCopy, JOBS, PROJECTS, SKILLS, demosSk, demosEn };
 
 describe('copy parity', () => {
   it('SK and EN page copy have identical shape', () => {
@@ -59,12 +59,19 @@ describe('copy parity', () => {
     }
   });
 
-  it('uses hello@denisvarga.sk and never the old address', () => {
+  it('uses each language\'s own address and never the old one', () => {
     const all = strings(everything).join('\n');
     const oldAddress = ['info', 'denva.sk'].join('@');
     expect(all).not.toContain(oldAddress);
-    expect(copySk.ask.error).toContain('hello@denisvarga.sk');
-    expect(copyEn.ask.error).toContain('hello@denisvarga.sk');
-    expect(copySk.ask.error).toContain('+421 902 074 830');
+    expect(headCopy.sk.email).toBe('hello@denisvarga.sk');
+    expect(headCopy.en.email).toBe('hello@denisvarga.dev');
+    for (const [lang, copy] of [['sk', copySk], ['en', copyEn]] as const) {
+      const other = headCopy[lang === 'sk' ? 'en' : 'sk'].email;
+      expect(copy.ask.error).toContain(headCopy[lang].email);
+      expect(copy.ask.error).toContain('+421 902 074 830');
+      expect(headCopy[lang].consoleGreeting).toContain(headCopy[lang].email);
+      expect(contact[lang]).toMatchObject({ email: headCopy[lang].email, emailHref: `mailto:${headCopy[lang].email}` });
+      expect([copy.ask.error, headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
+    }
   });
 });

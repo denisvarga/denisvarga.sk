@@ -1,4 +1,5 @@
-import type { Localized, UiCopy } from './types';
+import { headCopy } from './head-copy';
+import type { Lang, Localized, UiCopy } from './types';
 
 export const ui: Localized<UiCopy> = {
   sk: {
@@ -23,10 +24,23 @@ export const ui: Localized<UiCopy> = {
   },
 };
 
-export const contact = {
-  email: 'hello@denisvarga.sk',
-  emailHref: 'mailto:hello@denisvarga.sk',
-  phone: '+421 902 074 830',
-  phoneHref: 'tel:+421902074830',
-  cvHref: 'https://resume.denva.sk/wp-content/uploads/cv/denis-varga-cv.pdf',
-} as const;
+export interface ContactCopy {
+  readonly email: string;
+  readonly emailHref: `mailto:${string}`;
+  readonly phone: string;
+  readonly phoneHref: `tel:${string}`;
+  readonly cvHref: string;
+}
+
+function contactCopy(lang: Lang): ContactCopy {
+  const { email } = headCopy[lang];
+  return {
+    email,
+    emailHref: `mailto:${email}`,
+    phone: '+421 902 074 830',
+    phoneHref: 'tel:+421902074830',
+    cvHref: 'https://resume.denva.sk/wp-content/uploads/cv/denis-varga-cv.pdf',
+  };
+}
+
+export const contact: Localized<ContactCopy> = { sk: contactCopy('sk'), en: contactCopy('en') };

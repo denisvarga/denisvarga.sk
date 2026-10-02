@@ -2,16 +2,18 @@ import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { App } from './app';
 
+const h1Text = (html: string) => new DOMParser().parseFromString(html, 'text/html').querySelector('h1')?.textContent;
+
 describe('App', () => {
   it('renders the seven sections inside main#top', () => {
     const html = renderToString(<App lang="sk" />);
     expect(html).toContain('<main id="top">');
     expect(html.match(/<section data-sec/g)).toHaveLength(7);
-    expect(html).toContain('Ahoj, som Denis.');
+    expect(h1Text(html)).toBe('Ahoj, som Denis.');
   });
 
   it('renders the English copy for lang="en"', () => {
-    expect(renderToString(<App lang="en" />)).toContain("Hi, I&#x27;m Denis.");
+    expect(h1Text(renderToString(<App lang="en" />))).toBe("Hi, I'm Denis.");
   });
 
   it('never renders a style attribute or data-in', () => {

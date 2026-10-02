@@ -15,6 +15,8 @@ const expectError = async (res: Response, status: number, error: string) => {
   expect(await res.json()).toEqual({ error });
 };
 
+const SIG = expect.stringMatching(/^[A-Za-z0-9_-]{43}$/);
+
 describe('POST /api/ask rejections', () => {
   it('rejects a missing or foreign Origin and a non-JSON content type', async () => {
     const { env } = makeEnv();
@@ -50,7 +52,7 @@ describe('easter eggs', () => {
     const { env, db } = makeEnv();
     const res = await send({ env, body: askBody('  Sudo HIRE denis! ', { lang: 'en' }) });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ reply: expect.stringContaining('Access granted.'), kind: 'easter_egg' });
+    expect(await res.json()).toEqual({ reply: expect.stringContaining('Access granted.'), kind: 'easter_egg', sig: SIG });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(db.writes).toBe(0);
     expect(logs).not.toHaveBeenCalled();
@@ -136,7 +138,7 @@ describe('model call', () => {
     const fetchMock = stubFetch({ siteverify: turnstileOk, openai: () => openaiCompleted('Denis robí WordPress na mieru.') });
     const { env, db } = makeEnv();
     const res = await send({ env, body: askBody('Čo robí Denis?', { lang: 'sk' }) });
-    expect(await res.json()).toEqual({ reply: 'Denis robí WordPress na mieru.', kind: 'answer' });
+    expect(await res.json()).toEqual({ reply: 'Denis robí WordPress na mieru.', kind: 'answer', sig: SIG });
     expect(db.rows).toHaveLength(1);
     expect(db.rows[0]).toMatchObject({ lang: 'sk', question: 'Čo robí Denis?', answer: 'Denis robí WordPress na mieru.', model: 'gpt-6-luna-2026-05-18', input_tokens: 1200, output_tokens: 40, outcome: 'ok' });
     expect(JSON.stringify(db.rows)).not.toContain(CLIENT_IP);
@@ -154,7 +156,7 @@ describe('model call', () => {
       openai: () => json({ status: 'incomplete', incomplete_details: { reason: 'max_output_tokens' }, output: [{ type: 'message', content: [{ type: 'output_text', text: 'Jedna. Dve nedoko' }] }] }),
     });
     const { env, db } = makeEnv();
-    expect(await (await send({ env, body: askBody('Opíš všetko') })).json()).toEqual({ reply: 'Jedna.', kind: 'answer' });
+    expect(await (await send({ env, body: askBody('Opíš všetko') })).json()).toEqual({ reply: 'Jedna.', kind: 'answer', sig: SIG });
     expect(db.rows[0]?.outcome).toBe('truncated');
   });
 

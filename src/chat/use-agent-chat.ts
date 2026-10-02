@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import type { AskLang } from '../../shared/ask-contract';
-import { postAsk } from './api-client';
+import { postAsk, type AskOutcome } from './api-client';
 import { chatReducer, initialChatState, requestMessages, type ChatState } from './chat-reducer';
 import type { TokenClient } from './use-turnstile-token';
 
@@ -45,12 +45,12 @@ export function useAgentChat({ lang, errorText, tokens, post = postAsk }: AgentC
 
       const controller = new AbortController();
       request.current = controller;
-      let reply: string | null = null;
+      let reply: Extract<AskOutcome, { ok: true }> | null = null;
       try {
         const turnstileToken = await tokens.getToken();
         try {
           const outcome = await post({ messages, lang, turnstileToken }, { signal: controller.signal });
-          if (outcome.ok) reply = outcome.reply;
+          if (outcome.ok) reply = outcome;
         } finally {
           tokens.refresh();
         }
@@ -58,7 +58,7 @@ export function useAgentChat({ lang, errorText, tokens, post = postAsk }: AgentC
         // Token deadline, script or widget failure: the error copy below covers every case.
       }
       if (controller.signal.aborted) return;
-      dispatch(reply === null ? { type: 'fail', text: errorText } : { type: 'reply', text: reply });
+      dispatch(reply === null ? { type: 'fail', text: errorText } : { type: 'reply', text: reply.reply, sig: reply.sig });
     },
     [lang, errorText, tokens, post],
   );

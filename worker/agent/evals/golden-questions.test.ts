@@ -16,11 +16,14 @@ describe('golden questions', () => {
     }
   });
 
-  it('covers the follow-up after a ~1600-char assistant turn and the new contact address', () => {
+  it('covers the follow-up after a ~1600-char assistant turn and the contact address per language', () => {
     const followUp = cases.find((c) => c.id === 'follow-up-after-long-turn');
     const assistantTurn = followUp?.history?.find((m) => m.role === 'assistant')?.content ?? '';
     expect(assistantTurn.length).toBeGreaterThanOrEqual(1500);
     expect(assistantTurn.length).toBeLessThanOrEqual(2000);
     expect(cases.find((c) => c.id === 'contact-sk')?.expect.mustInclude).toContain('hello@denisvarga.sk');
+    expect(cases.find((c) => c.id === 'contact-sk')?.expect.mustNotInclude).toContain('hello@denisvarga.dev');
+    expect(cases.find((c) => c.id === 'contact-en')?.expect.mustInclude).toContain('hello@denisvarga.dev');
+    expect(cases.find((c) => c.id === 'contact-en')?.expect.mustNotInclude).toContain('hello@denisvarga.sk');
   });
 });

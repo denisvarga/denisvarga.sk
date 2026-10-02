@@ -8,6 +8,7 @@ import { parseDailyCap, reserveSlot, type Reservation } from '../ask/daily-cap';
 import { askError, logEvent } from '../ask/errors';
 import { callOpenAI, TOTAL_BUDGET_MS } from '../ask/openai';
 import { isAllowedRequest } from '../ask/origin';
+import { createReplySigner, keepSignedTurns } from '../ask/reply-sig';
 import { safetyIdentifier } from '../ask/safety-id';
 import { askSchema, lastUserMessage } from '../ask/schema';
 import { isTurnstileConfigValid, TURNSTILE_TIMEOUT_MS, verifyTurnstile } from '../ask/turnstile';
@@ -32,8 +33,18 @@ askRoute.post('/ask', async (c) => {
   const key = clientKey(ip);
   if (env.ASK_LIMITER && !(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
 
+  // Every reply is signed, easter eggs included, so the salt is required before any of them.
+  const salt = env.SAFETY_SALT?.trim();
+  if (!salt) {
+    logEvent('config_error', 503);
+    return askError(c, 'unavailable');
+  }
+  const signer = await createReplySigner(salt);
+
   const egg = easterEgg(question, input.lang);
-  if (egg !== null) return c.json({ reply: egg, kind: 'easter_egg' } satisfies AskSuccess);
+  if (egg !== null) {
+    return c.json({ reply: egg, kind: 'easter_egg', sig: await signer.sign(input.lang, egg) } satisfies AskSuccess);
+  }
 
   const turnstile = { secret: env.TURNSTILE_SECRET_KEY, hostname: env.TURNSTILE_HOSTNAME, action: env.TURNSTILE_ACTION };
   if (!isTurnstileConfigValid(turnstile)) {
@@ -42,7 +53,7 @@ askRoute.post('/ask', async (c) => {
   }
   // Checked before siteverify so a broken deploy neither burns the visitor's token nor writes a row.
   const cap = parseDailyCap(env.DAILY_CAP);
-  if (cap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim() || !env.SAFETY_SALT?.trim()) {
+  if (cap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim()) {
     logEvent('config_error', 503);
     return askError(c, 'unavailable');
   }
@@ -57,6 +68,9 @@ askRoute.post('/ask', async (c) => {
     if (verdict.httpStatus !== null) logEvent('turnstile_error', verdict.httpStatus);
     return askError(c, 'verification_failed');
   }
+
+  // Forged or foreign-language assistant turns are dropped silently; the request still goes through.
+  const messages = await keepSignedTurns(signer, input.lang, input.messages);
 
   let reservation: Reservation;
   try {
@@ -76,8 +90,8 @@ askRoute.post('/ask', async (c) => {
     model: env.OPENAI_MODEL.trim(),
     effort: env.OPENAI_REASONING_EFFORT,
     instructions: buildInstructions(),
-    messages: input.messages,
-    safetyIdentifier: await safetyIdentifier(env.SAFETY_SALT, key),
+    messages,
+    safetyIdentifier: await safetyIdentifier(salt, key),
     deadline,
   });
   c.executionCtx.waitUntil(
@@ -87,5 +101,5 @@ askRoute.post('/ask', async (c) => {
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);
   if (result.outcome === 'error') logEvent('openai_error', result.httpStatus);
   if (result.text === null) return askError(c, 'upstream_unavailable');
-  return c.json({ reply: result.text, kind: 'answer' } satisfies AskSuccess);
+  return c.json({ reply: result.text, kind: 'answer', sig: await signer.sign(input.lang, result.text) } satisfies AskSuccess);
 });

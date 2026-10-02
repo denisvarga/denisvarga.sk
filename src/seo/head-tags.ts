@@ -1,7 +1,7 @@
-import { SITE_URL, canonicalUrl, headCopy, notFoundCopy } from '../i18n/head-copy';
+import { canonicalUrl, headCopy, notFoundCopy } from '../i18n/head-copy';
 import { HEAD_COMMENT } from './head-comment';
 import { LANGS, type Lang, type Localized } from '../i18n/types';
-import { personJsonLd, serializeJsonLd } from './json-ld';
+import { profileJsonLd, serializeJsonLd } from './json-ld';
 
 // Share cards from scripts/build-og-image.ts, one per language; the paths are files in public/.
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
@@ -16,6 +16,14 @@ export const OG_IMAGES: Localized<{ readonly path: `/${string}.jpg`; readonly al
   },
 };
 export const THEME_COLOR = '#ECECE9';
+const SITE_NAME = 'Denis Varga';
+
+/** Hashed build outputs the head points at, as /assets/ paths found in dist/client. */
+export interface HeadAssets {
+  readonly fonts: readonly string[];
+  /** The 1024 px hero portrait, the profile image in the JSON-LD. */
+  readonly portrait: string;
+}
 
 export function escapeHtml(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -40,10 +48,10 @@ export function hreflangAlternates(): ReadonlyArray<readonly [hreflang: string, 
 }
 
 // charset and viewport live in index.html, so they are never emitted here.
-export function buildHeadTags(lang: Lang, fontPreloads: readonly string[]): string {
+export function buildHeadTags(lang: Lang, assets: HeadAssets): string {
   const copy = headCopy[lang];
   const other = LANGS.find((l) => l !== lang) ?? 'sk';
-  const image = { url: SITE_URL + OG_IMAGES[lang].path, alt: OG_IMAGES[lang].alt };
+  const image = { url: copy.origin + OG_IMAGES[lang].path, alt: OG_IMAGES[lang].alt };
   return [
     HEAD_COMMENT,
     `<title>${escapeHtml(copy.title)}</title>`,
@@ -51,6 +59,7 @@ export function buildHeadTags(lang: Lang, fontPreloads: readonly string[]): stri
     `<link rel="canonical" href="${canonicalUrl(lang)}">`,
     ...hreflangAlternates().map(([hreflang, href]) => `<link rel="alternate" hreflang="${hreflang}" href="${href}">`),
     meta('property', 'og:type', 'website'),
+    meta('property', 'og:site_name', SITE_NAME),
     meta('property', 'og:url', canonicalUrl(lang)),
     meta('property', 'og:title', copy.title),
     meta('property', 'og:description', copy.description),
@@ -63,8 +72,8 @@ export function buildHeadTags(lang: Lang, fontPreloads: readonly string[]): stri
     meta('name', 'twitter:card', 'summary_large_image'),
     meta('name', 'twitter:image', image.url),
     meta('name', 'twitter:image:alt', image.alt),
-    ...sharedTags(fontPreloads),
-    `<script type="application/ld+json">${serializeJsonLd(personJsonLd(lang))}</script>`,
+    ...sharedTags(assets.fonts),
+    `<script type="application/ld+json">${serializeJsonLd(profileJsonLd(lang, assets.portrait))}</script>`,
   ].join('\n    ');
 }
 

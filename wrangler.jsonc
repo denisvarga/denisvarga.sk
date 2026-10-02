@@ -6,9 +6,14 @@
   "compatibility_date": "2026-10-02",
   "workers_dev": false,
   "preview_urls": false,
-  "routes": [{ "pattern": "denisvarga.sk", "custom_domain": true }],
+  "routes": [
+    { "pattern": "denisvarga.sk", "custom_domain": true },
+    { "pattern": "denisvarga.dev", "custom_domain": true }
+  ],
   "assets": {
     "not_found_handling": "404-page",
+    // Pages stay free static assets: the denisvarga.dev "/" -> "/en/" rewrite and the "/en*"
+    // redirects are zone rules in Cloudflare, so only the chat API invokes the Worker.
     "run_worker_first": ["/api/*"]
   },
   "observability": {
@@ -38,8 +43,8 @@
     "OPENAI_MODEL": "gpt-6-luna",
     "OPENAI_REASONING_EFFORT": "none",
     "DAILY_CAP": "300",
-    "ALLOWED_ORIGINS": "https://denisvarga.sk",
-    "TURNSTILE_HOSTNAME": "denisvarga.sk",
+    "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
+    "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",
     "TURNSTILE_ACTION": "ask"
   }
 }

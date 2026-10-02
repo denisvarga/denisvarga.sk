@@ -8,6 +8,11 @@ export type AskRole = 'user' | 'assistant';
 export interface AskMessage {
   readonly role: AskRole;
   readonly content: string;
+  /**
+   * The `sig` the Worker returned with an assistant reply, echoed back with the reply text
+   * unchanged. The Worker drops assistant turns whose signature is missing or does not match.
+   */
+  readonly sig?: string;
 }
 
 export interface AskRequest {
@@ -21,6 +26,8 @@ export type AskReplyKind = 'answer' | 'easter_egg';
 export interface AskSuccess {
   readonly reply: string;
   readonly kind: AskReplyKind;
+  /** HMAC over the reply and the request `lang`; valid only for that language. */
+  readonly sig: string;
 }
 
 export const ASK_ERROR_CODES = [

@@ -12,10 +12,18 @@ describe('buildInstructions', () => {
     expect(text).not.toContain(EM_DASH);
   });
 
-  it('points visitors at hello@denisvarga.sk in the contact fact and the fallback rule', () => {
-    expect(text).toContain('- Kontakt: hello@denisvarga.sk, +421 902 074 830.');
-    expect(text).toContain('kontaktovať Denisa na hello@denisvarga.sk alebo +421 902 074 830');
+  it('gives the contact per language in the contact fact and the fallback rule', () => {
+    expect(text).toContain(
+      '- Kontakt: e-mail hello@denisvarga.sk (v slovenských odpovediach) alebo hello@denisvarga.dev (v anglických odpovediach), telefón +421 902 074 830.',
+    );
+    expect(text).toContain(
+      'kontaktovať Denisa: v slovenskej odpovedi na hello@denisvarga.sk, v anglickej na hello@denisvarga.dev, alebo na +421 902 074 830.',
+    );
     expect(text).not.toContain('info@denva.sk');
+  });
+
+  it('states which domain carries which language', () => {
+    expect(text).toContain('- Web má dve jazykové verzie: slovenskú na denisvarga.sk a anglickú na denisvarga.dev.');
   });
 
   it('keeps the design structure: intro, FAKTY, PRAVIDLÁ', () => {
@@ -26,7 +34,7 @@ describe('buildInstructions', () => {
     expect(text).toContain('Stručne, 1-4 vety');
   });
 
-  it('exposes a prompt version', () => {
-    expect(PROMPT_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\.\d+$/);
+  it('exposes the prompt version of this wording', () => {
+    expect(PROMPT_VERSION).toBe('2026-10-02.4');
   });
 });

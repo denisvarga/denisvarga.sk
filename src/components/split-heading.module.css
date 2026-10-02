@@ -17,3 +17,10 @@
   line-height: 1.02;
   letter-spacing: -0.045em;
 }
+
+/* Word separator at the end of a mask: zero-size, and preserved (a collapsible space at the end
+   of the mask's line would be dropped, and innerText with it). */
+.space {
+  font-size: 0;
+  white-space: pre;
+}

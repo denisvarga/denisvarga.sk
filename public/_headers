@@ -13,3 +13,5 @@
   ! Content-Security-Policy
   ! Content-Security-Policy-Report-Only
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8

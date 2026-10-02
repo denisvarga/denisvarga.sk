@@ -6,7 +6,7 @@ export const ASK_TIMEOUT_MS = 25_000;
 export type AskFailure = AskErrorCode | 'network' | 'timeout' | 'bad_response';
 
 export type AskOutcome =
-  | { readonly ok: true; readonly reply: string }
+  | { readonly ok: true; readonly reply: string; readonly sig?: string }
   | { readonly ok: false; readonly error: AskFailure };
 
 export interface PostAskOptions {
@@ -25,7 +25,9 @@ function readBody(body: unknown, httpOk: boolean): AskOutcome {
   if (!isRecord(body)) return { ok: false, error: 'bad_response' };
   if (httpOk && typeof body.reply === 'string') {
     const reply = body.reply.trim();
-    return reply ? { ok: true, reply } : { ok: false, error: 'bad_response' };
+    if (!reply) return { ok: false, error: 'bad_response' };
+    // An unsigned reply is still shown; sent back without a signature, the server leaves it out.
+    return typeof body.sig === 'string' && body.sig ? { ok: true, reply, sig: body.sig } : { ok: true, reply };
   }
   if (typeof body.error === 'string' && knownCodes.has(body.error)) {
     return { ok: false, error: body.error as AskErrorCode };

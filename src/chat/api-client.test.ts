@@ -11,13 +11,20 @@ const stub = (response: Response | Error) =>
   vi.fn<typeof fetch>(() => (response instanceof Error ? Promise.reject(response) : Promise.resolve(response)));
 
 describe('postAsk', () => {
-  it('posts the request as JSON and returns the trimmed reply', async () => {
-    const fetchImpl = stub(json({ reply: '  Hello there \n', kind: 'answer' }));
-    await expect(postAsk(request, { fetchImpl })).resolves.toEqual({ ok: true, reply: 'Hello there' });
+  it('posts the request as JSON and returns the trimmed reply with its signature', async () => {
+    const fetchImpl = stub(json({ reply: '  Hello there \n', kind: 'answer', sig: 'sig-1' }));
+    await expect(postAsk(request, { fetchImpl })).resolves.toEqual({ ok: true, reply: 'Hello there', sig: 'sig-1' });
     const [url, init] = fetchImpl.mock.calls[0] ?? [];
     expect(url).toBe(ASK_ENDPOINT);
     expect(init?.method).toBe('POST');
     expect(JSON.parse(String(init?.body))).toEqual(request);
+  });
+
+  it('keeps a reply whose signature is missing or not a non-empty string, unsigned', async () => {
+    for (const sig of [undefined, '', 42, null, { v: 1 }]) {
+      const outcome = await postAsk(request, { fetchImpl: stub(json({ reply: 'Hi', kind: 'answer', sig })) });
+      expect(outcome).toStrictEqual({ ok: true, reply: 'Hi' });
+    }
   });
 
   it.each(ASK_ERROR_CODES)('maps the %s error code', async (code) => {

@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { preview } from 'vite';
 import { copyEn } from '../src/i18n/copy-en';
 import { copySk } from '../src/i18n/copy-sk';
-import { SITE_URL, headCopy } from '../src/i18n/head-copy';
+import { headCopy } from '../src/i18n/head-copy';
 import type { Lang } from '../src/i18n/types';
 import { OG_IMAGES, OG_IMAGE_SIZE } from '../src/seo/head-tags';
 
@@ -37,18 +37,18 @@ declare global {
   }
 }
 
-const DOMAIN = new URL(SITE_URL).host;
+const domain = (lang: Lang) => new URL(headCopy[lang].origin).host;
 const CARDS: readonly OgCard[] = [
   {
     lang: 'sk',
-    sub: DOMAIN,
+    sub: domain('sk'),
     title: ['Denis', 'Varga'],
     lead: copySk.hero.sub,
     note: 'Webové aplikácie, AI agenti a interné nástroje',
   },
   {
     lang: 'en',
-    sub: DOMAIN,
+    sub: domain('en'),
     title: ['Denis', 'Varga'],
     lead: copyEn.hero.sub,
     note: 'Web apps, AI agents and internal tools',
@@ -87,13 +87,12 @@ function applyCard(card: OgCard): void {
   const note = pulse?.parentElement;
   const noteText = note?.querySelector('span:not([data-pulse])');
   const ctas = text?.querySelector('button')?.parentElement;
-  const hidden = title?.querySelector('.visually-hidden');
   const words = [...(title?.querySelectorAll('.word') ?? [])];
   const portrait = [...(hero?.querySelectorAll('[data-heroimg]') ?? [])]
     .find((img) => img.getBoundingClientRect().width > 0)
     ?.closest('[data-enter]');
   const overlay = portrait?.parentElement?.parentElement;
-  const parts = { canvas, hero, title, text, sub, lead, pulse, note, noteText, ctas, hidden, portrait, overlay };
+  const parts = { canvas, hero, title, text, sub, lead, pulse, note, noteText, ctas, portrait, overlay };
   const missing = Object.entries(parts).filter(([, el]) => !el).map(([name]) => name);
   if (words.length < 2) missing.push('title words');
   if (missing.length > 0) throw new Error(`hero markup changed, missing: ${missing.join(', ')}`);
@@ -120,7 +119,6 @@ function applyCard(card: OgCard): void {
   sub!.textContent = card.sub;
   words[0]!.textContent = card.title[0];
   words.at(-1)!.textContent = card.title[1];
-  hidden!.textContent = card.title.join(' ');
   lead!.textContent = card.lead;
   noteText!.textContent = card.note;
 }
