@@ -11,9 +11,9 @@ import {
 
 const run = (actions: readonly ChatAction[], from: ChatState = initialChatState) => actions.reduce(chatReducer, from);
 
-const exchange = (q: string, a: string): ChatAction[] => [
+const exchange = (q: string, a: string, sig?: string): ChatAction[] => [
   { type: 'ask', text: q },
-  { type: 'reply', text: a },
+  { type: 'reply', text: a, sig },
 ];
 
 describe('chatReducer', () => {
@@ -44,6 +44,11 @@ describe('chatReducer', () => {
     expect(failed.typingId).toBe(2);
   });
 
+  it('stores the reply signature, and none when the server sent none', () => {
+    expect(run(exchange('q', 'a', 'sig-a')).messages[1]).toEqual({ id: 2, role: 'assistant', text: 'a', failed: false, sig: 'sig-a' });
+    expect(run(exchange('q', 'a')).messages[1]).not.toHaveProperty('sig');
+  });
+
   it('ignores replies that arrive without a pending question', () => {
     expect(chatReducer(initialChatState, { type: 'reply', text: 'late' })).toBe(initialChatState);
   });
@@ -64,16 +69,30 @@ describe('requestMessages', () => {
     expect(payload[0]).toEqual({ role: 'assistant', content: 'a2' });
   });
 
+  it('sends assistant turns back with their signature, unsigned ones without', () => {
+    const history = run([...exchange('q1', 'a1', 'sig-1'), ...exchange('q2', 'a2')]).messages;
+    expect(requestMessages(history, 'q3')).toStrictEqual([
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1', sig: 'sig-1' },
+      { role: 'user', content: 'q2' },
+      { role: 'assistant', content: 'a2' },
+      { role: 'user', content: 'q3' },
+    ]);
+  });
+
   it('excludes failed replies together with their questions', () => {
     const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy' }]).messages;
     expect(requestMessages(history, 'q2').map((m) => m.content)).toEqual(['q1', 'a1', 'q2']);
   });
 
-  it('clamps each turn to its role limit', () => {
-    const history = run(exchange('u'.repeat(900), 'a'.repeat(3000))).messages;
+  it('clamps each turn to its role limit, dropping the signature of a clamped reply', () => {
+    const history = run(exchange('u'.repeat(900), 'a'.repeat(3000), 'sig-long')).messages;
     const [user, assistant] = requestMessages(history, 'q');
     expect(user?.content).toHaveLength(MAX_USER_CONTENT);
     expect(assistant?.content).toHaveLength(MAX_ASSISTANT_CONTENT);
+    expect(assistant).not.toHaveProperty('sig');
+    const exact = run(exchange('q', 'a'.repeat(MAX_ASSISTANT_CONTENT), 'sig-max')).messages;
+    expect(requestMessages(exact, 'next')[1]).toHaveProperty('sig', 'sig-max');
   });
 
   it('drops the oldest turns while the total exceeds the limit', () => {

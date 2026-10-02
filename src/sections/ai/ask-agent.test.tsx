@@ -62,7 +62,7 @@ beforeEach(() => {
   root = createRoot(container);
   act(() =>
     root.render(
-      <LangProvider initialLang="en">
+      <LangProvider lang="en">
         <AskAgent />
       </LangProvider>,
     ),

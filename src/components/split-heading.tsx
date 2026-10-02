@@ -1,5 +1,5 @@
 import { useRef, type RefObject } from 'react';
-import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
+import { parseTitleMarkup } from '../lib/title-markup';
 import { useReveal } from '../motion/use-reveal';
 import styles from './split-heading.module.css';
 
@@ -14,8 +14,10 @@ export interface SplitHeadingProps {
 
 const NO_REF: RefObject<HTMLHeadingElement | null> = { current: null };
 
-// Word spans sit side by side without whitespace (spacing is the mask margin, as in the design),
-// so screen readers get the plain title from a visually hidden copy instead.
+// The visible gap between words is the mask margin (as in the design). Each mask but the last also
+// ends with a real space, zero-size and preserved, so crawlers, screen readers and copy-paste get
+// the plain sentence once. Kept inside the mask, the space adds no line-break opportunity, so
+// wrapping (text-wrap: balance included) stays exactly as with bare masks.
 export function SplitHeading({ as: Tag, text, className, delay, enter = false }: SplitHeadingProps) {
   const ref = useRef<HTMLHeadingElement>(null);
   useReveal(enter ? NO_REF : ref);
@@ -25,11 +27,11 @@ export function SplitHeading({ as: Tag, text, className, delay, enter = false }:
   return (
     <Tag ref={ref} className={className ? `${styles.heading} ${className}` : styles.heading} data-delay={delay} {...mode}>
       {words.map((word, i) => (
-        <span key={`${i}-${word.text}`} className="word-mask" aria-hidden="true">
+        <span key={`${i}-${word.text}`} className="word-mask">
           <span className={`word ${word.bold ? styles.bold : styles.light}`}>{word.text}</span>
+          {i < words.length - 1 && <span className={styles.space}>{' '}</span>}
         </span>
       ))}
-      <span className="visually-hidden">{plainTitle(text)}</span>
     </Tag>
   );
 }

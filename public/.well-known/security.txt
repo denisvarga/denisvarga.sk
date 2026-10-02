@@ -1,4 +1,6 @@
 Contact: mailto:hello@denisvarga.sk
+Contact: mailto:hello@denisvarga.dev
 Expires: 2027-10-01T00:00:00.000Z
 Preferred-Languages: sk, en
 Canonical: https://denisvarga.sk/.well-known/security.txt
+Canonical: https://denisvarga.dev/.well-known/security.txt

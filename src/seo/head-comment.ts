@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, SOURCE_URL } from '../i18n/head-copy';
+import { SOURCE_URL, headCopy } from '../i18n/head-copy';
 import { ASCII_PORTRAIT } from './ascii-portrait';
 
 // Build-time only: importing this from client code would pull the portrait into the entry chunk.
@@ -13,6 +13,6 @@ ${ASCII_PORTRAIT}
   ${SOURCE_URL}
 
   Skúste v chate / try in the chat:  sudo hire denis
-  ${CONTACT_EMAIL}
+  ${headCopy.sk.email} / ${headCopy.en.email}
 
 -->`;

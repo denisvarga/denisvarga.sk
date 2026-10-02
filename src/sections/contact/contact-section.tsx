@@ -31,7 +31,8 @@ function MagnetLink({ href, tone, external = false, children }: MagnetLinkProps)
 }
 
 export function ContactSection() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
+  const links = contact[lang];
   const bodyRef = useRef<HTMLParagraphElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
   useReveal(bodyRef);
@@ -46,13 +47,13 @@ export function ContactSection() {
             {t.contact.body}
           </p>
           <div ref={linksRef} className={styles.links} data-reveal="">
-            <MagnetLink href={contact.emailHref} tone="dark">
-              {contact.email}
+            <MagnetLink href={links.emailHref} tone="dark">
+              {links.email}
             </MagnetLink>
-            <MagnetLink href={contact.phoneHref} tone="outline">
-              {contact.phone}
+            <MagnetLink href={links.phoneHref} tone="outline">
+              {links.phone}
             </MagnetLink>
-            <MagnetLink href={contact.cvHref} tone="outline" external>
+            <MagnetLink href={links.cvHref} tone="outline" external>
               <span>{t.contact.cv}</span>
               <span aria-hidden="true">↓</span>
             </MagnetLink>

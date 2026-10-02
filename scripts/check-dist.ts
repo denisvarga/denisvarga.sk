@@ -2,7 +2,12 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const SITE_ORIGIN = 'https://denisvarga.sk';
+// Production origin -> the page dist/client serves at its root (the Worker maps "/" on
+// denisvarga.dev to the English page); every other path maps 1:1 on both domains.
+const SITE_ROOTS = new Map([
+  ['https://denisvarga.sk', '/index.html'],
+  ['https://denisvarga.dev', '/en/index.html'],
+]);
 const REQUIRED_ARTIFACTS = [
   'index.html',
   'en/index.html',
@@ -18,8 +23,8 @@ const REQUIRED_ARTIFACTS = [
   'apple-touch-icon.png',
 ];
 const PAGES = [
-  { file: 'index.html', lang: 'sk', canonical: `${SITE_ORIGIN}/` },
-  { file: 'en/index.html', lang: 'en', canonical: `${SITE_ORIGIN}/en/` },
+  { file: 'index.html', lang: 'sk', canonical: 'https://denisvarga.sk/' },
+  { file: 'en/index.html', lang: 'en', canonical: 'https://denisvarga.dev/' },
   { file: '404.html', lang: 'sk', canonical: null },
 ] as const;
 const HREFLANGS = ['en', 'sk', 'x-default'];
@@ -57,7 +62,9 @@ export function parseTags(html: string): Tag[] {
 
 // Local URL -> path inside dist/client, or null for external, anchor and protocol links.
 export function localAssetPath(url: string): string | null {
-  const path = url.startsWith(SITE_ORIGIN + '/') ? url.slice(SITE_ORIGIN.length) : url;
+  const origin = [...SITE_ROOTS.keys()].find((o) => url.startsWith(`${o}/`));
+  const path = origin ? url.slice(origin.length) : url;
+  if (origin && /^\/(?:[?#]|$)/.test(path)) return SITE_ROOTS.get(origin) ?? null;
   if (!path.startsWith('/') || path.startsWith('//')) return null;
   const clean = decodeURIComponent(path.replace(/[?#].*$/, ''));
   return clean.endsWith('/') ? `${clean}index.html` : clean;

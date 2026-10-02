@@ -2,10 +2,11 @@
  * Reveal contract (D-19):
  * - [data-reveal] / [data-reveal='fade'] / [data-split] are hidden here and shown when
  *   use-reveal sets data-in from its IntersectionObserver. React never renders data-in.
- * - Split headings: <h2 data-split><span class="word-mask"><span class="word">..</span></span>..</h2>.
- *   --i comes from the mask's position, so stagger needs no inline style.
+ * - Split headings: <h2 data-split><span class="word-mask"><span class="word">..</span>
+ *   <span> </span></span>..</h2>, the space zero-size. --i comes from the mask's position, so
+ *   stagger needs no inline style.
  * - [data-enter], [data-enter='fade'], [data-enter-split] are the hero's first-paint keyframes;
- *   an ancestor with data-in switches them off so a language switch does not replay them.
+ *   an ancestor with data-in switches them off once played, so remounted words never replay them.
  * - Without data-js on <html> (JS failed or never loaded) a one-shot failsafe shows everything
  *   after 3 s; use-reveal sets data-js once its observer exists, which cancels it.
  */

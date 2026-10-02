@@ -13,7 +13,13 @@ const page = (lang: string, canonical: string | null, body = '<p class="_p_1">x<
     ${canonical ? `<link rel="canonical" href="${canonical}">` : ''}
     ${
       canonical
-        ? ['sk', 'en', 'x-default'].map((h) => `<link rel="alternate" hreflang="${h}" href="https://denisvarga.sk/">`).join('')
+        ? [
+            ['sk', 'https://denisvarga.sk/'],
+            ['en', 'https://denisvarga.dev/'],
+            ['x-default', 'https://denisvarga.sk/'],
+          ]
+            .map(([h, href]) => `<link rel="alternate" hreflang="${h}" href="${href}">`)
+            .join('')
         : ''
     }
     <link rel="preload" href="/assets/manrope-latin-wght-normal-A1.woff2" as="font" type="font/woff2" crossorigin>
@@ -26,8 +32,8 @@ const page = (lang: string, canonical: string | null, body = '<p class="_p_1">x<
 
 const FIXTURE: Record<string, string> = {
   'client/index.html': page('sk', 'https://denisvarga.sk/'),
-  'client/en/index.html': page('en', 'https://denisvarga.sk/en/'),
-  'client/404.html': page('sk', null, '<a class="_p_1" href="/en/">x</a>'),
+  'client/en/index.html': page('en', 'https://denisvarga.dev/'),
+  'client/404.html': page('sk', null, '<a class="_p_1" href="https://denisvarga.dev/">x</a>'),
   'client/assets/index-A1.css': '._p_1{color:red}._img_2{width:1px}',
   'client/assets/index-A1.js': '',
   'client/assets/manrope-latin-wght-normal-A1.woff2': '',
@@ -80,12 +86,19 @@ describe('checkDist', () => {
   });
 
   it('rule 4: wrong lang, missing canonical, wrong hreflang count', async () => {
-    await put('client/en/index.html', page('sk', 'https://denisvarga.sk/en/'));
+    await put('client/en/index.html', page('sk', 'https://denisvarga.dev/'));
     await put('client/index.html', page('sk', null));
     expect(await checkDist(dist)).toEqual([
       'client/index.html: canonical [], expected https://denisvarga.sk/',
       'client/index.html: hreflang [], expected en,sk,x-default',
       'client/en/index.html: <html lang="sk">, expected "en"',
+    ]);
+  });
+
+  it('rule 4: the English page canonical on the Slovak domain', async () => {
+    await put('client/en/index.html', page('en', 'https://denisvarga.sk/en/'));
+    expect(await checkDist(dist)).toEqual([
+      'client/en/index.html: canonical ["https://denisvarga.sk/en/"], expected https://denisvarga.dev/',
     ]);
   });
 
@@ -123,10 +136,16 @@ describe('localAssetPath', () => {
     ['/en/', '/en/index.html'],
     ['/assets/a.css?v=1#x', '/assets/a.css'],
     ['https://denisvarga.sk/og-image.jpg', '/og-image.jpg'],
+    ['https://denisvarga.sk/', '/index.html'],
+    ['https://denisvarga.dev/', '/en/index.html'],
+    ['https://denisvarga.dev/?ref=x', '/en/index.html'],
+    ['https://denisvarga.dev/og-image-en.jpg', '/og-image-en.jpg'],
+    ['https://denisvarga.sk.evil.example/', null],
     ['//cdn.example.com/a.js', null],
     ['https://github.com/denisvarga', null],
     ['#top', null],
     ['mailto:hello@denisvarga.sk', null],
+    ['mailto:hello@denisvarga.dev', null],
   ])('%s -> %s', (url, expected) => {
     expect(localAssetPath(url)).toBe(expected);
   });

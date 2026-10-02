@@ -44,5 +44,9 @@ describe.each(LANGS)('prerendered App (%s)', (lang) => {
     expect(onRecoverableError).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
     expect(container.querySelectorAll('section[data-sec]')).toHaveLength(7);
+    // Prerendered with the production domains; jsdom runs on localhost, so hydration swaps in the
+    // relative paths without a mismatch.
+    expect(html).toContain('href="https://denisvarga.dev/"');
+    expect([...container.querySelectorAll('a[hreflang]')].map((a) => a.getAttribute('href'))).toEqual(['/', '/en/']);
   });
 });
