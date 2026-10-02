@@ -93,7 +93,7 @@
       "mustInclude": [
         "agent"
       ],
-      "note": "Site suggestion. Built by an AI agent team Denis directed, design to production in one afternoon."
+      "note": "Site suggestion. Denis built it with AI agents under his control, design to production in one afternoon."
     }
   },
   {
@@ -126,7 +126,7 @@
       "mustInclude": [
         "agent"
       ],
-      "note": "Site suggestion. AI agent team, Cloudflare Worker, GPT-6 Luna chat."
+      "note": "Site suggestion. Built by Denis with AI agents under his control; Cloudflare Worker, GPT-6 Luna chat."
     }
   },
   {

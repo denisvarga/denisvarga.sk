@@ -35,6 +35,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-02.4');
+    expect(PROMPT_VERSION).toBe('2026-10-02.5');
   });
 });
