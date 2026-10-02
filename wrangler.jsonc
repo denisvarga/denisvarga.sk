@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "denisvarga-sk",
+  "account_id": "9236461db74f030db851f864fb7ebb1b",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-02",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "invocation_logs": false }
+  },
+  "vars": {
+    "OPENAI_MODEL": "gpt-6-luna",
+    "OPENAI_REASONING_EFFORT": "none",
+    "DAILY_CAP": "300",
+    "ALLOWED_ORIGINS": "https://denisvarga.sk",
+    "TURNSTILE_HOSTNAME": "denisvarga.sk",
+    "TURNSTILE_ACTION": "ask"
+  }
+}

@@ -1,0 +1,7 @@
+# Single-package repo; this file only carries pnpm settings.
+minimumReleaseAge: 1440
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true

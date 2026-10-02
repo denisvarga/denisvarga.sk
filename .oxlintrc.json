@@ -1,0 +1,5 @@
+{
+  "categories": { "correctness": "error", "suspicious": "warn" },
+  "env": { "browser": true, "node": true, "es2024": true },
+  "ignorePatterns": ["dist/**", "dist-ssr/**", "design/**", "spikes/**", "worker-configuration.d.ts"]
+}

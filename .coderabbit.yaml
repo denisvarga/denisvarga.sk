@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "^main$"
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!worker-configuration.d.ts"
+    - "!**/*.webp"
+    - "!**/*.avif"
+    - "!**/*.png"
+    - "!**/*.jpg"
+    - "!**/*.woff2"
