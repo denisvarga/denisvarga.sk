@@ -28,10 +28,10 @@ export const demosEn: readonly Demo[] = [
     ],
   },
   {
-    title: 'mcp - denva fleet',
+    title: 'mcp - site care',
     lines: [
       ['cmd', 'Find sites with a critical plugin update, update them on staging and check nothing broke.'],
-      ['out', 'denva_fleet.list_sites({ filter: "critical_updates" })'],
+      ['out', 'sites.list({ filter: "critical_updates" })'],
       ['out', 'wordpress.create_staging(site)'],
       ['out', 'wordpress.update_plugins(staging, { only: "critical" })'],
       ['out', 'browser.visual_diff(staging, production)'],

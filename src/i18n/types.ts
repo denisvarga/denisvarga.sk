@@ -39,6 +39,7 @@ export interface Copy {
     readonly title: string;
     readonly lead: string;
     readonly tools: Four<AiTool>;
+    readonly demoNote: string;
   };
   readonly ask: {
     readonly label: string;

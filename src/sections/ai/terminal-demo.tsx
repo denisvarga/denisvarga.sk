@@ -9,6 +9,8 @@ import styles from './terminal.module.css';
 interface TerminalDemoProps {
   readonly id: string;
   readonly demo: Demo;
+  /** Shown under the terminal: the demos are scripted, not recorded runs. */
+  readonly note: string;
   readonly tool: number;
   /** Changes on every tool pick; each change restarts the timing. */
   readonly runKey: string;
@@ -37,7 +39,7 @@ function Prefix({ kind }: { readonly kind: DemoLineKind }) {
   );
 }
 
-export function TerminalDemo({ id, demo, tool, runKey, barRefs, onDone }: TerminalDemoProps) {
+export function TerminalDemo({ id, demo, note, tool, runKey, barRefs, onDone }: TerminalDemoProps) {
   const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
   const titleId = useId();
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -118,6 +120,7 @@ export function TerminalDemo({ id, demo, tool, runKey, barRefs, onDone }: Termin
           ))}
         </div>
       </div>
+      <p className={styles.note}>{note}</p>
     </div>
   );
 }

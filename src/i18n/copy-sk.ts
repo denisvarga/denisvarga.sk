@@ -43,6 +43,7 @@ export const copySk: Copy = {
         desc: 'Make, n8n, Zapier, webhooky a API. Najprv proces zmapujem a zbytočné kroky vyhodím, až potom ho automatizujem.',
       },
     ],
+    demoNote: 'Ilustračná ukážka postupu, nie záznam reálneho behu.',
   },
   ask: {
     label: 'Môj AI agent',

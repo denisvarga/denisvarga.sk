@@ -43,6 +43,7 @@ export const copyEn: Copy = {
         desc: 'Make, n8n, Zapier, webhooks and APIs. First I map the process and cut the unnecessary steps. Only then do I automate it.',
       },
     ],
+    demoNote: 'Illustrative workflow, not a recorded run.',
   },
   ask: {
     label: 'My AI agent',

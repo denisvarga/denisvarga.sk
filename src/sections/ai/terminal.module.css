@@ -2,6 +2,8 @@
   flex: 1.5 1 min(100%, 480px);
   min-width: 0;
   display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .card {
@@ -85,4 +87,12 @@
   margin-left: 2px;
   vertical-align: -2px;
   background: var(--bg);
+}
+
+/* The ask card's note size, but grey-600: grey-500 falls below AA contrast on the light background. */
+.note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey-600);
 }
