@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import { JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
-import { headCopy } from '../i18n/head-copy';
+import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 import { contact } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
-import { CV_NAME, cvCopy, cvDate, cvLabels, displayUrl, GITHUB_URL, LINKEDIN_URL, typeset } from './cv-copy';
+import { CV_NAME, cvCopy, cvDate, cvLabels, displayUrl, typeset } from './cv-copy';
 
 export interface CvDocumentProps {
   readonly lang: Lang;

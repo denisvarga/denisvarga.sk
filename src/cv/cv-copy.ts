@@ -4,8 +4,6 @@ import type { Copy, Lang, Localized } from '../i18n/types';
 
 export const CV_NAME = 'Denis Varga';
 export const CV_TITLE = `${CV_NAME} - CV`;
-export const GITHUB_URL = 'https://github.com/denisvarga';
-export const LINKEDIN_URL = 'https://www.linkedin.com/in/denisvarg/';
 
 const TIME_ZONE = 'Europe/Bratislava';
 const DATE_LOCALE: Localized<string> = { sk: 'sk-SK', en: 'en-GB' };

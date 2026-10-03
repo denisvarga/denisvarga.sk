@@ -1,6 +1,8 @@
 import type { Lang, Localized } from './types';
 
 export const SOURCE_URL = 'https://github.com/denisvarga/denisvarga.sk';
+export const GITHUB_URL = 'https://github.com/denisvarga';
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/denisvarg/';
 
 export interface HeadCopy {
   /** Each language has its own domain; its page is served at the domain root. */

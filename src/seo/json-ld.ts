@@ -1,5 +1,5 @@
 import { SKILLS, skillLabel } from '../data/skills';
-import { canonicalUrl, headCopy } from '../i18n/head-copy';
+import { canonicalUrl, GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 
 // One @id on both domains, so the SK and EN profile pages describe the same person.
@@ -48,7 +48,7 @@ export function profileJsonLd(lang: Lang, portraitPath: string): Record<string, 
           description: head.description,
           email: `mailto:${head.email}`,
           telephone: '+421902074830',
-          sameAs: ['https://github.com/denisvarga', 'https://www.linkedin.com/in/denisvarg/'],
+          sameAs: [GITHUB_URL, LINKEDIN_URL],
           worksFor: [
             { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
           ],

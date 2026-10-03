@@ -2,7 +2,7 @@ import { JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { copyEn } from '../i18n/copy-en';
-import { headCopy, SOURCE_URL } from '../i18n/head-copy';
+import { headCopy, LINKEDIN_URL, SOURCE_URL } from '../i18n/head-copy';
 import { contact } from '../i18n/ui-copy';
 
 const EN = headCopy.en;
@@ -14,7 +14,7 @@ function contactLines(): string[] {
     `- Email (English): ${EN.email}`,
     `- Email (Slovak): ${SK.email}`,
     `- Phone: ${contact.en.phone}`,
-    '- LinkedIn: https://www.linkedin.com/in/denisvarg/',
+    `- LinkedIn: ${LINKEDIN_URL}`,
     `- Source code of this site: ${SOURCE_URL}`,
   ];
 }
