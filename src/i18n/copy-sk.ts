@@ -5,7 +5,7 @@ export const copySk: Copy = {
   hero: {
     sub: 'AI developer s produktovým myslením',
     title: 'Ahoj, som *Denis.*',
-    lead: 'Staviam webové aplikácie, AI agentov a interné nástroje a automatizujem firemné procesy. AI mi dáva rýchlosť, všestrannosť a väčšiu kontrolu. Ja určujem smer: čo má vzniknúť, pre koho a prečo.',
+    lead: 'V probléme nevidím prekážku, ale príležitosť niečo zlepšiť. Najprv ho poriadne pochopím a potom navrhnem a postavím vhodné riešenie, či je to webová aplikácia, AI agent alebo interný nástroj.',
     cta1: 'Moja práca',
     cta2: 'Spýtať sa môjho AI agenta',
     badge: 'Otvorený projektom aj pozíciám',
@@ -13,7 +13,7 @@ export const copySk: Copy = {
   about: {
     label: 'O mne',
     title: 'Vyvíjam od roku 2017. Dnes s AI v *každom kroku.*',
-    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru: weby, e-shopy, aplikácie aj interné nástroje. Dnes pracujem AI-first. Kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a firme. Čo ešte neviem, rýchlo sa doučím. A keď niečo v procese bolí, zvyčajne to vyrieši dobrý nástroj. Niekedy stačí proces zjednodušiť.',
+    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru: weby, e-shopy, aplikácie aj interné nástroje. Dnes pracujem AI-first: AI mi dáva rýchlosť, všestrannosť a väčšiu kontrolu, smer určujem ja. Kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a firme. Čo ešte neviem, rýchlo sa doučím. A niekedy je najlepšie riešenie proces zjednodušiť, nie ho automatizovať.',
     facts: [
       { label: 'AI', value: 'Agenti, MCP, Claude Code, Codex' },
       { label: 'Vyvíjam', value: 'Full-stack, od nápadu po produkciu' },

@@ -5,7 +5,7 @@ export const copyEn: Copy = {
   hero: {
     sub: 'AI developer with a product mindset',
     title: "Hi, I'm *Denis.*",
-    lead: 'I build web apps, AI agents and internal tools, and automate company processes. AI gives me speed, versatility and more control. I set the direction: what gets built, for whom and why.',
+    lead: "I don't see a problem as an obstacle but as a chance to make something better. First I make sure I understand it, then I design and build the right solution, whether that's a web app, an AI agent or an internal tool.",
     cta1: 'My work',
     cta2: 'Ask my AI agent',
     badge: 'Open to projects and roles',
@@ -13,7 +13,7 @@ export const copyEn: Copy = {
   about: {
     label: 'About',
     title: 'Building software since 2017. Now with AI at *every step.*',
-    body: "I started in 2015 with an agency internship, moved through graphic design and print, and since 2017 I've been building custom websites, online stores, apps and internal tools. Today I work AI-first. I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. What I don't know yet, I learn fast. And when a process hurts, the right tool usually fixes it. Sometimes the process just needs to be simpler.",
+    body: "I started in 2015 with an agency internship, moved through graphic design and print, and since 2017 I've been building custom websites, online stores, apps and internal tools. Today I work AI-first: AI gives me speed, versatility and more control; I set the direction. I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. What I don't know yet, I learn fast. And sometimes the best solution is to simplify the process, not automate it.",
     facts: [
       { label: 'AI', value: 'Agents, MCP, Claude Code, Codex' },
       { label: 'I build', value: 'Full-stack, from idea to production' },
