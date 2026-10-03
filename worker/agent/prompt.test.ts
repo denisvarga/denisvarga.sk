@@ -26,6 +26,14 @@ describe('buildInstructions', () => {
     expect(text).toContain('- Web má dve jazykové verzie: slovenskú na denisvarga.sk a anglickú na denisvarga.dev.');
   });
 
+  it('gives location, languages and education as facts and no rule forbids stating them', () => {
+    expect(text).toContain('- Lokalita: Bratislava, Slovensko.');
+    expect(text).toContain('- Jazyky: slovenčina (materinský jazyk) a angličtina na pracovnej úrovni');
+    expect(text).toContain('- Vzdelanie: Stredná odborná škola polygrafická');
+    expect(text).toContain('Nikdy si nič nevymýšľaj (ceny, sadzby, termíny, klientov, osobné údaje).');
+    expect(text).toContain('- Skúsenosti: Denva (2018-dnes');
+  });
+
   it('keeps the design structure: intro, FAKTY, PRAVIDLÁ', () => {
     expect(text.startsWith('Si AI agent na osobnom CV a portfóliu Denisa Vargu.')).toBe(true);
     expect(text.indexOf('\n\nFAKTY:\n- Denis Varga')).toBeGreaterThan(0);
@@ -35,6 +43,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-02.5');
+    expect(PROMPT_VERSION).toBe('2026-10-03.1');
   });
 });
