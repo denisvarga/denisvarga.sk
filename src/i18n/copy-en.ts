@@ -5,7 +5,7 @@ export const copyEn: Copy = {
   hero: {
     sub: 'AI developer with a product mindset',
     title: "Hi, I'm *Denis.*",
-    lead: 'I build web apps, AI agents and internal tools, and automate company processes. AI gives me speed; I set the direction: what gets built, for whom and why.',
+    lead: 'I build web apps, AI agents and internal tools, and automate company processes. AI gives me speed, versatility and more control. I set the direction: what gets built, for whom and why.',
     cta1: 'My work',
     cta2: 'Ask my AI agent',
     badge: 'Open to projects and roles',

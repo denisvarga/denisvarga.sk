@@ -5,7 +5,7 @@ export const copySk: Copy = {
   hero: {
     sub: 'AI developer s produktovým myslením',
     title: 'Ahoj, som *Denis.*',
-    lead: 'Staviam webové aplikácie, AI agentov a interné nástroje a automatizujem firemné procesy. AI mi dáva rýchlosť, ja určujem smer: čo má vzniknúť, pre koho a prečo.',
+    lead: 'Staviam webové aplikácie, AI agentov a interné nástroje a automatizujem firemné procesy. AI mi dáva rýchlosť, všestrannosť a väčšiu kontrolu. Ja určujem smer: čo má vzniknúť, pre koho a prečo.',
     cta1: 'Moja práca',
     cta2: 'Spýtať sa môjho AI agenta',
     badge: 'Otvorený projektom aj pozíciám',
