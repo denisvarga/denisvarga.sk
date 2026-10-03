@@ -56,12 +56,12 @@ describe('buildHeadTags', () => {
     [
       'sk',
       'Denis Varga | AI developer s produktovým myslením',
-      'Webové aplikácie, AI agenti a interné nástroje. Vyše desať rokov vývoja, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
+      'Webové aplikácie, AI agenti a interné nástroje. Vyvíjam od roku 2017, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
     ],
     [
       'en',
       'Denis Varga | AI developer with a product mindset',
-      'Web apps, AI agents and internal tools. Over ten years of development, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
+      'Web apps, AI agents and internal tools. Building software since 2017, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
     ],
   ] as const)('%s: the approved title and description in the page and OG tags', (lang, title, description) => {
     const doc = parseHead(buildHeadTags(lang, ASSETS));

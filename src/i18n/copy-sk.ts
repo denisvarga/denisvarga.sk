@@ -5,26 +5,26 @@ export const copySk: Copy = {
   hero: {
     sub: 'AI developer s produktovým myslením',
     title: 'Ahoj, som *Denis.*',
-    lead: 'Na takmer každý problém sa dá postaviť riešenie. Webové aplikácie, AI agenti aj interné nástroje - s AI rýchlo, s rozumným prístupom tak, aby dávali zmysel aj biznisu.',
+    lead: 'Staviam webové aplikácie, AI agentov a interné nástroje a automatizujem firemné procesy. AI mi dáva rýchlosť, ja určujem smer: čo má vzniknúť, pre koho a prečo.',
     cta1: 'Moja práca',
     cta2: 'Spýtať sa môjho AI agenta',
     badge: 'Otvorený projektom aj pozíciám',
   },
   about: {
     label: 'O mne',
-    title: 'Vyše desať rokov vývoja. Dnes s AI v *každom kroku.*',
-    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru - weby, e-shopy, aplikácie aj interné nástroje. Dnes robím AI-first: kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a biznisu. Čo ešte neviem, rýchlo sa doučím. Rozumný problém, na ktorý by sa nedalo postaviť riešenie, som zatiaľ nestretol.',
+    title: 'Vyvíjam od roku 2017. Dnes s AI v *každom kroku.*',
+    body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru: weby, e-shopy, aplikácie aj interné nástroje. Dnes pracujem AI-first. Kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a firme. Čo ešte neviem, rýchlo sa doučím. A keď niečo v procese bolí, zvyčajne to vyrieši dobrý nástroj. Niekedy stačí proces zjednodušiť.',
     facts: [
       { label: 'AI', value: 'Agenti, MCP, Claude Code, Codex' },
       { label: 'Vyvíjam', value: 'Full-stack, od nápadu po produkciu' },
-      { label: 'Teraz', value: 'Otvorený projektom aj pozíciám' },
+      { label: 'Lokalita', value: 'Bratislava alebo remote' },
     ],
   },
   exp: { label: 'Skúsenosti', title: 'Moja *cesta*', present: 'dnes' },
   ai: {
     label: 'AI',
     title: 'AI píše, ja *rozhodujem.*',
-    lead: 'Agentom nechávam, čo zvládnu rýchlejšie: kód, testy, rešerše a opakujúcu sa prácu. Ja riešim, čo má produkt robiť, ako ho postaviť a či dáva zmysel pre biznis. Výsledok vždy kontrolujem sám.',
+    lead: 'Agentom nechávam, čo zvládnu rýchlejšie: kód, testy, rešerše a opakujúcu sa prácu. Ja riešim, čo má produkt robiť, ako ho postaviť a či sa ho oplatí stavať. Výsledok vždy kontrolujem sám.',
     tools: [
       {
         name: 'Claude Code a Codex',
@@ -66,12 +66,12 @@ export const copySk: Copy = {
   work: {
     label: 'Projekty',
     title: 'Čo som *postavil*',
-    body: 'Weby, e-shopy a aplikácie na mieru, bez pagebuilderov a kúpených šablón. Dnes ich staviam aj spravujem s AI agentmi po boku.',
+    body: 'Weby, e-shopy a aplikácie na mieru, bez page builderov a kúpených šablón. Dnes ich staviam aj spravujem s AI agentmi po boku.',
   },
   stack: { label: 'Nástroje', title: 'S čím *pracujem*' },
   contact: {
     title: 'Zaujal som vás? *Ozvite sa mi.*',
-    body: 'Chceli by ste ma vo svojom tíme alebo spolupracovať na projekte? Napíšte mi, rád sa porozprávam.',
+    body: 'Hľadáte posilu do tímu alebo partnera na projekt? Napíšte mi, rád sa porozprávam.',
     cv: 'Stiahnuť CV',
     top: 'Späť hore',
   },
