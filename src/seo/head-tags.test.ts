@@ -119,6 +119,8 @@ describe('buildHeadTags', () => {
       email: `mailto:${email}`,
       telephone: '+421902074830',
       sameAs: ['https://github.com/denisvarga', 'https://www.linkedin.com/in/denisvarg/'],
+      address: { '@type': 'PostalAddress', addressLocality: 'Bratislava', addressCountry: 'SK' },
+      knowsLanguage: ['sk', 'en'],
       knowsAbout: knowsAbout(lang),
     });
     expect(person.worksFor).toEqual([

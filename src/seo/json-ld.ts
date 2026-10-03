@@ -49,6 +49,8 @@ export function profileJsonLd(lang: Lang, portraitPath: string): Record<string, 
           email: `mailto:${head.email}`,
           telephone: '+421902074830',
           sameAs: [GITHUB_URL, LINKEDIN_URL],
+          address: { '@type': 'PostalAddress', addressLocality: 'Bratislava', addressCountry: 'SK' },
+          knowsLanguage: ['sk', 'en'],
           worksFor: [
             { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
           ],

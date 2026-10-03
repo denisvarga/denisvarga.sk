@@ -58,6 +58,9 @@ export function buildLlmsFullTxt(): string {
     t.about.body,
     '',
     ...t.about.facts.map((f) => `- ${f.label}: ${f.value}`),
+    '- Location: Bratislava, Slovakia; remote preferred.',
+    '- Languages: Slovak (native), English (professional working proficiency).',
+    '- Education: Secondary School of Printing (Stredná odborná škola polygrafická), digital media graphic designer, 2012 - 2016.',
     '',
     '## Experience',
     ...JOBS.flatMap((job) => [
