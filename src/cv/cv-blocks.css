@@ -7,9 +7,10 @@
   row-gap: 3mm;
 }
 
+/* Wide enough for "2018 - present" at the period's font size. */
 .job {
   display: grid;
-  grid-template-columns: 19mm 1fr;
+  grid-template-columns: 21mm 1fr;
   column-gap: 4mm;
   break-inside: avoid;
 }

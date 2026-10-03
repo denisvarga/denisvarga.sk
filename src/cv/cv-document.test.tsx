@@ -4,7 +4,7 @@ import { JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';
-import { cvLabels, displayUrl, typeset } from './cv-copy';
+import { cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 import { CvDocument } from './cv-document';
 import { cvHtmlDocument } from './cv-html';
 
@@ -39,7 +39,7 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
 
   it('labels every section in its language', () => {
     const l = cvLabels[lang];
-    expect(textOf(doc, 'h2')).toEqual([l.contact, l.profile, l.experience, l.ai, l.skills, l.projects]);
+    expect(textOf(doc, 'h2')).toEqual([l.contact, l.profile, l.experience, l.ai, l.skills, l.languages, l.education, l.projects]);
   });
 
   it('carries the per-language contacts', () => {
@@ -52,7 +52,13 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
       'https://www.linkedin.com/in/denisvarg/',
     ]);
     expect(text).toContain('linkedin.com/in/denisvarg');
+    expect(doc.querySelector('.contact-list li')?.textContent).toBe(cvFacts[lang].location);
     expect(doc.querySelector('img')?.getAttribute('src')).toBe('portrait.jpg');
+  });
+
+  it('states languages and education in their own sections', () => {
+    expect(doc.querySelector('.languages p')?.textContent).toBe(cvFacts[lang].languages);
+    expect(doc.querySelector('.education p')?.textContent).toContain('(2012 - 2016)');
   });
 
   it('renders plain text: no markup asterisks and no en or em dash', () => {

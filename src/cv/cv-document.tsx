@@ -6,7 +6,7 @@ import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 import { contact } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
-import { CV_NAME, cvCopy, cvDate, cvLabels, displayUrl, typeset } from './cv-copy';
+import { CV_NAME, cvCopy, cvDate, cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 
 export interface CvDocumentProps {
   readonly lang: Lang;
@@ -53,6 +53,7 @@ function Header({ lang, portraitSrc }: { lang: Lang; portraitSrc: string }) {
       <section className="contact">
         <h2 className="sec-label">{cvLabels[lang].contact}</h2>
         <ul className="contact-list">
+          <li>{cvFacts[lang].location}</li>
           {links.map(([href, text]) => (
             <li key={href}>
               <a href={href}>{text}</a>
@@ -67,6 +68,7 @@ function Header({ lang, portraitSrc }: { lang: Lang; portraitSrc: string }) {
 export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) {
   const t = cvCopy[lang];
   const label = cvLabels[lang];
+  const facts = cvFacts[lang];
   const text = (source: string) => typeset(plainTitle(source), lang);
 
   return (
@@ -119,6 +121,14 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
             </div>
           ))}
         </dl>
+      </Section>
+
+      <Section label={label.languages} className="languages">
+        <p>{text(facts.languages)}</p>
+      </Section>
+
+      <Section label={label.education} className="education">
+        <p>{text(facts.education)}</p>
       </Section>
 
       <Section label={label.projects} className="projects">

@@ -13,9 +13,17 @@ export interface CvLabels {
   readonly experience: string;
   readonly ai: string;
   readonly skills: string;
+  readonly languages: string;
+  readonly education: string;
   readonly projects: string;
   readonly contact: string;
   readonly generated: (date: string) => string;
+}
+
+export interface CvFacts {
+  readonly location: string;
+  readonly languages: string;
+  readonly education: string;
 }
 
 export const cvLabels: Localized<CvLabels> = {
@@ -24,6 +32,8 @@ export const cvLabels: Localized<CvLabels> = {
     experience: 'Skúsenosti',
     ai: 'Ako pracujem s AI',
     skills: 'Zručnosti',
+    languages: 'Jazyky',
+    education: 'Vzdelanie',
     projects: 'Projekty',
     contact: 'Kontakt',
     generated: (date) => `Vygenerované z denisvarga.sk ${date}`,
@@ -33,9 +43,24 @@ export const cvLabels: Localized<CvLabels> = {
     experience: 'Experience',
     ai: 'How I work with AI',
     skills: 'Skills',
+    languages: 'Languages',
+    education: 'Education',
     projects: 'Projects',
     contact: 'Contact',
     generated: (date) => `Generated from denisvarga.dev on ${date}`,
+  },
+};
+
+export const cvFacts: Localized<CvFacts> = {
+  sk: {
+    location: 'Bratislava alebo remote',
+    languages: 'slovenčina (materinský jazyk), angličtina (pracovná úroveň)',
+    education: 'Stredná odborná škola polygrafická, grafik digitálnych médií (2012 - 2016)',
+  },
+  en: {
+    location: 'Bratislava or remote',
+    languages: 'Slovak (native), English (professional working proficiency)',
+    education: 'Secondary School of Printing, digital media graphic designer (2012 - 2016)',
   },
 };
 
