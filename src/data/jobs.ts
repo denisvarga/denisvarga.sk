@@ -10,21 +10,12 @@ export interface Job {
 
 export const JOBS: readonly Job[] = [
   {
-    period: { start: 2026, end: null },
-    company: 'GrandPano',
-    role: { sk: 'WordPress špecialista', en: 'WordPress specialist' },
-    text: {
-      sk: 'WordPress weby pre developerské projekty, postavené na mieru a 1:1 podľa Figma dizajnu.',
-      en: 'WordPress sites for real-estate development projects, custom-built 1:1 from Figma designs.',
-    },
-  },
-  {
     period: { start: 2018, end: null },
-    company: 'Freelance',
-    role: { sk: 'AI a fullstack developer', en: 'AI & fullstack developer' },
+    company: 'Denva',
+    role: { sk: 'AI engineer a fullstack developer', en: 'AI engineer & full-stack developer' },
     text: {
-      sk: 'Pod menom Denva robím priamo pre klientov: AI agenti, automatizácie a vlastné MCP servery, k tomu weby, e-shopy a aplikácie od prvého náčrtu po server.',
-      en: 'Under the name Denva I work directly with clients: AI agents, automations and custom MCP servers, plus websites, stores and apps from the first sketch to the server.',
+      sk: 'Pod značkou Denva pracujem priamo pre klientov. Staviam AI agentov, automatizácie a vlastné MCP servery a k tomu weby, e-shopy a aplikácie od prvého náčrtu po produkciu.',
+      en: 'Under the Denva name I work directly with clients. I build AI agents, automations and custom MCP servers, plus websites, online stores and apps from first sketch to production.',
     },
   },
   {
@@ -32,8 +23,8 @@ export const JOBS: readonly Job[] = [
     company: 'Vibration s.r.o.',
     role: { sk: 'Web developer', en: 'Web developer' },
     text: {
-      sk: 'WordPress od veľkých multisite inštalácií po WooCommerce e-shopy, vývoj aj dlhodobá správa. Popri tom frontendy e-shopov na platforme Sellio v PHP Yii a Vue.js.',
-      en: 'WordPress from large multisite installs to WooCommerce stores, development and long-term care. Plus e-shop frontends on the Sellio platform in PHP Yii and Vue.js.',
+      sk: 'Vyvíjam a dlhodobo spravujem WordPress, od veľkých multisite inštalácií po WooCommerce e-shopy. Popritom robím frontendy e-shopov na platforme Sellio (PHP Yii, Vue.js).',
+      en: 'I build and maintain WordPress, from large multisite installs to WooCommerce stores. Alongside that I build store frontends on the Sellio e-commerce platform (PHP Yii, Vue.js).',
     },
   },
   {
@@ -41,26 +32,26 @@ export const JOBS: readonly Job[] = [
     company: 'TENENET o.z.',
     role: { sk: 'Web developer a IT špecialista', en: 'Web developer & IT specialist' },
     text: {
-      sk: 'Štyri roky v neziskovej organizácii: weby pre jej projekty, hlavný web a IT podpora pre kolegov.',
-      en: 'Four years at a non-profit: sites for its projects, the main website and IT support for colleagues.',
+      sk: 'Štyri roky remote pre neziskovú organizáciu: weby jej projektov, hlavný web a IT podpora pre kolegov.',
+      en: 'Four years remote for a non-profit: sites for its projects, the main website and IT support for colleagues.',
     },
   },
   {
     period: { start: 2016, end: 2017 },
     company: 'Multimedia s.r.o.',
-    role: { sk: 'Grafik a tlačiar', en: 'Designer & printer' },
+    role: { sk: 'Grafik (tlač a web)', en: 'Graphic designer & press operator' },
     text: {
-      sk: 'Grafika pre tlač aj web a obsluha tlačových strojov. Odtiaľ mám cit pre typografiu a detail.',
-      en: "Graphics for print and web, running print machines. That's where my eye for type and detail comes from.",
+      sk: 'Navrhoval som grafiku pre tlač aj web a obsluhoval tlačové stroje. Odtiaľ mám cit pre typografiu a detail.',
+      en: "I designed graphics for print and web and ran the printing presses. That's where my eye for type and detail comes from.",
     },
   },
   {
     period: { start: 2015, end: 2016 },
     company: 'Comsultia s.r.o.',
-    role: { sk: 'Stáž', en: 'Internship' },
+    role: { sk: 'Web developer (stáž)', en: 'Web developer intern' },
     text: {
-      sk: 'HTML, CSS a JavaScript pre agentúrne projekty. Prvé weby, ktoré išli von - tu ma to chytilo.',
-      en: 'HTML, CSS and JavaScript for agency projects. The first sites that went live - this is where it got me.',
+      sk: 'HTML, CSS a JavaScript pre agentúrne projekty. Tu som spustil svoje prvé weby a tu ma vývoj chytil.',
+      en: "HTML, CSS and JavaScript for agency projects. My first sites went live here, and that's where I got hooked.",
     },
   },
 ];

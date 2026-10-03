@@ -122,7 +122,6 @@ describe('buildHeadTags', () => {
       knowsAbout: knowsAbout(lang),
     });
     expect(person.worksFor).toEqual([
-      { '@type': 'Organization', name: 'GrandPano', url: 'https://grandpano.sk/' },
       { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
     ]);
     expect(person).not.toHaveProperty('alumniOf');

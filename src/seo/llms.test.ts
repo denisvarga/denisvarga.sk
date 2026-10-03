@@ -14,7 +14,7 @@ describe('llms.txt', () => {
   it('carries the whole CV without markup', () => {
     const text = buildLlmsFullTxt();
     for (const project of PROJECTS) expect(text).toContain(project.url);
-    expect(text).toContain('GrandPano, WordPress specialist (2026 - present)');
+    expect(text).toContain('### Denva, AI engineer & full-stack developer (2018 - present)');
     expect(text).not.toContain('*');
   });
 });

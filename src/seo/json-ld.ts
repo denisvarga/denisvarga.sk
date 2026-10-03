@@ -50,7 +50,6 @@ export function profileJsonLd(lang: Lang, portraitPath: string): Record<string, 
           telephone: '+421902074830',
           sameAs: ['https://github.com/denisvarga', 'https://www.linkedin.com/in/denisvarg/'],
           worksFor: [
-            { '@type': 'Organization', name: 'GrandPano', url: 'https://grandpano.sk/' },
             { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
           ],
           knowsAbout: knowsAbout(lang),
