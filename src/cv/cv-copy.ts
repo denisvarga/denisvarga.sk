@@ -4,8 +4,6 @@ import type { Copy, Lang, Localized } from '../i18n/types';
 
 export const CV_NAME = 'Denis Varga';
 export const CV_TITLE = `${CV_NAME} - CV`;
-export const GITHUB_URL = 'https://github.com/denisvarga';
-export const LINKEDIN_URL = 'https://www.linkedin.com/in/denisvarg/';
 
 const TIME_ZONE = 'Europe/Bratislava';
 const DATE_LOCALE: Localized<string> = { sk: 'sk-SK', en: 'en-GB' };
@@ -15,9 +13,17 @@ export interface CvLabels {
   readonly experience: string;
   readonly ai: string;
   readonly skills: string;
+  readonly languages: string;
+  readonly education: string;
   readonly projects: string;
   readonly contact: string;
   readonly generated: (date: string) => string;
+}
+
+export interface CvFacts {
+  readonly location: string;
+  readonly languages: string;
+  readonly education: string;
 }
 
 export const cvLabels: Localized<CvLabels> = {
@@ -26,6 +32,8 @@ export const cvLabels: Localized<CvLabels> = {
     experience: 'Skúsenosti',
     ai: 'Ako pracujem s AI',
     skills: 'Zručnosti',
+    languages: 'Jazyky',
+    education: 'Vzdelanie',
     projects: 'Projekty',
     contact: 'Kontakt',
     generated: (date) => `Vygenerované z denisvarga.sk ${date}`,
@@ -35,15 +43,30 @@ export const cvLabels: Localized<CvLabels> = {
     experience: 'Experience',
     ai: 'How I work with AI',
     skills: 'Skills',
+    languages: 'Languages',
+    education: 'Education',
     projects: 'Projects',
     contact: 'Contact',
     generated: (date) => `Generated from denisvarga.dev on ${date}`,
   },
 };
 
+export const cvFacts: Localized<CvFacts> = {
+  sk: {
+    location: 'Bratislava alebo remote',
+    languages: 'slovenčina (materinský jazyk), angličtina (pracovná úroveň)',
+    education: 'Stredná odborná škola polygrafická, grafik digitálnych médií (2012 - 2016)',
+  },
+  en: {
+    location: 'Bratislava or remote',
+    languages: 'Slovak (native), English (professional working proficiency)',
+    education: 'Secondary School of Printing, digital media graphic designer (2012 - 2016)',
+  },
+};
+
 export const cvCopy: Localized<Copy> = { sk: copySk, en: copyEn };
 
-// The site's timezone decides the date and the "until now" year, not the build machine's.
+// The site's timezone decides the date, not the build machine's.
 export function cvDate(date: Date, lang: Lang): string {
   return new Intl.DateTimeFormat(DATE_LOCALE[lang], {
     day: 'numeric',
@@ -51,10 +74,6 @@ export function cvDate(date: Date, lang: Lang): string {
     year: 'numeric',
     timeZone: TIME_ZONE,
   }).format(date);
-}
-
-export function cvYear(date: Date): number {
-  return Number(new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: TIME_ZONE }).format(date));
 }
 
 const SK_SINGLE_LETTER_WORD = /(?<=(?:^|[\s(])[aiksouvzAIKSOUVZ])\s+/g;

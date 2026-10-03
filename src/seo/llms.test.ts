@@ -14,7 +14,10 @@ describe('llms.txt', () => {
   it('carries the whole CV without markup', () => {
     const text = buildLlmsFullTxt();
     for (const project of PROJECTS) expect(text).toContain(project.url);
-    expect(text).toContain('GrandPano, WordPress specialist (2026 - present)');
+    expect(text).toContain('### Denva, AI engineer & full-stack developer (2018 - present)');
+    expect(text).toContain('- Location: Bratislava, Slovakia; remote preferred.');
+    expect(text).toContain('- Languages: Slovak (native), English (professional working proficiency).');
+    expect(text).toContain('- Education: Secondary School of Printing (Stredná odborná škola polygrafická), digital media graphic designer, 2012 - 2016.');
     expect(text).not.toContain('*');
   });
 });

@@ -16,6 +16,11 @@ describe('App', () => {
     expect(h1Text(renderToString(<App lang="en" />))).toBe("Hi, I'm Denis.");
   });
 
+  it('captions the terminal demo as illustrative in each language', () => {
+    expect(renderToString(<App lang="sk" />)).toContain('Ilustračná ukážka postupu, nie záznam reálneho behu.');
+    expect(renderToString(<App lang="en" />)).toContain('Illustrative workflow, not a recorded run.');
+  });
+
   it('never renders a style attribute or data-in', () => {
     const html = renderToString(<App lang="sk" />) + renderToString(<App lang="en" />);
     expect(html).not.toContain(' style=');

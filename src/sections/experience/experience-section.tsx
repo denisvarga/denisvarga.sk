@@ -3,13 +3,11 @@ import { SplitHeading } from '../../components/split-heading';
 import heading from '../../components/split-heading.module.css';
 import { JOBS } from '../../data/jobs';
 import { useLang } from '../../i18n/lang-context';
-import { useCurrentYear } from '../../lib/use-current-year';
 import { useReveal } from '../../motion/use-reveal';
 import styles from './experience.module.css';
 
 export function ExperienceSection() {
   const { lang, t } = useLang();
-  const year = useCurrentYear();
   const labelRef = useRef<HTMLSpanElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   useReveal(labelRef);
@@ -27,7 +25,7 @@ export function ExperienceSection() {
         <div ref={cardRef} className={styles.card} data-reveal="">
           {JOBS.map((job) => (
             <div key={job.company} className={styles.job}>
-              <span className={styles.period}>{`${job.period.start} - ${job.period.end ?? year}`}</span>
+              <span className={styles.period}>{`${job.period.start} - ${job.period.end ?? t.exp.present}`}</span>
               <div className={styles.who}>
                 <span className={styles.company}>{job.company}</span>
                 <span className={styles.role}>{job.role[lang]}</span>

@@ -27,7 +27,7 @@ export const PROJECTS: readonly Project[] = [
     name: 'Národný futbalový štadión',
     url: 'https://narodnyfutbalovystadion.sk',
     slug: 'narodnyfutbalovystadion',
-    desc: { sk: 'Šablóna na mieru, napojenie na Ticketportal', en: 'Custom theme, Ticketportal integration' },
+    desc: { sk: 'Téma na mieru, napojenie na Ticketportal', en: 'Custom theme, Ticketportal integration' },
     image: narodnyfutbalovystadion,
   },
   {
@@ -82,8 +82,8 @@ export const PROJECTS: readonly Project[] = [
     url: 'https://saunika.sk',
     slug: 'saunika',
     desc: {
-      sk: 'Šablóna na mieru, WooCommerce podľa dodanej grafiky',
-      en: 'Custom theme, WooCommerce from supplied design',
+      sk: 'Téma na mieru, WooCommerce podľa dodanej grafiky',
+      en: "Custom theme and WooCommerce from the client's design",
     },
     image: saunika,
   },

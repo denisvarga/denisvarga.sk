@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from 'react';
 import pill from '../../components/pill-link.module.css';
 import { SplitHeading } from '../../components/split-heading';
+import { LINKEDIN_URL } from '../../i18n/head-copy';
 import { useLang } from '../../i18n/lang-context';
 import { contact } from '../../i18n/ui-copy';
 import { SiteFooter } from '../../layout/site-footer';
@@ -11,11 +12,12 @@ import styles from './contact.module.css';
 interface MagnetLinkProps {
   readonly href: string;
   readonly tone: 'dark' | 'outline';
-  readonly external?: boolean;
+  /** Opens the link in a new tab with this rel; cross-origin links also drop the referrer. */
+  readonly newTabRel?: 'noopener' | 'noopener noreferrer';
   readonly children: ReactNode;
 }
 
-function MagnetLink({ href, tone, external = false, children }: MagnetLinkProps) {
+function MagnetLink({ href, tone, newTabRel, children }: MagnetLinkProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   useMagnet(ref);
   return (
@@ -23,7 +25,7 @@ function MagnetLink({ href, tone, external = false, children }: MagnetLinkProps)
       ref={ref}
       href={href}
       className={`${pill.pill} ${pill[tone]} ${styles.link}`}
-      {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+      {...(newTabRel ? { target: '_blank', rel: newTabRel } : {})}
     >
       {children}
     </a>
@@ -53,9 +55,12 @@ export function ContactSection() {
             <MagnetLink href={links.phoneHref} tone="outline">
               {links.phone}
             </MagnetLink>
-            <MagnetLink href={links.cvHref} tone="outline" external>
+            <MagnetLink href={links.cvHref} tone="outline" newTabRel="noopener">
               <span>{t.contact.cv}</span>
               <span aria-hidden="true">↓</span>
+            </MagnetLink>
+            <MagnetLink href={LINKEDIN_URL} tone="outline" newTabRel="noopener noreferrer">
+              LinkedIn
             </MagnetLink>
           </div>
         </div>

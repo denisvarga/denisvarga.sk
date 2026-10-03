@@ -4,7 +4,7 @@ import { JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';
-import { cvLabels, displayUrl, typeset } from './cv-copy';
+import { cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 import { CvDocument } from './cv-document';
 import { cvHtmlDocument } from './cv-html';
 
@@ -29,15 +29,17 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
     expect(textOf(doc, '.project')).toHaveLength(12);
   });
 
-  it('ends ongoing jobs at the year of generation', () => {
-    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? 2031}`));
-    expect(textOf(doc, '.period')).toContain('2018 - 2031');
+  it('shows ongoing jobs as present in its language, not as a year', () => {
+    const present = lang === 'sk' ? 'dnes' : 'present';
+    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? present}`));
+    expect(textOf(doc, '.period')).toContain(`2018 - ${present}`);
     expect(textOf(doc, '.period')).toContain('2021 - 2025');
+    expect(textOf(doc, '.period').join(' ')).not.toContain('2031');
   });
 
   it('labels every section in its language', () => {
     const l = cvLabels[lang];
-    expect(textOf(doc, 'h2')).toEqual([l.contact, l.profile, l.experience, l.ai, l.skills, l.projects]);
+    expect(textOf(doc, 'h2')).toEqual([l.contact, l.profile, l.experience, l.ai, l.skills, l.languages, l.education, l.projects]);
   });
 
   it('carries the per-language contacts', () => {
@@ -50,7 +52,13 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
       'https://www.linkedin.com/in/denisvarg/',
     ]);
     expect(text).toContain('linkedin.com/in/denisvarg');
+    expect(doc.querySelector('.contact-list li')?.textContent).toBe(cvFacts[lang].location);
     expect(doc.querySelector('img')?.getAttribute('src')).toBe('portrait.jpg');
+  });
+
+  it('states languages and education in their own sections', () => {
+    expect(doc.querySelector('.languages p')?.textContent).toBe(cvFacts[lang].languages);
+    expect(doc.querySelector('.education p')?.textContent).toContain('(2012 - 2016)');
   });
 
   it('renders plain text: no markup asterisks and no en or em dash', () => {
@@ -61,13 +69,12 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
 });
 
 describe('CvDocument dates', () => {
-  it('uses the Europe/Bratislava date and year, not UTC', () => {
+  it('uses the Europe/Bratislava date, not UTC', () => {
     const newYearsEve = new Date('2026-12-31T23:30:00Z');
     const sk = render('sk', newYearsEve);
     const en = render('en', newYearsEve);
     expect(sk.querySelector('.foot')?.textContent).toBe('Vygenerované z denisvarga.sk 1. januára 2027');
     expect(en.querySelector('.foot')?.textContent).toBe('Generated from denisvarga.dev on 1 January 2027');
-    expect(textOf(en, '.period')).toContain('2018 - 2027');
   });
 });
 

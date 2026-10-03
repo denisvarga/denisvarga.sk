@@ -1,6 +1,8 @@
 import type { Lang, Localized } from './types';
 
 export const SOURCE_URL = 'https://github.com/denisvarga/denisvarga.sk';
+export const GITHUB_URL = 'https://github.com/denisvarga';
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/denisvarg/';
 
 export interface HeadCopy {
   /** Each language has its own domain; its page is served at the domain root. */
@@ -22,7 +24,7 @@ export const headCopy: Localized<HeadCopy> = {
     email: 'hello@denisvarga.sk',
     title: 'Denis Varga | AI developer s produktovým myslením',
     description:
-      'Webové aplikácie, AI agenti a interné nástroje. Vyše desať rokov vývoja, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
+      'Webové aplikácie, AI agenti a interné nástroje. Vyvíjam od roku 2017, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
     jobTitle: 'AI developer s produktovým myslením',
     ogLocale: 'sk_SK',
     consoleGreeting:
@@ -34,7 +36,7 @@ export const headCopy: Localized<HeadCopy> = {
     email: 'hello@denisvarga.dev',
     title: 'Denis Varga | AI developer with a product mindset',
     description:
-      'Web apps, AI agents and internal tools. Over ten years of development, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
+      'Web apps, AI agents and internal tools. Building software since 2017, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
     jobTitle: 'AI developer with a product mindset',
     ogLocale: 'en_US',
     consoleGreeting:
