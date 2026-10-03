@@ -43,7 +43,7 @@ export const cvLabels: Localized<CvLabels> = {
 
 export const cvCopy: Localized<Copy> = { sk: copySk, en: copyEn };
 
-// The site's timezone decides the date and the "until now" year, not the build machine's.
+// The site's timezone decides the date, not the build machine's.
 export function cvDate(date: Date, lang: Lang): string {
   return new Intl.DateTimeFormat(DATE_LOCALE[lang], {
     day: 'numeric',
@@ -51,10 +51,6 @@ export function cvDate(date: Date, lang: Lang): string {
     year: 'numeric',
     timeZone: TIME_ZONE,
   }).format(date);
-}
-
-export function cvYear(date: Date): number {
-  return Number(new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: TIME_ZONE }).format(date));
 }
 
 const SK_SINGLE_LETTER_WORD = /(?<=(?:^|[\s(])[aiksouvzAIKSOUVZ])\s+/g;

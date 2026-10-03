@@ -33,7 +33,7 @@ export interface Copy {
     readonly body: string;
     readonly facts: Three<Fact>;
   };
-  readonly exp: { readonly label: string; readonly title: string };
+  readonly exp: { readonly label: string; readonly title: string; readonly present: string };
   readonly ai: {
     readonly label: string;
     readonly title: string;

@@ -61,7 +61,7 @@ export function buildLlmsFullTxt(): string {
     '',
     '## Experience',
     ...JOBS.flatMap((job) => [
-      `### ${job.company}, ${job.role.en} (${job.period.start} - ${job.period.end ?? 'present'})`,
+      `### ${job.company}, ${job.role.en} (${job.period.start} - ${job.period.end ?? t.exp.present})`,
       job.text.en,
       '',
     ]),

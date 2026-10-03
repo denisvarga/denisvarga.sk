@@ -20,7 +20,7 @@ export const copyEn: Copy = {
       { label: 'Now', value: 'Open to projects and roles' },
     ],
   },
-  exp: { label: 'Experience', title: 'My *path*' },
+  exp: { label: 'Experience', title: 'My *path*', present: 'present' },
   ai: {
     label: 'AI',
     title: 'AI writes, I *decide.*',

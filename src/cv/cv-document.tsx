@@ -6,12 +6,12 @@ import { headCopy } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 import { contact } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
-import { CV_NAME, cvCopy, cvDate, cvLabels, cvYear, displayUrl, GITHUB_URL, LINKEDIN_URL, typeset } from './cv-copy';
+import { CV_NAME, cvCopy, cvDate, cvLabels, displayUrl, GITHUB_URL, LINKEDIN_URL, typeset } from './cv-copy';
 
 export interface CvDocumentProps {
   readonly lang: Lang;
   readonly portraitSrc: string;
-  /** Ongoing jobs end at this year and the footer shows this date (both in Europe/Bratislava). */
+  /** The footer shows this date in Europe/Bratislava. */
   readonly generatedAt: Date;
 }
 
@@ -67,7 +67,6 @@ function Header({ lang, portraitSrc }: { lang: Lang; portraitSrc: string }) {
 export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) {
   const t = cvCopy[lang];
   const label = cvLabels[lang];
-  const year = cvYear(generatedAt);
   const text = (source: string) => typeset(plainTitle(source), lang);
 
   return (
@@ -83,7 +82,7 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
         <ol className="jobs">
           {JOBS.map((job) => (
             <li key={job.company} className="job">
-              <span className="period">{`${job.period.start} - ${job.period.end ?? year}`}</span>
+              <span className="period">{`${job.period.start} - ${job.period.end ?? t.exp.present}`}</span>
               <div>
                 <h3 className="job-head">
                   {job.company}

@@ -130,6 +130,7 @@ describe('prerendered markup', () => {
       expect(html).toContain('href="https://denisvarga.sk/" hrefLang="sk"');
       expect(html).toContain('href="https://denisvarga.dev/" hrefLang="en"');
       expect(html).toContain('href="tel:+421902074830"');
+      expect(html).toContain(lang === 'sk' ? '2018 - dnes' : '2018 - present');
       expect(html).toContain('rel="noopener"');
       expect(html.match(/data-heroimg/g)).toHaveLength(2);
     }

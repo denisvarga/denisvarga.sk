@@ -29,10 +29,12 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
     expect(textOf(doc, '.project')).toHaveLength(12);
   });
 
-  it('ends ongoing jobs at the year of generation', () => {
-    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? 2031}`));
-    expect(textOf(doc, '.period')).toContain('2018 - 2031');
+  it('shows ongoing jobs as present in its language, not as a year', () => {
+    const present = lang === 'sk' ? 'dnes' : 'present';
+    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? present}`));
+    expect(textOf(doc, '.period')).toContain(`2018 - ${present}`);
     expect(textOf(doc, '.period')).toContain('2021 - 2025');
+    expect(textOf(doc, '.period').join(' ')).not.toContain('2031');
   });
 
   it('labels every section in its language', () => {
@@ -61,13 +63,12 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
 });
 
 describe('CvDocument dates', () => {
-  it('uses the Europe/Bratislava date and year, not UTC', () => {
+  it('uses the Europe/Bratislava date, not UTC', () => {
     const newYearsEve = new Date('2026-12-31T23:30:00Z');
     const sk = render('sk', newYearsEve);
     const en = render('en', newYearsEve);
     expect(sk.querySelector('.foot')?.textContent).toBe('Vygenerované z denisvarga.sk 1. januára 2027');
     expect(en.querySelector('.foot')?.textContent).toBe('Generated from denisvarga.dev on 1 January 2027');
-    expect(textOf(en, '.period')).toContain('2018 - 2027');
   });
 });
 

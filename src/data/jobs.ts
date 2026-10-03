@@ -1,7 +1,7 @@
 import type { Localized } from '../i18n/types';
 
 export interface Job {
-  /** `end: null` means the job is ongoing; it renders up to the current year. */
+  /** `end: null` means the job is ongoing; it renders as "dnes" / "present". */
   readonly period: { readonly start: number; readonly end: number | null };
   readonly company: string;
   readonly role: Localized<string>;
