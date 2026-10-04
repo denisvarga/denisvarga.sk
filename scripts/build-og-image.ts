@@ -38,20 +38,22 @@ declare global {
 }
 
 const domain = (lang: Lang) => new URL(headCopy[lang].origin).host;
+// One line per half of the positioning line reads better than wherever the 560 px column wraps it.
+const leadLines = (sub: string) => sub.replace(', ', ',\n');
 const CARDS: readonly OgCard[] = [
   {
     lang: 'sk',
     sub: domain('sk'),
     title: ['Denis', 'Varga'],
-    lead: copySk.hero.sub,
-    note: 'Webové aplikácie, AI agenti a interné nástroje',
+    lead: leadLines(copySk.hero.sub),
+    note: 'Aplikácie, AI agenti, automatizácie a interné nástroje',
   },
   {
     lang: 'en',
     sub: domain('en'),
     title: ['Denis', 'Varga'],
-    lead: copyEn.hero.sub,
-    note: 'Web apps, AI agents and internal tools',
+    lead: leadLines(copyEn.hero.sub),
+    note: 'Web apps, AI agents, automation and internal tools',
   },
 ];
 
@@ -68,7 +70,7 @@ html, body { overflow: hidden !important; }
 [data-og='sub']::before { content: ''; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); }
 [data-og='title'] { margin-top: 30px; font-size: 118px; line-height: 0.94; }
 [data-og='title'] .word-mask { display: block; width: fit-content; }
-[data-og='lead'] { margin-top: 34px; font-size: 30px; line-height: 1.25; }
+[data-og='lead'] { margin-top: 34px; font-size: 30px; line-height: 1.25; white-space: pre-line; }
 [data-og='note'] { margin-top: 14px; font-size: 21px; color: var(--grey-600); }
 [data-og='overlay'] { padding: 0; }
 [data-og='portrait'] { top: auto; bottom: -86px; right: -22px; width: 640px; transform: none; }
