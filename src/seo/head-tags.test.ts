@@ -38,8 +38,8 @@ describe('buildHeadTags', () => {
   });
 
   it.each([
-    ['sk', 'https://denisvarga.sk/og-image.jpg', /^Denis Varga, AI developer pre automatizáciu procesov\./],
-    ['en', 'https://denisvarga.dev/og-image-en.jpg', /^Denis Varga, AI developer for process automation\./],
+    ['sk', 'https://denisvarga.sk/og-image.jpg?v=2026-10-04', /^Denis Varga, AI developer pre automatizáciu procesov\./],
+    ['en', 'https://denisvarga.dev/og-image-en.jpg?v=2026-10-04', /^Denis Varga, AI developer for process automation\./],
   ] as const)('%s: its own share image for Open Graph and X, with size and alt text', (lang, url, alt) => {
     const doc = parseHead(buildHeadTags(lang, ASSETS));
     expect(attrs(doc, 'meta[property="og:image"]', 'content')).toEqual([url]);

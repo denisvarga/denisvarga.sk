@@ -15,6 +15,8 @@ export const OG_IMAGES: Localized<{ readonly path: `/${string}.jpg`; readonly al
     alt: 'Denis Varga, AI developer for process automation. Web apps, AI agents and internal tools.',
   },
 };
+// Bump whenever the share cards are regenerated: LinkedIn and others cache an image by its URL.
+export const OG_IMAGE_VERSION = '2026-10-04';
 export const THEME_COLOR = '#ECECE9';
 const SITE_NAME = 'Denis Varga';
 
@@ -51,7 +53,7 @@ export function hreflangAlternates(): ReadonlyArray<readonly [hreflang: string, 
 export function buildHeadTags(lang: Lang, assets: HeadAssets): string {
   const copy = headCopy[lang];
   const other = LANGS.find((l) => l !== lang) ?? 'sk';
-  const image = { url: copy.origin + OG_IMAGES[lang].path, alt: OG_IMAGES[lang].alt };
+  const image = { url: `${copy.origin}${OG_IMAGES[lang].path}?v=${OG_IMAGE_VERSION}`, alt: OG_IMAGES[lang].alt };
   return [
     HEAD_COMMENT,
     `<title>${escapeHtml(copy.title)}</title>`,
