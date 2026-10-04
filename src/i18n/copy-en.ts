@@ -3,7 +3,7 @@ import type { Copy } from './types';
 export const copyEn: Copy = {
   nav: { items: ['About', 'AI', 'Work'], contact: 'Contact' },
   hero: {
-    sub: 'AI developer with a product mindset',
+    sub: 'AI developer for process automation',
     title: "Hi, I'm *Denis.*",
     lead: "I don't see a problem as an obstacle but as a chance to make something better. First I make sure I understand it, then I design and build the right solution, whether that's a web app, an AI agent or an internal tool.",
     cta1: 'My work',

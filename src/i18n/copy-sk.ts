@@ -3,7 +3,7 @@ import type { Copy } from './types';
 export const copySk: Copy = {
   nav: { items: ['O mne', 'AI', 'Projekty'], contact: 'Kontakt' },
   hero: {
-    sub: 'AI developer s produktovým myslením',
+    sub: 'AI developer pre automatizáciu procesov',
     title: 'Ahoj, som *Denis.*',
     lead: 'V probléme nevidím prekážku, ale príležitosť niečo zlepšiť. Najprv ho poriadne pochopím a potom navrhnem a postavím vhodné riešenie, či je to webová aplikácia, AI agent alebo interný nástroj.',
     cta1: 'Moja práca',

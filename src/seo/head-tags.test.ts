@@ -38,8 +38,8 @@ describe('buildHeadTags', () => {
   });
 
   it.each([
-    ['sk', 'https://denisvarga.sk/og-image.jpg', /^Denis Varga, AI developer s produktovým myslením\./],
-    ['en', 'https://denisvarga.dev/og-image-en.jpg', /^Denis Varga, AI developer with a product mindset\./],
+    ['sk', 'https://denisvarga.sk/og-image.jpg', /^Denis Varga, AI developer pre automatizáciu procesov\./],
+    ['en', 'https://denisvarga.dev/og-image-en.jpg', /^Denis Varga, AI developer for process automation\./],
   ] as const)('%s: its own share image for Open Graph and X, with size and alt text', (lang, url, alt) => {
     const doc = parseHead(buildHeadTags(lang, ASSETS));
     expect(attrs(doc, 'meta[property="og:image"]', 'content')).toEqual([url]);
@@ -55,12 +55,12 @@ describe('buildHeadTags', () => {
   it.each([
     [
       'sk',
-      'Denis Varga | AI developer s produktovým myslením',
+      'Denis Varga | AI developer pre automatizáciu procesov',
       'Webové aplikácie, AI agenti a interné nástroje. Vyvíjam od roku 2017, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
     ],
     [
       'en',
-      'Denis Varga | AI developer with a product mindset',
+      'Denis Varga | AI developer for process automation',
       'Web apps, AI agents and internal tools. Building software since 2017, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
     ],
   ] as const)('%s: the approved title and description in the page and OG tags', (lang, title, description) => {
@@ -89,8 +89,8 @@ describe('buildHeadTags', () => {
   });
 
   it.each([
-    ['sk', 'https://denisvarga.sk/', 'AI developer s produktovým myslením', 'hello@denisvarga.sk'],
-    ['en', 'https://denisvarga.dev/', 'AI developer with a product mindset', 'hello@denisvarga.dev'],
+    ['sk', 'https://denisvarga.sk/', 'AI developer pre automatizáciu procesov', 'hello@denisvarga.sk'],
+    ['en', 'https://denisvarga.dev/', 'AI developer for process automation', 'hello@denisvarga.dev'],
   ] as const)('%s: WebSite and ProfilePage JSON-LD for the one Person', (lang, url, jobTitle, email) => {
     const doc = parseHead(buildHeadTags(lang, ASSETS));
     const scripts = doc.querySelectorAll('script');

@@ -8,11 +8,11 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
 export const OG_IMAGES: Localized<{ readonly path: `/${string}.jpg`; readonly alt: string }> = {
   sk: {
     path: '/og-image.jpg',
-    alt: 'Denis Varga, AI developer s produktovým myslením. Webové aplikácie, AI agenti a interné nástroje.',
+    alt: 'Denis Varga, AI developer pre automatizáciu procesov. Webové aplikácie, AI agenti a interné nástroje.',
   },
   en: {
     path: '/og-image-en.jpg',
-    alt: 'Denis Varga, AI developer with a product mindset. Web apps, AI agents and internal tools.',
+    alt: 'Denis Varga, AI developer for process automation. Web apps, AI agents and internal tools.',
   },
 };
 export const THEME_COLOR = '#ECECE9';
