@@ -8,11 +8,11 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
 export const OG_IMAGES: Localized<{ readonly path: `/${string}.jpg`; readonly alt: string }> = {
   sk: {
     path: '/og-image.jpg',
-    alt: 'Denis Varga, AI developer pre automatizáciu procesov. Webové aplikácie, AI agenti a interné nástroje.',
+    alt: 'Denis Varga, AI a full-stack developer od nápadu po produkciu. Aplikácie, AI agenti, automatizácie a interné nástroje.',
   },
   en: {
     path: '/og-image-en.jpg',
-    alt: 'Denis Varga, AI developer for process automation. Web apps, AI agents and internal tools.',
+    alt: 'Denis Varga, AI & full-stack developer from idea to production. Web apps, AI agents, automation and internal tools.',
   },
 };
 // Bump whenever the share cards are regenerated: LinkedIn and others cache an image by its URL.

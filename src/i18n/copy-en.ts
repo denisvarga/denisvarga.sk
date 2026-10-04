@@ -3,7 +3,7 @@ import type { Copy } from './types';
 export const copyEn: Copy = {
   nav: { items: ['About', 'AI', 'Work'], contact: 'Contact' },
   hero: {
-    sub: 'AI developer for process automation',
+    sub: 'AI & full-stack developer, from idea to production',
     title: "Hi, I'm *Denis.*",
     lead: "I don't see a problem as an obstacle but as a chance to make something better. First I make sure I understand it, then I design and build the right solution, whether that's a web app, an AI agent or an internal tool.",
     cta1: 'My work',
@@ -16,7 +16,7 @@ export const copyEn: Copy = {
     body: "I started in 2015 with an agency internship, moved through graphic design and print, and since 2017 I've been building custom websites, online stores, apps and internal tools. Today I work AI-first: AI gives me speed, versatility and more control; I set the direction. I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. What I don't know yet, I learn fast. And sometimes the best solution is to simplify the process, not automate it.",
     facts: [
       { label: 'AI', value: 'Agents, MCP, Claude Code, Codex' },
-      { label: 'I build', value: 'Full-stack, from idea to production' },
+      { label: 'I build', value: 'Websites, apps, automation' },
       { label: 'Based in', value: 'Bratislava or remote' },
     ],
   },

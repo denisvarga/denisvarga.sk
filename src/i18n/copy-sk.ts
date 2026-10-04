@@ -3,7 +3,7 @@ import type { Copy } from './types';
 export const copySk: Copy = {
   nav: { items: ['O mne', 'AI', 'Projekty'], contact: 'Kontakt' },
   hero: {
-    sub: 'AI developer pre automatizáciu procesov',
+    sub: 'AI a full-stack developer, od nápadu po produkciu',
     title: 'Ahoj, som *Denis.*',
     lead: 'V probléme nevidím prekážku, ale príležitosť niečo zlepšiť. Najprv ho poriadne pochopím a potom navrhnem a postavím vhodné riešenie, či je to webová aplikácia, AI agent alebo interný nástroj.',
     cta1: 'Moja práca',
@@ -16,7 +16,7 @@ export const copySk: Copy = {
     body: 'Začínal som v roku 2015 stážou v agentúre, prešiel som grafikou a tlačou a od roku 2017 vyvíjam na mieru: weby, e-shopy, aplikácie aj interné nástroje. Dnes pracujem AI-first: AI mi dáva rýchlosť, všestrannosť a väčšiu kontrolu, smer určujem ja. Kód píšem s Claude Code a Codexom a pri každom projekte sa najprv pýtam, čo má priniesť používateľom a firme. Čo ešte neviem, rýchlo sa doučím. A niekedy je najlepšie riešenie proces zjednodušiť, nie ho automatizovať.',
     facts: [
       { label: 'AI', value: 'Agenti, MCP, Claude Code, Codex' },
-      { label: 'Vyvíjam', value: 'Full-stack, od nápadu po produkciu' },
+      { label: 'Vyvíjam', value: 'Weby, aplikácie, automatizácie' },
       { label: 'Lokalita', value: 'Bratislava alebo remote' },
     ],
   },
