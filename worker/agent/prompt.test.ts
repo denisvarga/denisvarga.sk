@@ -38,7 +38,7 @@ describe('buildInstructions', () => {
   it('derives one fact per project with its relationship, plus the full list in site order', () => {
     expect(text.match(/^- Projekt /gm)).toHaveLength(PROJECT_INFO.length);
     expect(text).toContain(
-      '- Projekt Brixx (brixx.cz, web rezidenčného projektu): robil ho ako zamestnanec GrandPano. Rozsah: Téma od základu podľa Figmy 1:1',
+      '- Projekt Brixx (brixx.cz, web rezidenčného projektu): robil ho ako zamestnanec GrandPano. Realizované ako zamestnanec GrandPano. Web rezidenčného projektu v Brne',
     );
     expect(text).toContain(
       '- Projekt Národný futbalový štadión (narodnyfutbalovystadion.sk, web národného štadióna): robil ho na voľnej nohe pod značkou Denva (denva.studio).',
@@ -63,6 +63,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-05.1');
+    expect(PROMPT_VERSION).toBe('2026-10-05.3');
   });
 });

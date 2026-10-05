@@ -12,13 +12,14 @@ const RELATIONSHIP: Readonly<Record<ProjectContext, string>> = {
 
 const names = (projects: readonly ProjectInfo[]): string => projects.map((p) => p.name).join(', ');
 const lowerFirst = (text: string): string => text.charAt(0).toLowerCase() + text.slice(1);
+const where = (p: ProjectInfo): string => (p.url ? new URL(p.url).hostname : 'súkromný projekt bez verejného webu');
 
 // Generated from the same data as the site, so the chat never drifts from the project list.
 const PROJECT_FACTS: readonly string[] = [
   `Portfólio: spolu ${PROJECT_INFO.length} projektov: ${names(PROJECT_INFO)}. Na úvodnej stránke je výber (${names(PROJECT_INFO.filter((p) => p.featured))}), celý zoznam je v sekcii "Všetky projekty". Keď sa niekto pýta na všetky projekty, vymenuj všetkých ${PROJECT_INFO.length}.`,
   ...PROJECT_INFO.map(
     (p) =>
-      `Projekt ${p.name} (${new URL(p.url).hostname}, ${lowerFirst(p.kind.sk)}): ${RELATIONSHIP[p.context]}. Rozsah: ${p.desc.sk}.`,
+      `Projekt ${p.name} (${where(p)}, ${lowerFirst(p.kind.sk)}): ${RELATIONSHIP[p.context]}.${p.credit ? ` ${p.credit.sk}` : ''} ${p.summary.sk} Rozsah: ${p.scope.sk.join('; ')}.`,
   ),
 ];
 
