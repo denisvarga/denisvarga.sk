@@ -65,7 +65,7 @@ describe('useSmoothScroll', () => {
     mount();
     await vi.waitFor(() => expect(lenisMock.state.instances).toHaveLength(1));
     const lenis = lenisMock.state.instances[0]!;
-    expect(lenis.options).toEqual({ lerp: 0.085, smoothWheel: true, autoRaf: false });
+    expect(lenis.options).toEqual({ lerp: 0.13, smoothWheel: true, autoRaf: false });
     expect(getLenis()).toBe(lenis);
     act(() => root.unmount());
     root = createRoot(container);
