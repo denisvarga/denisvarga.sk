@@ -31,8 +31,9 @@ export function ProjectDrawerContent({ project, titleId }: ProjectDrawerContentP
         <p className={styles.kind}>
           {project.kind[lang]} · {t.work.contexts[project.context]}
         </p>
+        {/* No referrer: the portfolio sites must not see that a visit came from this CV. */}
         {project.url ? (
-          <a className={styles.domain} href={project.url} target="_blank" rel="noopener">
+          <a className={styles.domain} href={project.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
             {projectDomain(project.url)} <span aria-hidden="true">↗</span>
           </a>
         ) : (
@@ -55,7 +56,7 @@ export function ProjectDrawerContent({ project, titleId }: ProjectDrawerContentP
         ))}
       </div>
       {project.url && (
-        <a className={styles.cta} href={project.url} target="_blank" rel="noopener">
+        <a className={styles.cta} href={project.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
           {ui.open} <span aria-hidden="true">↗</span>
         </a>
       )}
