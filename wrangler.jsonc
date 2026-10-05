@@ -47,8 +47,9 @@
     "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
     "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",
     "TURNSTILE_ACTION": "ask",
-    // /prehlad answers 404 until ACCESS_AUD holds the AUD tag of the Access application.
+    // AUD tag of the "denisvarga prehlad" Access application (denisvarga.sk and .dev /prehlad);
+    // with an empty value /prehlad answers 404.
     "ACCESS_TEAM_DOMAIN": "https://denva.cloudflareaccess.com",
-    "ACCESS_AUD": ""
+    "ACCESS_AUD": "b1f48cd087ed7fc17a30400939a7193c6aa2b1e7f649b7031685de3b76aff335"
   }
 }
