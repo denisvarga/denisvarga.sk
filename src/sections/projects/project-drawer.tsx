@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, type KeyboardEvent } from 'react';
-import { PROJECT_IMAGE_SIZE, PROJECTS } from '../../data/projects';
+import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { matchesMedia, REDUCED_MOTION_QUERY } from '../../motion/use-media-query';
 import styles from './drawer.module.css';
-import { pad2, projectDomain, projectScope } from './project-scope';
+import { ProjectDrawerContent } from './project-drawer-content';
+import { pad2 } from './project-format';
 import type { ProjectDrawer as DrawerApi } from './use-project-drawer';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -38,7 +39,7 @@ function trapTab(event: KeyboardEvent<HTMLElement>): void {
 }
 
 export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
-  const { lang, t, ui } = useLang();
+  const { ui } = useLang();
   const { open, last, close, step, openerRef } = drawer;
   const rootRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLElement>(null);
@@ -118,42 +119,7 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
           </div>
         </div>
         <div ref={bodyRef} className={styles.body}>
-          <div className={styles.media}>
-            <img
-              className={styles.img}
-              src={project.image}
-              alt={project.name}
-              width={PROJECT_IMAGE_SIZE.width}
-              height={PROJECT_IMAGE_SIZE.height}
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div className={styles.head}>
-            <h2 id={titleId} className={styles.name}>
-              {project.name}
-            </h2>
-            <p className={styles.kind}>
-              {project.kind[lang]} · {t.work.contexts[project.context]}
-            </p>
-            <a className={styles.domain} href={project.url} target="_blank" rel="noopener">
-              {projectDomain(project.url)} <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-          <div className={styles.scope}>
-            <span className={styles.scopeLabel}>{ui.scope}</span>
-            {projectScope(project.desc[lang]).map((item) => (
-              <div key={item.n} className={styles.scopeRow}>
-                <span className={styles.scopeNum} aria-hidden="true">
-                  {item.n}
-                </span>
-                <span>{item.text}</span>
-              </div>
-            ))}
-          </div>
-          <a className={styles.cta} href={project.url} target="_blank" rel="noopener">
-            {ui.open} <span aria-hidden="true">↗</span>
-          </a>
+          <ProjectDrawerContent project={project} titleId={titleId} />
         </div>
       </aside>
     </div>

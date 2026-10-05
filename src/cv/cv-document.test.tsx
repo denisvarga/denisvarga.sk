@@ -4,6 +4,7 @@ import { JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';
+import { ui } from '../i18n/ui-copy';
 import { cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 import { CvDocument } from './cv-document';
 import { cvHtmlDocument } from './cv-html';
@@ -22,11 +23,24 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
   const doc = render(lang);
   const text = doc.body.textContent ?? '';
 
-  it('lists every company and every project with a link to its domain', () => {
+  it('lists every company and every project, linking each public project to its domain', () => {
     for (const job of JOBS) expect(text).toContain(job.company);
-    const links = new Map([...doc.querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]));
-    for (const project of PROJECTS) expect(links.get(project.url)).toBe(displayUrl(project.url));
-    expect(textOf(doc, '.project')).toHaveLength(PROJECTS.length);
+    const items = [...doc.querySelectorAll('.project')];
+    expect(items).toHaveLength(PROJECTS.length);
+    PROJECTS.forEach((project, i) => {
+      const links = [...items[i]!.querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]);
+      expect(links).toEqual(project.url ? [[project.url, displayUrl(project.url)]] : []);
+    });
+  });
+
+  it('marks a project without a public site as private instead of linking it', () => {
+    const items = [...doc.querySelectorAll('.project')];
+    const privateIndexes = PROJECTS.flatMap((project, i) => (project.url === null ? [i] : []));
+    expect(privateIndexes.length).toBeGreaterThan(0);
+    for (const i of privateIndexes) {
+      expect(items[i]!.querySelector('a')).toBeNull();
+      expect(items[i]!.querySelector('.domain')?.textContent).toBe(ui[lang].privateProject);
+    }
   });
 
   it('shows ongoing jobs as present in its language, not as a year', () => {

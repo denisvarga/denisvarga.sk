@@ -2,8 +2,8 @@ import { useRef, type MouseEvent } from 'react';
 import type { Project } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { useReveal } from '../../motion/use-reveal';
+import { pad2, projectDomain } from './project-format';
 import styles from './project-index.module.css';
-import { pad2, projectDomain } from './project-scope';
 
 interface ProjectIndexRowProps {
   readonly project: Project;
@@ -14,7 +14,7 @@ interface ProjectIndexRowProps {
 // The spaces between the spans are dropped by the grid and flex layout but keep the button's
 // accessible name and the crawled text readable as separate words.
 export function ProjectIndexRow({ project, index, onOpen }: ProjectIndexRowProps) {
-  const { lang, t } = useLang();
+  const { lang, t, ui } = useLang();
   const ref = useRef<HTMLLIElement>(null);
   useReveal(ref);
   const open = (event: MouseEvent<HTMLButtonElement>) => onOpen(index, event.currentTarget);
@@ -33,7 +33,7 @@ export function ProjectIndexRow({ project, index, onOpen }: ProjectIndexRowProps
             <span className={styles.dot} aria-hidden="true">
               ·
             </span>
-            {projectDomain(project.url)}
+            {project.url ? projectDomain(project.url) : ui.privateProject}
           </span>
         </span>
       </button>

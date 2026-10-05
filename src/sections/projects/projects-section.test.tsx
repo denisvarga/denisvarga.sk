@@ -6,7 +6,8 @@ import { PROJECTS } from '../../data/projects';
 import { copySk } from '../../i18n/copy-sk';
 import { LangProvider } from '../../i18n/lang-context';
 import type { Lang } from '../../i18n/types';
-import { pad2 } from './project-scope';
+import { ui } from '../../i18n/ui-copy';
+import { pad2 } from './project-format';
 import { ProjectsSection } from './projects-section';
 
 declare global {
@@ -41,6 +42,10 @@ const label = () => toggle().firstElementChild?.textContent;
 const panel = () => document.getElementById(toggle().getAttribute('aria-controls')!)!;
 const rows = () => [...panel().querySelectorAll<HTMLButtonElement>('li > button')];
 const dialog = () => container.querySelector<HTMLElement>('[role="dialog"]')!;
+const scopeRows = () => {
+  const heading = [...dialog().querySelectorAll('span')].find((el) => el.textContent === ui.sk.scope)!;
+  return [...heading.parentElement!.children].slice(1).map((row) => [...row.children].map((cell) => cell.textContent));
+};
 const click = (el: HTMLElement) => act(() => el.click());
 const press = (key: string) => act(() => void document.dispatchEvent(new KeyboardEvent('keydown', { key })));
 
@@ -55,6 +60,14 @@ describe('project rail', () => {
     expect(names.map((h) => h.previousElementSibling?.textContent)).toEqual(
       featured.map((p) => `${pad2(PROJECTS.indexOf(p) + 1)} / ${pad2(PROJECTS.length)}`),
     );
+  });
+
+  it('adds the credit under the description only on cards whose project has one', () => {
+    const featured = PROJECTS.filter((p) => p.featured);
+    const credits = [...container.querySelectorAll('h3')].map((h) => h.parentElement?.querySelector('small')?.textContent);
+    expect(credits).toEqual(featured.map((p) => p.credit?.sk));
+    expect(credits.some((credit) => credit === undefined)).toBe(true);
+    expect(credits.some((credit) => credit !== undefined)).toBe(true);
   });
 });
 
@@ -91,7 +104,7 @@ describe('all projects list', () => {
       expect(row.textContent).toContain(project.name);
       expect(row.textContent).toContain(project.kind.sk);
       expect(row.textContent).toContain(copySk.work.contexts[project.context]);
-      expect(row.textContent).toContain(project.url.replace('https://', ''));
+      expect(row.textContent).toContain(project.url ? project.url.replace('https://', '') : ui.sk.privateProject);
       expect(row.querySelector('a, button, input, [tabindex]')).toBeNull();
     });
   });
@@ -121,6 +134,41 @@ describe('all projects list', () => {
     expect(dialog().querySelector('h2')?.textContent).toBe(PROJECTS[0]!.name);
     press('ArrowLeft');
     expect(dialog().querySelector('h2')?.textContent).toBe(PROJECTS.at(-1)!.name);
+  });
+});
+
+describe('project drawer', () => {
+  it('opens with the summary, the numbered scope and the credit only when the project has one', () => {
+    click(toggle());
+    click(rows()[0]!);
+    for (const project of PROJECTS) {
+      expect(dialog().querySelector('h2')?.textContent).toBe(project.name);
+      expect([...dialog().querySelectorAll('p')].map((p) => p.textContent)).toContain(project.summary.sk);
+      expect(scopeRows()).toEqual(project.scope.sk.map((item, i) => [pad2(i + 1), item]));
+      expect(dialog().querySelector('small')?.textContent).toBe(project.credit?.sk);
+      press('ArrowRight');
+    }
+    expect(PROJECTS.some((p) => p.credit)).toBe(true);
+    expect(PROJECTS.some((p) => !p.credit)).toBe(true);
+  });
+
+  it('links a public project out and shows a private one as a label without any link', () => {
+    click(toggle());
+    click(rows()[0]!);
+    for (const project of PROJECTS) {
+      const links = [...dialog().querySelectorAll('a')];
+      if (project.url) {
+        expect(links.map((a) => a.getAttribute('href'))).toEqual([project.url, project.url]);
+        expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
+        expect(links.at(-1)?.textContent).toContain(ui.sk.open);
+        expect(dialog().textContent).not.toContain(ui.sk.privateProject);
+      } else {
+        expect(links).toEqual([]);
+        expect(dialog().textContent).toContain(ui.sk.privateProject);
+      }
+      press('ArrowRight');
+    }
+    expect(PROJECTS.some((p) => p.url === null)).toBe(true);
   });
 });
 

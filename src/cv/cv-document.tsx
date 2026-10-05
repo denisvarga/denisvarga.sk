@@ -4,7 +4,7 @@ import { PROJECTS } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
-import { contact } from '../i18n/ui-copy';
+import { contact, ui } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
 import { CV_NAME, cvCopy, cvDate, cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 
@@ -136,9 +136,13 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
           {PROJECTS.map((project) => (
             <li key={project.slug} className="project">
               <span className="project-name">{project.name}</span>{' '}
-              <a className="domain" href={project.url}>
-                {displayUrl(project.url)}
-              </a>
+              {project.url ? (
+                <a className="domain" href={project.url}>
+                  {displayUrl(project.url)}
+                </a>
+              ) : (
+                <span className="domain">{ui[lang].privateProject}</span>
+              )}
               <span className="project-desc">{text(project.desc[lang])}</span>
             </li>
           ))}

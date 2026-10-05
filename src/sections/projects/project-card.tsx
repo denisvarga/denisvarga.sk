@@ -1,7 +1,7 @@
 import { useId, type MouseEvent } from 'react';
 import { PROJECT_IMAGE_SIZE, type Project } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
-import { pad2 } from './project-scope';
+import { pad2 } from './project-format';
 import styles from './projects.module.css';
 
 interface ProjectCardProps {
@@ -39,6 +39,7 @@ export function ProjectCard({ project, index, total, onOpen }: ProjectCardProps)
             {project.name}
           </h3>
           <span className={styles.desc}>{project.desc[lang]}</span>
+          {project.credit && <small className={styles.credit}>{project.credit[lang]}</small>}
         </div>
         <button type="button" className={styles.more} aria-label={ui.more} aria-describedby={nameId} onClick={open}>
           +
