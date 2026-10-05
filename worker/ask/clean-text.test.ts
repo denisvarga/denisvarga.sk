@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cleanContent } from './clean-text';
+import { cleanContent, plainReply } from './clean-text';
 
 describe('cleanContent', () => {
   it('keeps newlines and tabs, normalises CRLF and drops other controls', () => {
@@ -15,3 +15,24 @@ describe('cleanContent', () => {
     expect(cleanContent(once)).toBe(once);
   });
 });
+
+describe('plainReply', () => {
+  const en = String.fromCodePoint(0x2013);
+  const em = String.fromCodePoint(0x2014);
+
+  it('turns en and em dashes, spaced or not, into a spaced hyphen', () => {
+    expect(plainReply(`nevyšiel ${em} Denis`)).toBe('nevyšiel - Denis');
+    expect(plainReply(`work${em}Denis`)).toBe('work - Denis');
+    expect(plainReply(`2018${en}2026`)).toBe('2018 - 2026');
+  });
+
+  it('leaves plain hyphens alone', () => {
+    expect(plainReply('e-shop, full-stack, 1-4 vety')).toBe('e-shop, full-stack, 1-4 vety');
+  });
+
+  it('drops bold markers but keeps the words and lone asterisks', () => {
+    expect(plainReply('**Vlastné projekty:** Routie, Denva')).toBe('Vlastné projekty: Routie, Denva');
+    expect(plainReply('5 * 3')).toBe('5 * 3');
+  });
+});
+

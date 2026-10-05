@@ -10,3 +10,14 @@ export function cleanContent(value: string): string {
   for (const ch of normalized) if (!isControl(ch.codePointAt(0) ?? 0)) out += ch;
   return out.trim();
 }
+
+const DASHES = /\s*[\u2013\u2014]\s*/g;
+const BOLD = /\*\*(.+?)\*\*/g;
+
+/**
+ * The chat shows plain text and the site never uses en or em dashes. The model still slips into
+ * both, so dashes become a spaced hyphen and **bold** loses its markers.
+ */
+export function plainReply(value: string): string {
+  return value.replace(DASHES, ' - ').replace(BOLD, '$1');
+}
