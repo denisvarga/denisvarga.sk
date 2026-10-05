@@ -2,8 +2,8 @@
 
 export type ProjectLang = 'sk' | 'en';
 
-/** Who the work was done for: freelance under Denva, as a GrandPano employee, or Denis's own product. */
-export type ProjectContext = 'denva' | 'grandpano' | 'own';
+/** Who the work was done for: freelance under Denva, as a GrandPano or Vibration employee, or Denis's own product. */
+export type ProjectContext = 'denva' | 'grandpano' | 'vibration' | 'own';
 
 type Localized<T> = Readonly<Record<ProjectLang, T>>;
 
@@ -468,6 +468,440 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
         'Contact form with Turnstile and an email log',
       ],
     },
+  },
+  {
+    name: 'Slovenský Červený kríž',
+    url: 'https://redcross.sk',
+    slug: 'redcross',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'WordPress multisite sieť', en: 'WordPress multisite network' },
+    desc: {
+      sk: 'Téma na mieru pre WordPress multisite s viac ako 70 samostatnými webmi',
+      en: 'Custom theme for a WordPress multisite with more than 70 separate sites',
+    },
+    summary: {
+      sk: 'Oficiálny web Slovenského Červeného kríža a jeho spolkov ako jedna WordPress multisite sieť s viac ako 70 samostatnými webmi. Téma na mieru podľa dizajnu 1:1, logika celej siete a optimalizácia výkonu.',
+      en: 'The official site of the Slovak Red Cross and its branches as one WordPress multisite network of more than 70 separate sites. A custom theme 1:1 from the design, the logic of the whole network and performance work.',
+    },
+    scope: {
+      sk: [
+        'Téma na mieru pre celú multisite sieť podľa dizajnu 1:1 a návrh logiky zdieľaných nastavení, ktoré sa načítajú raz a cachujú',
+        'Sieťové nástroje: mapa spolkov na Google Maps, vyhľadanie spolku podľa PSČ a jedno tlačidlo na premazanie WP Rocket a Redis cache na všetkých weboch',
+        'Vlastný e-learning s kvízmi z CSV, výsledkami, exportom a e-mailmi podľa skóre',
+        '12 vlastných ACF blokov vrátane máp a mapy centier darovania krvi',
+        'Darovanie cez Darujme vrátane opakovaných platieb, integrácie SmartEmailing, Relevanssi a WPForms so Salesforce',
+        'Zjednodušená administrácia pre správcov jednotlivých webov',
+      ],
+      en: [
+        'A custom theme for the whole multisite network 1:1 from the design, and the logic of shared settings that are read once and cached',
+        'Network tools: a Google Maps map of branches, branch lookup by postal code and one button that purges the WP Rocket and Redis caches on every site',
+        'Custom e-learning with quizzes from CSV, results, export and score-based emails',
+        '12 custom ACF blocks including maps and a map of blood donation centres',
+        'Donations through Darujme including recurring payments, SmartEmailing, Relevanssi and WPForms with Salesforce integrations',
+        'A simplified admin for the managers of individual sites',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: '123gold',
+    url: 'https://trauring-zentrum-mainz.de',
+    slug: '123gold',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Multisite sieť 72 webov zlatníctiev', en: 'Multisite network of 72 jewellery store sites' },
+    desc: {
+      sk: 'Migrácia na novú WooCommerce multisite infraštruktúru so 72 webmi a nočnou synchronizáciou produktov cez API',
+      en: 'Migration to a new WooCommerce multisite infrastructure of 72 sites with nightly product sync over an API',
+    },
+    summary: {
+      sk: 'Sieť webov nemeckých zlatníctiev, každé na vlastnej doméne, napríklad Trauring-Zentrum Mainz. Pôvodná multisite inštalácia s viac ako 100 tisíc tabuľkami v databáze prešla na novú optimalizovanú WooCommerce infraštruktúru, kde sa nový obchod pridá jednoduchým importom a produkty so skladom sa synchronizujú s externým systémom.',
+      en: 'A network of German jewellery store sites, each on its own domain, such as Trauring-Zentrum Mainz. The original multisite install with over 100,000 database tables moved to a new, optimised WooCommerce infrastructure where a new store is added with a simple import and products and stock sync with an external system.',
+    },
+    scope: {
+      sk: [
+        'Migrácia pôvodnej multisite inštalácie s viac ako 100 tisíc tabuľkami na novú WooCommerce infraštruktúru',
+        '72 webov na vlastných doménach so zdieľaným obsahom, ktorý si každý obchod môže prepísať',
+        'Synchronizácia produktov a skladu s externým systémom cez API: paralelné požiadavky s opakovaním, detekcia zmien cez sha256 a idempotentné zápisy pre približne 167 tisíc produktových záznamov',
+        'Nočná synchronizácia spúšťaná chráneným REST endpointom so zámkom proti súbehu',
+        'Nové obchody z CSV príkazom wp shop sync: vytvorenie, úprava, obnovenie alebo archivácia, predvolene s dry-run',
+        'Všetky veľkosti obrázkov rovno vo WebP pre sieť s viac ako miliónom obrázkov, vlastná schema vrstva a nemčina s angličtinou cez WPML',
+      ],
+      en: [
+        'Migration of the original multisite install with over 100,000 tables to a new WooCommerce infrastructure',
+        '72 sites on their own domains with shared content that each store can override',
+        'Product and stock sync with an external system over an API: parallel requests with retries, sha256 change detection and idempotent writes for about 167,000 product records',
+        'Nightly sync started by a protected REST endpoint with a lock against overlap',
+        'New stores from a CSV with a wp shop sync command: create, update, restore or archive, dry run by default',
+        'Every image size generated directly as WebP for a network of over a million images, its own schema layer and German with English on WPML',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Lekár.sk',
+    url: 'https://lekar.sk',
+    slug: 'lekar',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Zdravotný portál', en: 'Health portal' },
+    desc: {
+      sk: 'Zdravotný portál presťahovaný z pôvodného CMS do WordPressu s viac ako 7 tisíc presmerovaniami',
+      en: 'Health portal moved from its original CMS to WordPress with more than 7,000 redirects',
+    },
+    summary: {
+      sk: 'Zdravotný portál o ochoreniach, prevencii a zdravom životnom štýle. Celý obsah sa presťahoval z pôvodného CMS do WordPressu s vlastnou témou podľa dizajnu 1:1, s dôrazom na SEO a rýchlosť.',
+      en: 'A health portal about conditions, prevention and healthy living. All content moved from the original CMS to WordPress with a custom theme 1:1 from the design, with a focus on SEO and speed.',
+    },
+    scope: {
+      sk: [
+        'Migrácia celého obsahu z pôvodného CMS do WordPressu',
+        '7 413 presmerovaní 301 zo starých adries článkov a tém na nové URL',
+        'Pokročilá SEO optimalizácia so schemou MedicalOrganization',
+        'Optimalizácia výkonu a lazy loading obrázkov',
+        'Vlastná téma podľa dizajnu 1:1',
+      ],
+      en: [
+        'Migration of all content from the original CMS to WordPress',
+        '7,413 301 redirects from the old article and topic addresses to the new URLs',
+        'Advanced SEO with MedicalOrganization schema',
+        'Performance work and lazy-loaded images',
+        'A custom theme 1:1 from the design',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Sadíme budúcnosť',
+    url: 'https://sadimebuducnost.sk',
+    slug: 'sadimebuducnost',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Darcovský web projektu výsadby stromov', en: 'Tree planting donation website' },
+    desc: {
+      sk: 'Interaktívna mapa s tisíckami výsadieb a vlastný darovací formulár s platbou cez Stripe',
+      en: 'An interactive map of thousands of plantings and a custom donation form paid through Stripe',
+    },
+    summary: {
+      sk: 'Web projektu, ktorý vysádza stromy z príspevkov darcov. Interaktívna mapa ukazuje tisíce výsadieb a darovať sa dá cez vlastný formulár s platobnou bránou Stripe.',
+      en: 'A site for a project that plants trees from donations. An interactive map shows thousands of plantings, and donations go through a custom form with the Stripe payment gateway.',
+    },
+    scope: {
+      sk: [
+        'Mapa Google Maps s približne 4 000 bodmi z externého feedu výsadieb a vlastných záznamov s GPS',
+        'Body presunuté z 1,8 MB inline HTML do cachovaného markers.json, ktorý sa obnovuje každú hodinu',
+        'Vlastný darovací formulár so Stripe PaymentIntents: validácia pred platbou, idempotency kľúč a rate limit',
+        'Denné párovanie platieb namiesto webhooku: nájde zaplatené platby bez objednávky a označí refundácie a spory',
+        'Dary ako WooCommerce objednávky (HPOS), PDF certifikát pre darcu a export darcov do XLSX bez ďalších knižníc',
+      ],
+      en: [
+        'A Google Maps map with about 4,000 markers from an external planting feed and own GPS records',
+        'Markers moved from 1.8 MB of inline HTML to a cached markers.json rebuilt every hour',
+        'A custom donation form with Stripe PaymentIntents: validation before payment, an idempotency key and a rate limit',
+        'Daily payment reconciliation instead of a webhook: it finds paid intents without an order and flags refunds and disputes',
+        'Donations as WooCommerce orders (HPOS), a PDF certificate for donors and a donor export to XLSX without extra libraries',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Online žiak',
+    url: 'https://onlineziak.sk',
+    slug: 'onlineziak',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Vzdelávací portál', en: 'Education portal' },
+    desc: {
+      sk: 'Vzdelávací portál s vyhľadávaním, ktoré rozumie slovenským tvarom slov',
+      en: 'Education portal with a search that understands Slovak word forms',
+    },
+    summary: {
+      sk: 'Vzdelávací portál s článkami, poradňou a mapou predajných miest, postavený podľa dizajnu 1:1 s požiadavkou na prístupnosť WCAG 2.1 AA.',
+      en: 'An education portal with articles, a Q&A section and a map of sales points, built 1:1 from the design to meet WCAG 2.1 AA accessibility.',
+    },
+    scope: {
+      sk: [
+        'Slovenské vyhľadávanie: koncovky slov sa pred hľadaním v Relevanssi orežú, takže nájde aj vyskloňované tvary',
+        'AJAX filter článkov podľa formátu, roly a hľadaného výrazu cez vlastný REST endpoint',
+        'Mapa predajných miest na Google Maps a export do CSV len pre administrátorov, kontakty zostávajú mimo verejnej mapy',
+        'Poradňa s vlastným post typom a približne 40 ACF blokov',
+        'Mailchimp newsletter s honeypotom a prístupnosť podľa WCAG 2.1 AA',
+      ],
+      en: [
+        'Slovak search: word endings are trimmed before the Relevanssi query, so inflected forms still match',
+        'AJAX article filter by format, role and search term through a custom REST endpoint',
+        'A Google Maps map of sales points and a CSV export for admins only, keeping contacts off the public map',
+        'A Q&A section with its own post type and about 40 ACF blocks',
+        'Mailchimp newsletter with a honeypot and WCAG 2.1 AA accessibility',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Elektrárňa Piešťany',
+    url: 'https://elektrarnapiestany.sk',
+    slug: 'elektrarnapiestany',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Web na mieru', en: 'Custom website' },
+    desc: {
+      sk: 'Vlastná WordPress téma podľa dizajnu 1:1',
+      en: 'Custom WordPress theme 1:1 from the design',
+    },
+    summary: {
+      sk: 'Web Elektrárne Piešťany na vlastnej WordPress téme postavenej podľa dizajnu 1:1.',
+      en: 'The Elektrárňa Piešťany website on a custom WordPress theme built 1:1 from the design.',
+    },
+    scope: {
+      sk: ['Vlastná WordPress téma podľa dizajnu 1:1', 'Formuláre, tabuľky a Instagram feed', 'Meranie cez GTM'],
+      en: ['A custom WordPress theme 1:1 from the design', 'Forms, tables and an Instagram feed', 'Tracking through GTM'],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Chiptech',
+    url: 'https://chiptech.sk',
+    slug: 'chiptech',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Chiptuning vozidiel', en: 'Vehicle chiptuning' },
+    desc: {
+      sk: 'Pokročilý filter vozidiel doprogramovaný do existujúcej témy',
+      en: 'An advanced vehicle filter built into an existing theme',
+    },
+    summary: {
+      sk: 'Web firmy na chiptuning vozidiel postavený na existujúcej téme. Prácou na ňom bol pokročilý filtračný systém, ktorý návštevníka cez tri nadväzujúce úrovne dovedie k jeho vozidlu.',
+      en: 'A site for a vehicle chiptuning company built on an existing theme. The work on it was an advanced filtering system that takes visitors to their vehicle through three linked levels.',
+    },
+    scope: {
+      sk: [
+        'Pokročilý AJAX filter vozidiel s tromi nadväzujúcimi úrovňami',
+        'Doprogramovaný do existujúcej Elementor témy bez zásahu do zvyšku webu',
+      ],
+      en: [
+        'An advanced AJAX vehicle filter with three linked levels',
+        'Built into an existing Elementor theme without touching the rest of the site',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Vibration',
+    url: 'https://vibration.sk',
+    slug: 'vibration',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'Firemný web', en: 'Company website' },
+    desc: {
+      sk: 'Úpravy a programovanie frontendu firemného webu na vlastnej platforme Sellio 2',
+      en: 'Frontend changes and development of the company site on the in-house Sellio 2 platform',
+    },
+    summary: {
+      sk: 'Firemný web Vibration, ktorý beží na vlastnej platforme Sellio 2 s frontendom vo Vue 3 a Nuxt. Úpravy a programovanie frontendu podľa dizajnu.',
+      en: "Vibration's company site, running on the in-house Sellio 2 platform with a Vue 3 and Nuxt frontend. Frontend changes and development from the design.",
+    },
+    scope: {
+      sk: ['Frontend vo Vue 3 a Nuxt na vlastnom CMS Sellio 2', 'Úpravy a nové časti webu podľa dizajnu'],
+      en: ['A Vue 3 and Nuxt frontend on the in-house Sellio 2 CMS', 'Changes and new sections of the site from the design'],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Zlatníctvo Horváth',
+    url: 'https://zlatnictvohorvath.sk',
+    slug: 'zlatnictvohorvath',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop zlatníctva', en: 'Jewellery store' },
+    desc: {
+      sk: 'Vue komponenty a frontend e-shopu podľa Figmy 1:1, s videom na produktových kartách',
+      en: 'Vue components and a store frontend 1:1 from Figma, with video on product cards',
+    },
+    summary: {
+      sk: 'E-shop a kamenná predajňa zlatníctva na platforme Sellio 2. Frontend vo Vue 3 a Nuxt podľa Figmy 1:1, v slovenčine aj češtine.',
+      en: 'The online store of a jeweller with a physical shop, on the Sellio 2 platform. A Vue 3 and Nuxt frontend 1:1 from Figma, in Slovak and Czech.',
+    },
+    scope: {
+      sk: [
+        'Frontend vo Vue 3 a Nuxt 4 podľa Figmy 1:1: 97 komponentov a 24 stránok',
+        'Produktové karty, ktoré pri prejdení myšou prehrajú video a na mobile ho ukážu po potiahnutí',
+        'Text gravírovania, ktorý prejde cez košík až do pokladne',
+        'Naposledy prezerané šperky, wishlist, Trustindex recenzie a Instagram galéria',
+        'Výdajné miesta Packety a postupné načítanie produktov s počítadlom',
+        'Slovenská a česká verzia, každá na vlastnej doméne',
+      ],
+      en: [
+        'A Vue 3 and Nuxt 4 frontend 1:1 from Figma: 97 components and 24 pages',
+        'Product cards that play video on hover and reveal it with a swipe on mobile',
+        'Engraving text carried through the cart into checkout',
+        'Recently viewed jewellery, a wishlist, Trustindex reviews and an Instagram gallery',
+        'Packeta pickup points and load more with a counter',
+        'Slovak and Czech versions, each on its own domain',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Voňavý domov',
+    url: 'https://vonavydomov.eu',
+    slug: 'vonavydomov',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop s parfumami na pranie', en: 'Laundry perfume store' },
+    desc: {
+      sk: 'E-shop v 7 jazykoch na 7 doménach, s piatimi dopravcami a výkonom ako referencia platformy',
+      en: 'Store in 7 languages on 7 domains, with five carriers and performance that sets the platform reference',
+    },
+    summary: {
+      sk: 'E-shop s parfumami na pranie na platforme Sellio 2 v siedmich jazykoch, každý na vlastnej doméne. Frontend vo Vue 3 a Nuxt podľa Figmy 1:1, ktorý slúži ako výkonová referencia pre ostatné e-shopy platformy.',
+      en: 'A laundry perfume store on the Sellio 2 platform in seven languages, each on its own domain. A Vue 3 and Nuxt frontend 1:1 from Figma that serves as the performance reference for the other stores on the platform.',
+    },
+    scope: {
+      sk: [
+        'Frontend vo Vue 3 a Nuxt 4 podľa Figmy 1:1: 109 komponentov a 26 stránok',
+        '7 jazykov, každý na vlastnej doméne',
+        'Päť dopravcov v pokladni vrátane GLS widgetu, Packety, SPS a DPD',
+        'Skladanie sád produktov, zľava za vernostné body a darčekové karty s vlastnými pravidlami košíka',
+        'Výkon: preload bannera, atribúty loading a decoding, routeRules pre pokladňu a podmnožiny fontov',
+        'Fixná hlavička bez skoku layoutu, recenzie a integrácia Heureky',
+      ],
+      en: [
+        'A Vue 3 and Nuxt 4 frontend 1:1 from Figma: 109 components and 26 pages',
+        '7 languages, each on its own domain',
+        'Five carriers at checkout including a GLS widget, Packeta, SPS and DPD',
+        'Product set builder, a loyalty points discount and gift cards with their own cart rules',
+        'Performance: a banner preload, loading and decoding attributes, checkout routeRules and subsetted fonts',
+        'A fixed header without layout shift, reviews and a Heureka integration',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Tatranský profil',
+    url: 'https://tatranskyprofil.eu',
+    slug: 'tatranskyprofil',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop so severským drevom', en: 'Nordic timber store' },
+    desc: {
+      sk: 'Najväčšia téma platformy Sellio 2: 191 komponentov a kontrola doručenia do Poľska na SVG mape',
+      en: 'The largest theme on Sellio 2: 191 components and a Polish delivery check on an SVG map',
+    },
+    summary: {
+      sk: 'E-shop s tatranským profilom, terasovými doskami a hranolmi zo severského dreva na platforme Sellio 2. Téma založená od nuly, od hlavičky a widgetov CMS až po blog a stránky pre veľkoobchod.',
+      en: 'A store for Tatra profile cladding, decking and beams from Nordic timber on the Sellio 2 platform. A theme started from scratch, from the header and CMS widgets to the blog and wholesale pages.',
+    },
+    scope: {
+      sk: [
+        'Najväčšia téma platformy: 191 komponentov a 27 stránok vo Vue 3 a Nuxt',
+        'Hlavička, menu kategórií, fixný bočný panel, pätička, bannery a približne 10 widgetov CMS',
+        'Kontrola doručenia do Poľska: PSČ overené voči CSV z CMS a regióny vyfarbené na SVG mape',
+        'Prihlásenie v modálnom okne, blog so stránkami autorov a stránky pre veľkoobchod, predajňu a partnerov',
+        'Tooltipy parametrov a úprava úrovní nadpisov kvôli SEO',
+      ],
+      en: [
+        'The largest theme on the platform: 191 components and 27 pages in Vue 3 and Nuxt',
+        'Header, category menu, fixed sidebar, footer, banners and about 10 CMS widgets',
+        'Polish delivery check: postcodes checked against a CSV from the CMS and regions coloured on an SVG map',
+        'A login modal, a blog with author pages and pages for wholesale, the store and partners',
+        'Parameter tooltips and heading levels adjusted for SEO',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Najkoberce',
+    url: 'https://najkoberce.sk',
+    slug: 'najkoberce',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop s kobercami', en: 'Carpet store' },
+    desc: {
+      sk: 'Frontend e-shopu na Yii platforme Sellio 1 pre slovenskú aj českú doménu',
+      en: 'Store frontend on the Yii-based Sellio 1 platform for a Slovak and a Czech domain',
+    },
+    summary: {
+      sk: 'E-shop s kobercami a bytovými doplnkami na platforme Sellio 1 (PHP Yii). Frontend podľa dizajnu 1:1 v SCSS, JavaScripte a jQuery, s dlhodobým vývojom od roku 2021.',
+      en: 'A store for carpets and home accessories on the Sellio 1 platform (PHP Yii). A frontend 1:1 from the design in SCSS, JavaScript and jQuery, developed continuously since 2021.',
+    },
+    scope: {
+      sk: [
+        'Frontend v Yii šablónach, SCSS a jQuery: 36 SCSS súborov a 88 šablón, build cez Grunt',
+        'Jeden e-shop pre slovenskú a českú doménu s opravenými hreflang odkazmi',
+        'Farebné varianty ako okrúhle tlačidlá podľa Figmy namiesto selectu a zmena obrázka podľa variantu',
+        'Filtre s počtom produktov, mobilný filter, AJAX pridanie do košíka a GA datalayer',
+        'Dlhodobý vývoj: viac ako 600 commitov od roku 2021',
+      ],
+      en: [
+        'A frontend in Yii views, SCSS and jQuery: 36 SCSS partials and 88 views, built with Grunt',
+        'One store for a Slovak and a Czech domain with fixed hreflang links',
+        'Colour variants as round buttons from Figma instead of a select, and the image switches per variant',
+        'Filters with product counts, a mobile filter, AJAX add to cart and a GA data layer',
+        'Long-term development: over 600 commits since 2021',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Tomaflora',
+    url: 'https://tomaflora.sk',
+    slug: 'tomaflora',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop s izbovými rastlinami', en: 'Houseplant store' },
+    desc: {
+      sk: 'Šablóna e-shopu na Sellio 1 podľa dizajnu 1:1 s Instagram feedom a zoomom fotiek',
+      en: 'Store template on Sellio 1 1:1 from the design, with an Instagram feed and photo zoom',
+    },
+    summary: {
+      sk: 'E-shop s izbovými rastlinami, kvetináčmi a machovými stenami na platforme Sellio 1. Šablóna podľa dizajnu 1:1 a príprava na spustenie.',
+      en: 'A store for houseplants, pots and moss walls on the Sellio 1 platform. A template 1:1 from the design and the launch preparation.',
+    },
+    scope: {
+      sk: [
+        'Šablóna e-shopu podľa dizajnu 1:1 v Yii, SCSS a jQuery, build cez Grunt',
+        'Instagram feed a zoom produktových fotiek v jQuery',
+        'Doprava s knižnicou Packety',
+      ],
+      en: [
+        'A store template 1:1 from the design in Yii, SCSS and jQuery, built with Grunt',
+        'An Instagram feed and product photo zoom in jQuery',
+        'Shipping with the Packeta library',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
+  },
+  {
+    name: 'Madad',
+    url: 'https://madad.sk',
+    slug: 'madad',
+    context: 'vibration',
+    featured: false,
+    kind: { sk: 'E-shop Madness Advertising', en: 'Madness Advertising store' },
+    desc: {
+      sk: 'Frontend e-shopu na Sellio 1 podľa dizajnu 1:1 s balíčkami produktov',
+      en: 'Store frontend on Sellio 1 1:1 from the design, with product packs',
+    },
+    summary: {
+      sk: 'E-shop Madness Advertising na platforme Sellio 1. Frontend podľa dizajnu 1:1 a jeho dlhodobý vývoj od roku 2020.',
+      en: 'The Madness Advertising store on the Sellio 1 platform. A frontend 1:1 from the design, developed continuously since 2020.',
+    },
+    scope: {
+      sk: [
+        'Frontend v Yii šablónach, SCSS na Bootstrap 4 a jQuery s Masonry',
+        'Balíčky produktov a zobrazenie ceny od',
+        'Zatvárateľný oznam v hornej lište, newsletter s reCAPTCHA a FAQ',
+        'Dlhodobý vývoj: viac ako 150 commitov od roku 2020',
+      ],
+      en: [
+        'A frontend in Yii views, SCSS on Bootstrap 4 and jQuery with Masonry',
+        'Product packs and a price from display',
+        'A dismissible top bar notice, a newsletter with reCAPTCHA and an FAQ',
+        'Long-term development: over 150 commits since 2020',
+      ],
+    },
+    credit: { sk: 'Realizované ako zamestnanec Vibration.', en: 'Built as an employee of Vibration.' },
   },
   {
     name: 'Dermateq',

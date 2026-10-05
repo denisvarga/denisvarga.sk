@@ -12,6 +12,7 @@ const plain = (markup: string): string => markup.replaceAll('*', '');
 const PROJECT_CONTEXT: Readonly<Record<ProjectContext, string>> = {
   denva: 'freelance under Denva (denva.studio)',
   grandpano: 'built as an employee of GrandPano',
+  vibration: 'built as an employee of Vibration',
   own: 'his own project',
 };
 

@@ -7,6 +7,7 @@ export const CONTACT_PHONE = '+421 902 074 830';
 const RELATIONSHIP: Readonly<Record<ProjectContext, string>> = {
   denva: 'robil ho na voľnej nohe pod značkou Denva (denva.studio)',
   grandpano: 'robil ho ako zamestnanec GrandPano',
+  vibration: 'robil ho ako zamestnanec Vibration s.r.o.',
   own: 'je to jeho vlastný projekt',
 };
 
