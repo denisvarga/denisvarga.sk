@@ -5,10 +5,11 @@ Personal CV site of Denis Varga, in Slovak at [denisvarga.sk](https://denisvarga
 ## Architecture
 
 - **Static pages.** React 19 and TypeScript, built with Vite and prerendered to plain HTML for both languages (`scripts/prerender.ts`), together with `sitemap.xml`, `llms.txt` and `llms-full.txt`. The PDF CVs in `public/cv/` are printed from the same data (`pnpm cv`).
-- **One Cloudflare Worker.** Pages are served as static assets; the Worker script (`worker/`) runs only for `/api/*`. It is a Hono app with a single `POST /api/ask` endpoint.
+- **One Cloudflare Worker.** Pages are served as static assets; the Worker script (`worker/`) runs only for `/api/*` and `/prehlad*`. It is a Hono app with the `POST /api/ask` endpoint and the private overview.
 - **Chat.** The agent answers through the OpenAI Responses API from a fixed fact sheet and rules (`worker/agent/`), behind Cloudflare Turnstile.
 - **Projects.** One list in `shared/projects.ts` feeds the project rail and index, the PDF CVs, `llms.txt` and the chat agent's facts. The screenshots come from `scripts/project-shots/`: `capture.ts` photographs each site at desktop and phone size, `compose.ts --variants b` lays them out as a tilted browser and a phone.
 - **Storage.** A D1 database created in the EU jurisdiction holds the question log and backs the daily cap (`migrations/`).
+- **Private overview.** `/prehlad` shows statistics, a daily chart and a searchable table of the question log with a CSV export (`worker/admin/`). Cloudflare Access protects it, and the Worker verifies the Access JWT itself as well (signature against the team's keys, audience, issuer and expiry). It answers 404 until `ACCESS_AUD` is set.
 - **Analytics.** Google Analytics 4 through Google Tag Manager, loaded only on the production domains and only after the visitor accepts it in the cookie bar (`src/consent/`). The container ID is set in `src/consent/gtm-config.ts`.
 
 ## Security
