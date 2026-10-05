@@ -17,6 +17,7 @@ import rkovacovsky from '../assets/projects/rkovacovsky.webp';
 import routie from '../assets/projects/routie.webp';
 import saunika from '../assets/projects/saunika.webp';
 import schoolofarts from '../assets/projects/schoolofarts.webp';
+import secondBrain from '../assets/projects/second-brain.webp';
 import zanzara from '../assets/projects/zanzara.webp';
 import { PROJECT_INFO, type ProjectInfo } from '../../shared/projects';
 
@@ -48,6 +49,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   routie,
   saunika,
   schoolofarts,
+  'second-brain': secondBrain,
   zanzara,
 };
 

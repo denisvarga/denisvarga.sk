@@ -5,10 +5,12 @@ import { FREEZE_PAGE, HIDE_CARETS, PIN_CLASS_SLIDERS, PIN_SLIDERS } from './page
 import { argList, loadProjects, RAW_DIR, type ShotProject } from './project-list.ts';
 
 // Usage: tsx scripts/project-shots/capture.ts [--only slug,slug] [--channel chrome]
+// Private projects (url null) are skipped; their raw images come from spikes/project-shots/html.
 // Defaults to full Chromium (new headless), which renders large blurred shadows without the tile
 // seams of the headless shell. Use the chrome channel when a site relies on H.264 video.
 
 type Kind = 'desktop' | 'mobile';
+type PublicProject = ShotProject & { readonly url: string };
 
 interface ShotResult {
   readonly kind: Kind;
@@ -45,7 +47,7 @@ function strings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : [];
 }
 
-async function shoot(browser: Browser, project: ShotProject, kind: Kind): Promise<ShotResult> {
+async function shoot(browser: Browser, project: PublicProject, kind: Kind): Promise<ShotResult> {
   const context = await browser.newContext({
     ...CONTEXTS[kind],
     locale: 'sk-SK',
@@ -96,7 +98,9 @@ async function readLog(): Promise<Record<string, ShotResult[]>> {
   }
 }
 
-const projects = await loadProjects(argList('--only'));
+const listed = await loadProjects(argList('--only'));
+for (const { slug } of listed.filter((p) => !p.url)) console.log(`${slug}: skipped, private project without a url`);
+const projects = listed.filter((p): p is PublicProject => p.url !== null);
 const channel = argList('--channel')[0] ?? 'chromium';
 await mkdir(RAW_DIR, { recursive: true });
 

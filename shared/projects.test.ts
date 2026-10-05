@@ -6,7 +6,7 @@ describe('PROJECT_INFO', () => {
     expect(new Set(PROJECT_INFO.map((p) => p.slug)).size).toBe(PROJECT_INFO.length);
     for (const p of PROJECT_INFO) {
       expect(p.slug).toMatch(/^[a-z0-9-]+$/);
-      expect(p.url).toMatch(/^https:\/\/[a-z0-9.-]+$/);
+      if (p.url !== null) expect(p.url).toMatch(/^https:\/\/[a-z0-9.-]+$/);
     }
   });
 
@@ -18,7 +18,9 @@ describe('PROJECT_INFO', () => {
 
   it('describes every project in both languages', () => {
     for (const p of PROJECT_INFO) {
-      for (const text of [p.kind.sk, p.kind.en, p.desc.sk, p.desc.en]) expect(text.trim()).not.toBe('');
+      const texts = [p.kind, p.desc, p.summary, p.credit].flatMap((t) => (t ? [t.sk, t.en] : []));
+      for (const text of [...texts, ...p.scope.sk, ...p.scope.en]) expect(text.trim()).not.toBe('');
+      expect(p.scope.sk).toHaveLength(p.scope.en.length);
     }
   });
 });
