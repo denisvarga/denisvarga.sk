@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { formatPeriod } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
+import { BUILD_YEAR } from '../lib/use-current-year';
 import { buildLlmsFullTxt, buildLlmsTxt } from './llms';
 
 describe('llms.txt', () => {
@@ -14,9 +16,9 @@ describe('llms.txt', () => {
   it('carries the whole CV without markup', () => {
     const text = buildLlmsFullTxt();
     for (const project of PROJECTS) expect(text).toContain(project.url ?? `${project.name} (private project, no public site)`);
-    expect(text).toContain('### GrandPano, WordPress specialist (2026 - present)');
+    expect(text).toContain(`### GrandPano, WordPress specialist (${formatPeriod({ start: 2026, end: null }, BUILD_YEAR)})`);
     expect(text).toContain('- Brixx (https://brixx.cz): Residential development website, built as an employee of GrandPano. ');
-    expect(text).toContain('### Denva, AI engineer & full-stack developer (2018 - present)');
+    expect(text).toContain(`### Denva, AI engineer & full-stack developer (2018 - ${BUILD_YEAR})`);
     expect(text).toContain('- Location: Bratislava, Slovakia; remote preferred.');
     expect(text).toContain('- Languages: Slovak (native), English (professional working proficiency).');
     expect(text).toContain('- Education: Secondary School of Printing (Stredná odborná škola polygrafická), digital media graphic designer, 2012 - 2016.');

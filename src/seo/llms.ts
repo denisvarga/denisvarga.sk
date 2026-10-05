@@ -1,9 +1,10 @@
-import { JOBS } from '../data/jobs';
+import { formatPeriod, JOBS } from '../data/jobs';
 import { PROJECTS, type ProjectContext } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { copyEn } from '../i18n/copy-en';
 import { headCopy, LINKEDIN_URL, SOURCE_URL } from '../i18n/head-copy';
 import { contact } from '../i18n/ui-copy';
+import { BUILD_YEAR } from '../lib/use-current-year';
 
 const EN = headCopy.en;
 const SK = headCopy.sk;
@@ -12,6 +13,7 @@ const plain = (markup: string): string => markup.replaceAll('*', '');
 const PROJECT_CONTEXT: Readonly<Record<ProjectContext, string>> = {
   denva: 'freelance under Denva (denva.studio)',
   grandpano: 'built as an employee of GrandPano',
+  vibration: 'built as an employee of Vibration',
   own: 'his own project',
 };
 
@@ -70,7 +72,7 @@ export function buildLlmsFullTxt(): string {
     '',
     '## Experience',
     ...JOBS.flatMap((job) => [
-      `### ${job.company}, ${job.role.en} (${job.period.start} - ${job.period.end ?? t.exp.present})`,
+      `### ${job.company}, ${job.role.en} (${formatPeriod(job.period, BUILD_YEAR)})`,
       job.text.en,
       '',
     ]),

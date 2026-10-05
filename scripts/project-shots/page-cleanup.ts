@@ -14,12 +14,20 @@ iframe[src*="smartsupp"], iframe[title*="chat" i], .grecaptcha-badge
 { display: none !important; }
 `;
 
-// Live rendering bugs that would misrepresent the work in a shot, keyed by project slug.
-// Drop an entry once the site itself is fixed.
+// Keyed by project slug: live rendering bugs that would misrepresent the work in a shot, and
+// custom widgets the generic rules miss. Drop a bug entry once the site itself is fixed.
 export const SITE_CSS: Readonly<Record<string, string>> = {
   // Below 1024px .hero__canvas is display: contents, so the CTAs lose its z-index and the
   // blurred .hero__vignette paints over them.
   ledpixel: '@media (max-width: 1023.98px) { .hero__actions { position: relative; inset: auto; z-index: 2; } }',
+  // Self-hosted "Maxik" chat assistant: a launcher plus an invite bubble.
+  najkoberce: '#maxik-widget-root { display: none !important; }',
+  // The hero h1 has a fixed 700px width that overflows the 360px mobile slide, and the search
+  // placeholder is typed out letter by letter, so a frozen frame shows half a word.
+  tomaflora:
+    '#home-banner .slider-content h1, #home-banner .slider-content em { max-width: 100%; } #search-form .search-string::placeholder { color: transparent; }',
+  // The second topbar message is empty, leaving its "|" separator dangling like a caret.
+  zlatnictvohorvath: '#header .header-top-line-right span:empty::before { content: none !important; }',
 };
 
 export const CLICK_CONSENT = `(() => {

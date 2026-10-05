@@ -9,6 +9,7 @@ import { ExperienceSection } from '../sections/experience/experience-section';
 import { HeroSection } from '../sections/hero/hero-section';
 import { ProgressBar } from './progress-bar';
 import { SiteChrome } from './site-chrome';
+import { BUILD_YEAR } from '../lib/use-current-year';
 
 const goTo = vi.hoisted(() => vi.fn());
 vi.mock('../motion/scroll-to', () => ({ goTo }));
@@ -130,7 +131,7 @@ describe('prerendered markup', () => {
       expect(html).toContain('href="https://denisvarga.sk/" hrefLang="sk"');
       expect(html).toContain('href="https://denisvarga.dev/" hrefLang="en"');
       expect(html).toContain('href="tel:+421902074830"');
-      expect(html).toContain(lang === 'sk' ? '2018 - dnes' : '2018 - present');
+      expect(html).toContain(`2018 - ${BUILD_YEAR}`);
       expect(html).toContain('rel="noopener"');
       const linkedin = new DOMParser().parseFromString(html, 'text/html').querySelector('a[href*="linkedin.com"]');
       expect([linkedin?.textContent, linkedin?.getAttribute('target'), linkedin?.getAttribute('rel')]).toEqual([

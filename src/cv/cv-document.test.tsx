@@ -1,10 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { JOBS } from '../data/jobs';
+import { formatPeriod, JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';
 import { ui } from '../i18n/ui-copy';
+import { BUILD_YEAR } from '../lib/use-current-year';
 import { cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 import { CvDocument } from './cv-document';
 import { cvHtmlDocument } from './cv-html';
@@ -22,31 +23,40 @@ const textOf = (doc: Document, selector: string) => [...doc.querySelectorAll(sel
 describe.each(LANGS)('CvDocument (%s)', (lang) => {
   const doc = render(lang);
   const text = doc.body.textContent ?? '';
+  const items = [...doc.querySelectorAll('.project')];
+  const itemOf = (name: string) => items.find((item) => item.querySelector('.project-name')?.textContent === name);
 
   it('lists every company and every project, linking each public project to its domain', () => {
     for (const job of JOBS) expect(text).toContain(job.company);
-    const items = [...doc.querySelectorAll('.project')];
     expect(items).toHaveLength(PROJECTS.length);
-    PROJECTS.forEach((project, i) => {
-      const links = [...items[i]!.querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]);
+    for (const project of PROJECTS) {
+      const links = [...(itemOf(project.name)?.querySelectorAll('a') ?? [])].map((a) => [a.getAttribute('href'), a.textContent]);
       expect(links).toEqual(project.url ? [[project.url, displayUrl(project.url)]] : []);
-    });
-  });
-
-  it('marks a project without a public site as private instead of linking it', () => {
-    const items = [...doc.querySelectorAll('.project')];
-    const privateIndexes = PROJECTS.flatMap((project, i) => (project.url === null ? [i] : []));
-    expect(privateIndexes.length).toBeGreaterThan(0);
-    for (const i of privateIndexes) {
-      expect(items[i]!.querySelector('a')).toBeNull();
-      expect(items[i]!.querySelector('.domain')?.textContent).toBe(ui[lang].privateProject);
     }
   });
 
-  it('shows ongoing jobs as present in its language, not as a year', () => {
-    const present = lang === 'sk' ? 'dnes' : 'present';
-    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? present}`));
-    expect(textOf(doc, '.period')).toContain(`2018 - ${present}`);
+  it('describes own and freelance work but lists Vibration work by name only', () => {
+    for (const project of PROJECTS) {
+      const item = itemOf(project.name);
+      expect(item?.querySelector('.project-desc') ?? null).toEqual(project.context === 'vibration' ? null : expect.anything());
+      expect(item?.querySelector('.project-credit')?.textContent ?? null).toBe(
+        project.context === 'vibration' || !project.credit ? null : typeset(project.credit[lang], lang),
+      );
+    }
+  });
+
+  it('marks a project without a public site as private instead of linking it', () => {
+    const privateProjects = PROJECTS.filter((project) => project.url === null);
+    expect(privateProjects.length).toBeGreaterThan(0);
+    for (const project of privateProjects) {
+      expect(itemOf(project.name)?.querySelector('a')).toBeNull();
+      expect(itemOf(project.name)?.querySelector('.domain')?.textContent).toBe(ui[lang].privateProject);
+    }
+  });
+
+  it('ends ongoing jobs with the build year, not the generation date', () => {
+    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => formatPeriod(job.period, BUILD_YEAR)));
+    expect(textOf(doc, '.period')).toContain(`2018 - ${BUILD_YEAR}`);
     expect(textOf(doc, '.period')).toContain('2021 - 2025');
     expect(textOf(doc, '.period').join(' ')).not.toContain('2031');
   });

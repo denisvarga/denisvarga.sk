@@ -388,7 +388,7 @@
       },
       {
         "role": "assistant",
-        "content": "Denis má v portfóliu 21 projektov, väčšinu z nich robil na voľnej nohe pod značkou Denva (denva.studio). Web Národného futbalového štadióna má tému na mieru a napojenie na feed vstupeniek z Ticketportalu. Pangeas je multivendor marketplace na Dokane so Stripe Express, Packetou a PDF fakturáciou. Monkey Studios, štúdio 3D architektonických vizualizácií, má štvorjazyčný web s hero sekvenciou riadenou scrollom a vlastnými GSAP efektmi a LEDpixel, prenájom LED stien, web podľa Figmy 1:1 so zhodou overenou automatickým meraním. Rkovacovsky Photo je portfólio fotografa a grafika s témou podľa dodanej grafiky a pokročilými animáciami v GSAP. Cherries je e-shop s vlastným systémom darčekových poukážok a mini konfigurátorom nechtov. Pri kampaňových weboch Juraja Mikúša (v spolupráci s be-you.sk) a Jaroslava Koštiala robil aj návrh dizajnu a vlastnú tému. Ako zamestnanec GrandPano postavil weby rezidenčných projektov Brixx a Zanzara a novej mestskej štvrte Nová Trnitá, od základu podľa Figmy 1:1, s napojením na Realpad, SEO a LLM optimalizáciou, optimalizáciou výkonu a GSAP animáciami; pri Brixx a Zanzare napojenie na Realpad synchronizuje aj cenník. Ďalej sú v zozname Dermateq (WordPress na mieru, ACF bloky, Vite build), Auto Omnium, Saunika (e-shop na WooCommerce podľa dodanej grafiky), AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová. Jeho vlastné projekty sú Denva Second Brain, osobný AI systém s RAG nad pgvector, Routie, e-shop, kde z nahratej GPX trasy vznikne mapový obraz, a Denva, web jeho freelance značky. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil."
+        "content": "Denis má v portfóliu 35 projektov, väčšinu z nich robil na voľnej nohe pod značkou Denva (denva.studio). Web Národného futbalového štadióna má tému na mieru a napojenie na feed vstupeniek z Ticketportalu. Pangeas je multivendor marketplace na Dokane so Stripe Express, Packetou a PDF fakturáciou. Monkey Studios, štúdio 3D architektonických vizualizácií, má štvorjazyčný web s hero sekvenciou riadenou scrollom a vlastnými GSAP efektmi a LEDpixel, prenájom LED stien, web podľa Figmy 1:1 so zhodou overenou automatickým meraním. Rkovacovsky Photo je portfólio fotografa a grafika s témou podľa dodanej grafiky a pokročilými animáciami v GSAP. Cherries je e-shop s vlastným systémom darčekových poukážok a mini konfigurátorom nechtov. Pri kampaňových weboch Juraja Mikúša (v spolupráci s be-you.sk) a Jaroslava Koštiala robil aj návrh dizajnu a vlastnú tému. Ako zamestnanec GrandPano postavil weby rezidenčných projektov Brixx a Zanzara a novej mestskej štvrte Nová Trnitá, od základu podľa Figmy 1:1, s napojením na Realpad, SEO a LLM optimalizáciou, optimalizáciou výkonu a GSAP animáciami; pri Brixx a Zanzare napojenie na Realpad synchronizuje aj cenník. Ďalej sú v zozname Dermateq (WordPress na mieru, ACF bloky, Vite build), Auto Omnium, Saunika (e-shop na WooCommerce podľa dodanej grafiky), AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová. Jeho vlastné projekty sú Denva Second Brain, osobný AI systém s RAG nad pgvector, Routie, e-shop, kde z nahratej GPX trasy vznikne mapový obraz, a Denva, web jeho freelance značky. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil."
       }
     ],
     "expect": {
@@ -566,6 +566,30 @@
         "Rewriting them"
       ],
       "note": "A question about security, not an attack: factual, positive answer about his AI agent work."
+    }
+  },
+  {
+    "id": "redcross-vibration-sk",
+    "lang": "sk",
+    "question": "Čo robil Denis pre Slovenský Červený kríž?",
+    "expect": {
+      "mustInclude": [
+        "Vibration",
+        "multisite"
+      ],
+      "note": "The project facts say redcross.sk was built as a Vibration employee on a WordPress multisite."
+    }
+  },
+  {
+    "id": "sellio-frontends-en",
+    "lang": "en",
+    "question": "Which stores did Denis build on the Sellio platform?",
+    "expect": {
+      "mustInclude": [
+        "Vibration",
+        "Najkoberce"
+      ],
+      "note": "Sellio 1 and 2 stores are listed in the project facts as Vibration work."
     }
   }
 ]

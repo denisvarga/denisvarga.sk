@@ -20,7 +20,7 @@ export const copySk: Copy = {
       { label: 'Lokalita', value: 'Bratislava alebo remote' },
     ],
   },
-  exp: { label: 'Skúsenosti', title: 'Moja *cesta*', present: 'dnes' },
+  exp: { label: 'Skúsenosti', title: 'Moja *cesta*' },
   ai: {
     label: 'AI',
     title: 'AI píše, ja *rozhodujem.*',
@@ -70,7 +70,7 @@ export const copySk: Copy = {
     body: 'Weby, e-shopy a aplikácie na mieru, bez page builderov a kúpených šablón. Dnes ich staviam aj spravujem s AI agentmi po boku.',
     all: 'Všetky projekty',
     hide: 'Skryť zoznam',
-    contexts: { denva: 'Denva.studio', grandpano: 'Zamestnanec GrandPano', own: 'Vlastný projekt' },
+    contexts: { denva: 'Denva.studio', grandpano: 'Zamestnanec GrandPano', vibration: 'Zamestnanec Vibration', own: 'Vlastný projekt' },
   },
   stack: { label: 'Nástroje', title: 'S čím *pracujem*' },
   contact: {

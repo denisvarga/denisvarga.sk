@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
-import { JOBS } from '../data/jobs';
-import { PROJECTS } from '../data/projects';
+import { formatPeriod, JOBS } from '../data/jobs';
 import { SKILLS, skillLabel } from '../data/skills';
 import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
-import { contact, ui } from '../i18n/ui-copy';
+import { contact } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
+import { BUILD_YEAR } from '../lib/use-current-year';
 import { CV_NAME, cvCopy, cvDate, cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
+import { CvProjects } from './cv-projects';
 
 export interface CvDocumentProps {
   readonly lang: Lang;
@@ -84,7 +85,7 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
         <ol className="jobs">
           {JOBS.map((job) => (
             <li key={job.company} className="job">
-              <span className="period">{`${job.period.start} - ${job.period.end ?? t.exp.present}`}</span>
+              <span className="period">{formatPeriod(job.period, BUILD_YEAR)}</span>
               <div>
                 <h3 className="job-head">
                   {job.company}
@@ -132,21 +133,7 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
       </Section>
 
       <Section label={label.projects} className="projects">
-        <ul className="project-list">
-          {PROJECTS.map((project) => (
-            <li key={project.slug} className="project">
-              <span className="project-name">{project.name}</span>{' '}
-              {project.url ? (
-                <a className="domain" href={project.url}>
-                  {displayUrl(project.url)}
-                </a>
-              ) : (
-                <span className="domain">{ui[lang].privateProject}</span>
-              )}
-              <span className="project-desc">{text(project.desc[lang])}</span>
-            </li>
-          ))}
-        </ul>
+        <CvProjects lang={lang} />
       </Section>
 
       <footer className="foot">{label.generated(cvDate(generatedAt, lang))}</footer>
