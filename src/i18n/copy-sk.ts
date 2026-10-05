@@ -76,4 +76,19 @@ export const copySk: Copy = {
     cv: 'Stiahnuť CV',
     top: 'Späť hore',
   },
+  consent: {
+    label: 'Súhlas s cookies',
+    text: 'Analytické cookies (Google Analytics) mi pomáhajú zistiť, ako sa web používa. Bez vášho súhlasu sa nenačítajú.',
+    accept: 'Prijať',
+    reject: 'Odmietnuť',
+    granted: 'Aktuálna voľba: prijaté',
+    denied: 'Aktuálna voľba: odmietnuté',
+    details: 'Ktoré cookies?',
+    cookies: [
+      { name: 'dv-consent', desc: 'localStorage, ukladá vašu voľbu, nevyhnutné' },
+      { name: '_ga', desc: 'Google Analytics, rozlišuje návštevníkov, 2 roky' },
+      { name: '_ga_XMK9J72476', desc: 'Google Analytics, stav relácie, 2 roky' },
+    ],
+    settings: 'Nastavenia cookies',
+  },
 };

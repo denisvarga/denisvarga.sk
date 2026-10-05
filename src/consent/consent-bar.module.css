@@ -1,0 +1,109 @@
+/* Above page content, below the menu overlay (35), header (40) and project drawer (60). */
+.bar {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 30;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 24px 60px -24px rgb(19 20 22 / 0.5);
+  animation: consent-in 0.6s var(--ease) both;
+}
+
+/* The open menu overlay (MENU_ID in site-chrome.tsx) covers the card; hidden also takes its
+   buttons out of the tab order. The delay lets the menu's roll-down reach the card first. */
+:global(html:has(#site-menu[data-open])) .bar {
+  visibility: hidden;
+  transition: visibility 0s 1s;
+}
+
+.text,
+.current {
+  margin: 0;
+}
+
+.current {
+  font-size: 13px;
+  color: var(--grey-400);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  flex: 1 1 0;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bg);
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+@media (hover: hover) {
+  .button:hover {
+    background: #fff;
+  }
+}
+
+.details {
+  font-size: 13px;
+  color: var(--grey-400);
+}
+
+.summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.name {
+  font-family: var(--ff-mono), monospace;
+  font-size: 12px;
+  color: var(--bg);
+}
+
+@keyframes consent-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}
+
+@media print {
+  .bar {
+    display: none;
+  }
+}

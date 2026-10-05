@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { ConsentBar } from './consent/consent-bar';
 import { LangProvider } from './i18n/lang-context';
 import type { Lang } from './i18n/types';
 import { ProgressBar } from './layout/progress-bar';
@@ -31,6 +32,7 @@ export function App({ lang }: { lang: Lang }) {
         <StackSection />
         <ContactSection />
       </main>
+      <ConsentBar />
     </LangProvider>
   );
 }

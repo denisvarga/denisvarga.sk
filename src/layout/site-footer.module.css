@@ -9,7 +9,13 @@
   color: var(--grey-600);
 }
 
-.top {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.action {
   padding: 0;
   border: 0;
   background: none;
@@ -19,7 +25,7 @@
 }
 
 @media (hover: hover) {
-  .top:hover {
+  .action:hover {
     color: var(--ink);
   }
 }

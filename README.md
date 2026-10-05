@@ -8,10 +8,11 @@ Personal CV site of Denis Varga, in Slovak at [denisvarga.sk](https://denisvarga
 - **One Cloudflare Worker.** Pages are served as static assets; the Worker script (`worker/`) runs only for `/api/*`. It is a Hono app with a single `POST /api/ask` endpoint.
 - **Chat.** The agent answers through the OpenAI Responses API from a fixed fact sheet and rules (`worker/agent/`), behind Cloudflare Turnstile.
 - **Storage.** A D1 database created in the EU jurisdiction holds the question log and backs the daily cap (`migrations/`).
+- **Analytics.** Google Analytics 4 through Google Tag Manager, loaded only on the production domains and only after the visitor accepts it in the cookie bar (`src/consent/`). The container ID is set in `src/consent/gtm-config.ts`.
 
 ## Security
 
-- Strict Content Security Policy (`public/_headers`): `default-src 'none'`, scripts only from the site and Turnstile, and Trusted Types required.
+- Strict Content Security Policy (`public/_headers`): `default-src 'none'`, scripts only from the site, Turnstile and, after consent, Google Tag Manager, and Trusted Types required (`goog#html` is the policy Google's tag scripts create).
 - Every chat request passes an origin check, a body size limit, schema validation, a Turnstile check, a rate limit of 5 requests per minute per IP address (per /64 for IPv6) and a daily cap on model calls.
 - Every reply is signed with HMAC-SHA256. History sent back by the browser keeps only the assistant turns whose signature verifies, so earlier answers cannot be forged.
 - The question log stores the time, language, question, answer, model, latency, token counts and outcome. No IP address, user agent or other visitor identifier is stored.
