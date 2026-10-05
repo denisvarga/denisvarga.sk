@@ -6,11 +6,10 @@ import { z } from 'zod';
 import { guardAnswer, isManipulation, manipulationReply } from '../worker/agent/guard.ts';
 import { buildInstructions, PROMPT_VERSION } from '../worker/agent/prompt.ts';
 import { callOpenAI, type ModelResult, REASONING_EFFORTS, TOTAL_BUDGET_MS } from '../worker/ask/openai.ts';
+import { estimateCostUsd } from '../worker/ask/pricing.ts';
 import { safetyIdentifier } from '../worker/ask/safety-id.ts';
 import { askSchema, lastUserMessage } from '../worker/ask/schema.ts';
 
-const USD_PER_INPUT_TOKEN = 0.1 / 1_000_000;
-const USD_PER_OUTPUT_TOKEN = 0.5 / 1_000_000;
 const CASES_FILE = new URL('../worker/agent/evals/golden-questions.json', import.meta.url);
 
 const caseSchema = z.object({
@@ -65,7 +64,7 @@ function softChecks(answer: string, expect: EvalCase['expect']): string[] {
 
 const softLine = (checks: string[], note: string) => `  soft:   ${checks.length ? checks.join('; ') : 'pass'} (${note})`;
 
-const cost = (r: ModelResult) => (r.inputTokens ?? 0) * USD_PER_INPUT_TOKEN + (r.outputTokens ?? 0) * USD_PER_OUTPUT_TOKEN;
+const cost = (r: ModelResult) => estimateCostUsd(r.inputTokens ?? 0, r.outputTokens ?? 0);
 
 async function main(): Promise<void> {
   const opts = options();
