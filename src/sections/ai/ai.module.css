@@ -1,6 +1,6 @@
 .section {
   position: relative;
-  padding: 14vh var(--side) 10vh;
+  padding: var(--sec-top) var(--side) var(--sec-bottom);
 }
 
 .inner {

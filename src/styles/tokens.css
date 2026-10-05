@@ -15,6 +15,9 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-menu: cubic-bezier(0.76, 0, 0.24, 1);
   --side: clamp(20px, 4.4vw, 64px);
+  /* Section rhythm in px with a viewport nudge: pure vh left 200px+ gaps on tall screens. */
+  --sec-top: clamp(64px, 10vh, 120px);
+  --sec-bottom: clamp(32px, 5vh, 64px);
   --max: 1240px;
   --max-hero: 1560px;
   --ff: 'Manrope';

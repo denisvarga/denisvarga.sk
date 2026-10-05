@@ -1,6 +1,6 @@
 .experience {
   position: relative;
-  padding: 10vh var(--side);
+  padding: var(--sec-top) var(--side) var(--sec-bottom);
 }
 
 .inner {
