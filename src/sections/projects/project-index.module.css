@@ -53,7 +53,7 @@
   grid-template-rows: 1fr;
 }
 
-/* The inline padding keeps the rows' focus ring inside the clipping box. */
+/* The inline padding keeps the cards' focus ring inside the clipping box. */
 .clip {
   min-height: 0;
   margin: 0 -8px;
@@ -62,127 +62,42 @@
 }
 
 .list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px 20px;
   margin: 36px 0 8px;
   padding: 0;
   list-style: none;
-  border-bottom: 1px solid rgb(19 20 22 / 0.14);
 }
 
-.item {
-  border-top: 1px solid rgb(19 20 22 / 0.14);
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) minmax(0, 11rem) minmax(0, 12.5rem);
-  grid-template-areas:
-    'idx name context domain'
-    '. kind . .';
-  align-items: baseline;
-  gap: 8px clamp(16px, 3vw, 40px);
-  width: 100%;
-  margin: 0;
-  padding: clamp(16px, 1.8vw, 26px) 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.idx,
-.domain {
-  font-family: var(--ff-mono), monospace;
-  font-size: 12px;
-  color: var(--grey-600);
-}
-
-.idx {
-  grid-area: idx;
-  transition: color 0.3s;
-}
-
-.name {
-  grid-area: name;
-  font-size: clamp(28px, 3.6vw, 52px);
-  font-weight: 300;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
-  color: var(--ink);
-  text-wrap: balance;
-  transition:
-    opacity 0.5s ease,
-    transform 0.9s var(--ease);
-}
-
-.kind {
-  grid-area: kind;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--grey-700);
-}
-
-/* Desktop places context and domain in their own columns; mobile joins them on one line. */
-.meta {
-  display: contents;
-}
-
-.context {
-  grid-area: context;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.dot {
+.panel:not([data-primed]) .list {
   display: none;
 }
 
-.domain {
-  grid-area: domain;
-  justify-self: end;
-  text-align: right;
-  overflow-wrap: anywhere;
+/* A light per-column stagger: a row of cards enters the viewport together. */
+@media (max-width: 1023.98px) {
+  .list > :nth-child(2n) {
+    --d: 90ms;
+  }
 }
 
-.row:focus-visible .name {
-  transform: translateX(14px);
+@media (min-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .list > :nth-child(3n + 2) {
+    --d: 90ms;
+  }
+
+  .list > :nth-child(3n) {
+    --d: 180ms;
+  }
 }
 
-@media (max-width: 899.98px) {
-  .row {
-    grid-template-columns: 28px minmax(0, 1fr);
-    grid-template-areas:
-      'idx name'
-      '. kind'
-      '. meta';
-    gap: 6px 16px;
-  }
-
-  /* The dot sits in the gap before the domain; when the domain wraps to its own line the dot
-     falls outside this box and is clipped instead of dangling at the end of the line above. */
-  .meta {
-    grid-area: meta;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 2px 18px;
-    overflow: hidden;
-  }
-
-  .domain {
-    position: relative;
-    text-align: left;
-  }
-
-  .dot {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 100%;
-    width: 18px;
-    text-align: center;
-    color: var(--grey-500);
+@media (max-width: 599.98px) {
+  .list {
+    gap: 28px 12px;
   }
 }
 
@@ -194,18 +109,5 @@
 
   .toggle:hover .icon {
     background: var(--acc);
-  }
-
-  .list:hover .name {
-    opacity: 0.32;
-  }
-
-  .row:hover .name {
-    opacity: 1;
-    transform: translateX(14px);
-  }
-
-  .row:hover .idx {
-    color: var(--acc);
   }
 }

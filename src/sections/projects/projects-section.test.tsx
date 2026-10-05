@@ -2,7 +2,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { PROJECTS } from '../../data/projects';
+import { PROJECT_IMAGE_SIZE, PROJECTS } from '../../data/projects';
 import { copySk } from '../../i18n/copy-sk';
 import { LangProvider } from '../../i18n/lang-context';
 import type { Lang } from '../../i18n/types';
@@ -40,7 +40,7 @@ afterEach(() => {
 const toggle = () => container.querySelector<HTMLButtonElement>('button[aria-controls]')!;
 const label = () => toggle().firstElementChild?.textContent;
 const panel = () => document.getElementById(toggle().getAttribute('aria-controls')!)!;
-const rows = () => [...panel().querySelectorAll<HTMLButtonElement>('li > button')];
+const cards = () => [...panel().querySelectorAll<HTMLButtonElement>('li > button')];
 const dialog = () => container.querySelector<HTMLElement>('[role="dialog"]')!;
 const scopeRows = () => {
   const heading = [...dialog().querySelectorAll('span')].find((el) => el.textContent === ui.sk.scope)!;
@@ -72,11 +72,13 @@ describe('project rail', () => {
 });
 
 describe('all projects toggle', () => {
-  it('starts collapsed with the list inert', () => {
+  it('starts collapsed with the grid inert but rendered', () => {
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(label()).toBe(`Všetky projekty (${PROJECTS.length})`);
     expect(panel().hasAttribute('inert')).toBe(true);
     expect(panel().hasAttribute('data-open')).toBe(false);
+    expect(panel().hasAttribute('data-primed')).toBe(false);
+    expect(cards()).toHaveLength(PROJECTS.length);
   });
 
   it('expands and collapses the list, keeping focus on the toggle', () => {
@@ -92,29 +94,50 @@ describe('all projects toggle', () => {
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(label()).toBe(`${copySk.work.all} (${PROJECTS.length})`);
     expect(panel().hasAttribute('inert')).toBe(true);
+    // Stays rendered after the first expand so the close can animate.
+    expect(panel().hasAttribute('data-primed')).toBe(true);
   });
 });
 
-describe('all projects list', () => {
-  it('lists every project with name, kind, context and domain, without nested controls', () => {
-    expect(rows()).toHaveLength(PROJECTS.length);
-    rows().forEach((row, i) => {
+describe('all projects grid', () => {
+  it('renders every project as one card button with number, name, kind and context', () => {
+    expect(cards()).toHaveLength(PROJECTS.length);
+    cards().forEach((card, i) => {
       const project = PROJECTS[i]!;
-      expect(row.textContent).toContain(pad2(i + 1));
-      expect(row.textContent).toContain(project.name);
-      expect(row.textContent).toContain(project.kind.sk);
-      expect(row.textContent).toContain(copySk.work.contexts[project.context]);
-      expect(row.textContent).toContain(project.url ? project.url.replace('https://', '') : ui.sk.privateProject);
-      expect(row.querySelector('a, button, input, [tabindex]')).toBeNull();
+      expect(card.textContent).toContain(`${pad2(i + 1)} / ${pad2(PROJECTS.length)}`);
+      expect(card.textContent).toContain(project.name);
+      expect(card.textContent).toContain(`${project.kind.sk} · ${copySk.work.contexts[project.context]}`);
+      expect(card.textContent).toContain(project.desc.sk);
+      expect(card.querySelector('a, button, input, [tabindex]')).toBeNull();
     });
   });
 
-  it('opens the drawer at the row\'s project and returns focus to the row', () => {
+  it('shows each project image lazily, at its intrinsic size', () => {
+    cards().forEach((card, i) => {
+      const img = card.querySelector('img')!;
+      expect(img.getAttribute('src')).toBe(PROJECTS[i]!.image);
+      expect(img.getAttribute('loading')).toBe('lazy');
+      expect(img.getAttribute('decoding')).toBe('async');
+      expect(img.getAttribute('width')).toBe(String(PROJECT_IMAGE_SIZE.width));
+      expect(img.getAttribute('height')).toBe(String(PROJECT_IMAGE_SIZE.height));
+    });
+  });
+
+  it('adds the credit only where it names more than the employer in the context line', () => {
+    const credits = cards().map((card) => card.querySelector('small')?.textContent);
+    expect(credits).toEqual(
+      PROJECTS.map((p) => (p.context === 'grandpano' || p.context === 'vibration' ? undefined : p.credit?.sk)),
+    );
+    expect(credits.some((credit) => credit === undefined)).toBe(true);
+    expect(credits.some((credit) => credit !== undefined)).toBe(true);
+  });
+
+  it('opens the drawer at each card\'s project and returns focus to the card', () => {
     click(toggle());
-    for (const i of [0, PROJECTS.findIndex((p) => !p.featured), PROJECTS.length - 1]) {
-      const project = PROJECTS[i]!;
-      const row = rows()[i]!;
-      click(row);
+    PROJECTS.forEach((project, i) => {
+      const card = cards()[i]!;
+      click(card);
+      expect(dialog().closest('[inert]')).toBeNull();
       expect(dialog().querySelector('h2')?.textContent).toBe(project.name);
       expect(dialog().textContent).toContain(`${pad2(i + 1)} / ${pad2(PROJECTS.length)}`);
       expect(dialog().querySelector('h2 + p')?.textContent).toBe(
@@ -123,13 +146,13 @@ describe('all projects list', () => {
 
       press('Escape');
       expect(dialog().closest('[inert]')).not.toBeNull();
-      expect(document.activeElement).toBe(row);
-    }
+      expect(document.activeElement).toBe(card);
+    });
   });
 
   it('steps the drawer through every project, not just the featured ones', () => {
     click(toggle());
-    click(rows().at(-1)!);
+    click(cards().at(-1)!);
     press('ArrowRight');
     expect(dialog().querySelector('h2')?.textContent).toBe(PROJECTS[0]!.name);
     press('ArrowLeft');
@@ -140,7 +163,7 @@ describe('all projects list', () => {
 describe('project drawer', () => {
   it('opens with the summary, the numbered scope and the credit only when the project has one', () => {
     click(toggle());
-    click(rows()[0]!);
+    click(cards()[0]!);
     for (const project of PROJECTS) {
       expect(dialog().querySelector('h2')?.textContent).toBe(project.name);
       expect([...dialog().querySelectorAll('p')].map((p) => p.textContent)).toContain(project.summary.sk);
@@ -154,7 +177,7 @@ describe('project drawer', () => {
 
   it('links a public project out and shows a private one as a label without any link', () => {
     click(toggle());
-    click(rows()[0]!);
+    click(cards()[0]!);
     for (const project of PROJECTS) {
       const links = [...dialog().querySelectorAll('a')];
       if (project.url) {
@@ -173,7 +196,7 @@ describe('project drawer', () => {
 });
 
 describe('prerendered markup', () => {
-  it('carries the full list while collapsed, inside an inert panel', () => {
+  it('carries the full grid while collapsed, inside an inert panel', () => {
     const doc = new DOMParser().parseFromString(renderToString(page('sk')), 'text/html');
     const button = doc.querySelector('button[aria-controls]')!;
     expect(button.getAttribute('aria-expanded')).toBe('false');
@@ -181,6 +204,9 @@ describe('prerendered markup', () => {
     expect(list.hasAttribute('inert')).toBe(true);
     expect(list.querySelectorAll('li')).toHaveLength(PROJECTS.length);
     for (const project of PROJECTS) expect(list.textContent).toContain(project.name);
+    const images = [...list.querySelectorAll('img')];
+    expect(images.map((img) => img.getAttribute('src'))).toEqual(PROJECTS.map((p) => p.image));
+    expect(images.every((img) => img.getAttribute('loading') === 'lazy')).toBe(true);
   });
 
   it('uses the English labels on the English page', () => {
