@@ -26,7 +26,7 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
     for (const job of JOBS) expect(text).toContain(job.company);
     const links = new Map([...doc.querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]));
     for (const project of PROJECTS) expect(links.get(project.url)).toBe(displayUrl(project.url));
-    expect(textOf(doc, '.project')).toHaveLength(12);
+    expect(textOf(doc, '.project')).toHaveLength(PROJECTS.length);
   });
 
   it('shows ongoing jobs as present in its language, not as a year', () => {

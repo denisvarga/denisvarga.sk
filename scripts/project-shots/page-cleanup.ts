@@ -14,6 +14,14 @@ iframe[src*="smartsupp"], iframe[title*="chat" i], .grecaptcha-badge
 { display: none !important; }
 `;
 
+// Live rendering bugs that would misrepresent the work in a shot, keyed by project slug.
+// Drop an entry once the site itself is fixed.
+export const SITE_CSS: Readonly<Record<string, string>> = {
+  // Below 1024px .hero__canvas is display: contents, so the CTAs lose its z-index and the
+  // blurred .hero__vignette paints over them.
+  ledpixel: '@media (max-width: 1023.98px) { .hero__actions { position: relative; inset: auto; z-index: 2; } }',
+};
+
 export const CLICK_CONSENT = `(() => {
   const ACCEPT = /accept|súhlas|souhlas|prijať|přijmout|rozumiem|rozumím|agree|allow all|povoliť|povolit|\\bok\\b|got it/i;
   const AVOID = /nesúhlas|nesouhlas|odmietnuť|odmítnout|reject|decline|nastaven|settings|prispôsob|přizpůsob|customi[sz]e/i;
@@ -43,7 +51,7 @@ export const CLICK_CONSENT = `(() => {
 export const HIDE_OVERLAYS = `(() => {
   const vw = innerWidth, vh = innerHeight;
   const COOKIE = /cookie|súhlas so|souhlas s|gdpr|zásady ochrany|consent/i;
-  const MARKER = /cookie|consent|gdpr|cmplz|cky-|cli-/i;
+  const MARKER = /cookie|consent|gdpr|cmplz|cky-|cli-|popup/i;
   const describe = (el) => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
     (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
   const hidden = [];

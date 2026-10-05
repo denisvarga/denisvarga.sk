@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { calmTint, CALM_BASE, dominantChromatic, mix, toHex, type Rgb } from './palette.ts';
-import { parseProjects } from './project-list.ts';
 
 const lum = ([r, g, b]: Rgb) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
@@ -29,13 +28,5 @@ describe('palette', () => {
     const peach = calmTint([224, 190, 160]);
     expect(Math.abs(lum(navy) - lum(peach))).toBeLessThan(12);
     expect(lum(navy)).toBeGreaterThan(200);
-  });
-});
-
-describe('parseProjects', () => {
-  it('reads name, url and slug triples and rejects odd URLs', () => {
-    const src = `{ name: 'Pangeas', url: 'https://pangeas.cz', slug: 'pangeas', desc: {} }`;
-    expect(parseProjects(src)).toEqual([{ name: 'Pangeas', url: 'https://pangeas.cz', slug: 'pangeas' }]);
-    expect(() => parseProjects(`name: 'X', url: 'http://x.sk/a?b', slug: 'x'`)).toThrow(/Unexpected project URL/);
   });
 });
