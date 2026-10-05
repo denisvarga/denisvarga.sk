@@ -16,6 +16,7 @@ export interface CvLabels {
   readonly languages: string;
   readonly education: string;
   readonly projects: string;
+  readonly employerProjects: string;
   readonly contact: string;
   readonly generated: (date: string) => string;
 }
@@ -35,6 +36,7 @@ export const cvLabels: Localized<CvLabels> = {
     languages: 'Jazyky',
     education: 'Vzdelanie',
     projects: 'Projekty',
+    employerProjects: 'Ako zamestnanec Vibration s.r.o.',
     contact: 'Kontakt',
     generated: (date) => `Vygenerované z denisvarga.sk ${date}`,
   },
@@ -46,6 +48,7 @@ export const cvLabels: Localized<CvLabels> = {
     languages: 'Languages',
     education: 'Education',
     projects: 'Projects',
+    employerProjects: 'As an employee of Vibration',
     contact: 'Contact',
     generated: (date) => `Generated from denisvarga.dev on ${date}`,
   },

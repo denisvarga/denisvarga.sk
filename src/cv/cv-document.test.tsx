@@ -23,24 +23,34 @@ const textOf = (doc: Document, selector: string) => [...doc.querySelectorAll(sel
 describe.each(LANGS)('CvDocument (%s)', (lang) => {
   const doc = render(lang);
   const text = doc.body.textContent ?? '';
+  const items = [...doc.querySelectorAll('.project')];
+  const itemOf = (name: string) => items.find((item) => item.querySelector('.project-name')?.textContent === name);
 
   it('lists every company and every project, linking each public project to its domain', () => {
     for (const job of JOBS) expect(text).toContain(job.company);
-    const items = [...doc.querySelectorAll('.project')];
     expect(items).toHaveLength(PROJECTS.length);
-    PROJECTS.forEach((project, i) => {
-      const links = [...items[i]!.querySelectorAll('a')].map((a) => [a.getAttribute('href'), a.textContent]);
+    for (const project of PROJECTS) {
+      const links = [...(itemOf(project.name)?.querySelectorAll('a') ?? [])].map((a) => [a.getAttribute('href'), a.textContent]);
       expect(links).toEqual(project.url ? [[project.url, displayUrl(project.url)]] : []);
-    });
+    }
+  });
+
+  it('describes own and freelance work but lists Vibration work by name only', () => {
+    for (const project of PROJECTS) {
+      const item = itemOf(project.name);
+      expect(item?.querySelector('.project-desc') ?? null).toEqual(project.context === 'vibration' ? null : expect.anything());
+      expect(item?.querySelector('.project-credit')?.textContent ?? null).toBe(
+        project.context === 'vibration' || !project.credit ? null : typeset(project.credit[lang], lang),
+      );
+    }
   });
 
   it('marks a project without a public site as private instead of linking it', () => {
-    const items = [...doc.querySelectorAll('.project')];
-    const privateIndexes = PROJECTS.flatMap((project, i) => (project.url === null ? [i] : []));
-    expect(privateIndexes.length).toBeGreaterThan(0);
-    for (const i of privateIndexes) {
-      expect(items[i]!.querySelector('a')).toBeNull();
-      expect(items[i]!.querySelector('.domain')?.textContent).toBe(ui[lang].privateProject);
+    const privateProjects = PROJECTS.filter((project) => project.url === null);
+    expect(privateProjects.length).toBeGreaterThan(0);
+    for (const project of privateProjects) {
+      expect(itemOf(project.name)?.querySelector('a')).toBeNull();
+      expect(itemOf(project.name)?.querySelector('.domain')?.textContent).toBe(ui[lang].privateProject);
     }
   });
 

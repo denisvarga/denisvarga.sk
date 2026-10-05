@@ -105,6 +105,24 @@
   margin-top: 0.4mm;
 }
 
+.project-credit {
+  display: block;
+  font-size: 8pt;
+  color: var(--grey-600);
+}
+
+.project-group {
+  margin: 5mm 0 2.4mm;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.project-list-compact {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.4mm var(--gap);
+}
+
 /* Footer */
 
 .foot {
