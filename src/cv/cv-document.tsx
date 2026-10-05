@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { JOBS } from '../data/jobs';
+import { formatPeriod, JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 import { contact, ui } from '../i18n/ui-copy';
 import { parseTitleMarkup, plainTitle } from '../lib/title-markup';
+import { BUILD_YEAR } from '../lib/use-current-year';
 import { CV_NAME, cvCopy, cvDate, cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 
 export interface CvDocumentProps {
@@ -84,7 +85,7 @@ export function CvDocument({ lang, portraitSrc, generatedAt }: CvDocumentProps) 
         <ol className="jobs">
           {JOBS.map((job) => (
             <li key={job.company} className="job">
-              <span className="period">{`${job.period.start} - ${job.period.end ?? t.exp.present}`}</span>
+              <span className="period">{formatPeriod(job.period, BUILD_YEAR)}</span>
               <div>
                 <h3 className="job-head">
                   {job.company}

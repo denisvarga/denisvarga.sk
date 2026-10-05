@@ -20,7 +20,7 @@ export const copySk: Copy = {
       { label: 'Lokalita', value: 'Bratislava alebo remote' },
     ],
   },
-  exp: { label: 'Skúsenosti', title: 'Moja *cesta*', present: 'dnes' },
+  exp: { label: 'Skúsenosti', title: 'Moja *cesta*' },
   ai: {
     label: 'AI',
     title: 'AI píše, ja *rozhodujem.*',

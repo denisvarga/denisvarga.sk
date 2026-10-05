@@ -1,7 +1,7 @@
 import type { Localized } from '../i18n/types';
 
 export interface Job {
-  /** `end: null` means the job is ongoing; it renders as "dnes" / "present". */
+  /** `end: null` means the job is ongoing; it renders up to the current year. */
   readonly period: { readonly start: number; readonly end: number | null };
   readonly company: string;
   readonly role: Localized<string>;
@@ -64,3 +64,9 @@ export const JOBS: readonly Job[] = [
     },
   },
 ];
+
+/** "2017 - 2026"; an ongoing job ends in `currentYear`, and a single year stands alone. */
+export function formatPeriod(period: Job['period'], currentYear: number): string {
+  const end = period.end ?? currentYear;
+  return end === period.start ? String(end) : `${period.start} - ${end}`;
+}

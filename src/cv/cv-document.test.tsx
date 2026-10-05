@@ -1,10 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { JOBS } from '../data/jobs';
+import { formatPeriod, JOBS } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';
 import { ui } from '../i18n/ui-copy';
+import { BUILD_YEAR } from '../lib/use-current-year';
 import { cvFacts, cvLabels, displayUrl, typeset } from './cv-copy';
 import { CvDocument } from './cv-document';
 import { cvHtmlDocument } from './cv-html';
@@ -43,10 +44,9 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
     }
   });
 
-  it('shows ongoing jobs as present in its language, not as a year', () => {
-    const present = lang === 'sk' ? 'dnes' : 'present';
-    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => `${job.period.start} - ${job.period.end ?? present}`));
-    expect(textOf(doc, '.period')).toContain(`2018 - ${present}`);
+  it('ends ongoing jobs with the build year, not the generation date', () => {
+    expect(textOf(doc, '.period')).toEqual(JOBS.map((job) => formatPeriod(job.period, BUILD_YEAR)));
+    expect(textOf(doc, '.period')).toContain(`2018 - ${BUILD_YEAR}`);
     expect(textOf(doc, '.period')).toContain('2021 - 2025');
     expect(textOf(doc, '.period').join(' ')).not.toContain('2031');
   });
