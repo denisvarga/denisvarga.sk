@@ -17,7 +17,6 @@ export function HeroSection() {
   const { t } = useLang();
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const subRef = useRef<HTMLSpanElement>(null);
   const leadRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
@@ -27,7 +26,6 @@ export function HeroSection() {
   // The desktop image (fade, 350 + 1600 ms) is display:none on mobile, so it is left out; it
   // never ends last anyway (the badge ends at 2100 ms).
   const steps: EntranceStep[] = [
-    { kind: 'rise', delay: 100, target: () => subRef.current },
     { kind: 'split', delay: 200, words: parseTitleMarkup(t.hero.title).length, target: () => textRef.current?.querySelector('h1') ?? null },
     { kind: 'rise', delay: 550, target: () => leadRef.current },
     { kind: 'rise', delay: 700, target: () => ctaRef.current },
@@ -42,9 +40,6 @@ export function HeroSection() {
     <section ref={sectionRef} data-sec="" className={styles.hero}>
       <div className={styles.inner}>
         <div ref={textRef} className={styles.text}>
-          <span ref={subRef} className={styles.sub} data-enter="" data-delay="100">
-            {t.hero.sub}
-          </span>
           <SplitHeading as="h1" text={t.hero.title} className={styles.title} delay={200} enter />
           <p ref={leadRef} className={styles.lead} data-enter="" data-delay="550">
             {t.hero.lead}
