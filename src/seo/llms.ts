@@ -1,5 +1,5 @@
 import { JOBS } from '../data/jobs';
-import { PROJECTS } from '../data/projects';
+import { PROJECTS, type ProjectContext } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { copyEn } from '../i18n/copy-en';
 import { headCopy, LINKEDIN_URL, SOURCE_URL } from '../i18n/head-copy';
@@ -8,6 +8,12 @@ import { contact } from '../i18n/ui-copy';
 const EN = headCopy.en;
 const SK = headCopy.sk;
 const plain = (markup: string): string => markup.replaceAll('*', '');
+
+const PROJECT_CONTEXT: Readonly<Record<ProjectContext, string>> = {
+  denva: 'freelance under Denva (denva.studio)',
+  grandpano: 'built as an employee of GrandPano',
+  own: 'his own project',
+};
 
 function contactLines(): string[] {
   return [
@@ -79,7 +85,7 @@ export function buildLlmsFullTxt(): string {
     ...SKILLS.map((group) => `- ${group.name.en}: ${group.items.map((item) => skillLabel(item, 'en')).join(', ')}`),
     '',
     '## Projects',
-    ...PROJECTS.map((p) => `- ${p.name} (${p.url}): ${p.desc.en}`),
+    ...PROJECTS.map((p) => `- ${p.name} (${p.url}): ${p.kind.en}, ${PROJECT_CONTEXT[p.context]}. ${p.desc.en}.`),
     '',
     '## Contact',
     ...contactLines(),

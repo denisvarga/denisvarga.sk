@@ -8,6 +8,9 @@ import styles from './projects.module.css';
 
 const CARD_GAP_PX = 20;
 
+// Keeps each project's PROJECTS index so the card number and the drawer match the full list.
+const FEATURED = PROJECTS.flatMap((project, index) => (project.featured ? [{ project, index }] : []));
+
 interface ProjectRailProps {
   readonly onOpen: (index: number, opener: HTMLElement | null) => void;
 }
@@ -52,8 +55,8 @@ export function ProjectRail({ onOpen }: ProjectRailProps) {
   return (
     <div ref={wrapRef} data-reveal className={styles.rail}>
       <div ref={trackRef} className={styles.track}>
-        {PROJECTS.map((project, i) => (
-          <ProjectCard key={project.slug} project={project} index={i} total={PROJECTS.length} onOpen={onOpen} />
+        {FEATURED.map(({ project, index }) => (
+          <ProjectCard key={project.slug} project={project} index={index} total={PROJECTS.length} onOpen={onOpen} />
         ))}
       </div>
       <div className={styles.controls}>

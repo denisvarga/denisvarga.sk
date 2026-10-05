@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium, devices, type Browser, type BrowserContextOptions } from '@playwright/test';
-import { CLICK_CONSENT, FIND_LEFTOVERS, HIDE_OVERLAYS, SCROLL_NUDGE, VENDOR_HIDE_CSS } from './page-cleanup.ts';
+import { CLICK_CONSENT, FIND_LEFTOVERS, HIDE_OVERLAYS, SCROLL_NUDGE, SITE_CSS, VENDOR_HIDE_CSS } from './page-cleanup.ts';
 import { FREEZE_PAGE, HIDE_CARETS, PIN_CLASS_SLIDERS, PIN_SLIDERS } from './page-pinning.ts';
 import { argList, loadProjects, RAW_DIR, type ShotProject } from './project-list.ts';
 
@@ -67,7 +67,7 @@ async function shoot(browser: Browser, project: ShotProject, kind: Kind): Promis
     const clicked = await page.evaluate(CLICK_CONSENT);
     const consentClicked = typeof clicked === 'string' ? clicked : null;
     if (consentClicked) await page.waitForTimeout(1000);
-    await page.addStyleTag({ content: VENDOR_HIDE_CSS });
+    await page.addStyleTag({ content: VENDOR_HIDE_CSS + (SITE_CSS[project.slug] ?? '') });
     await page.evaluate(SCROLL_NUDGE);
     // Overlays run twice: some popups only appear after the scroll nudge or on a timer.
     const hidden = strings(await page.evaluate(HIDE_OVERLAYS));

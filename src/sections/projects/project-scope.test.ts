@@ -12,6 +12,14 @@ describe('projectScope', () => {
     ]);
   });
 
+  it('keeps a colon inside a ratio such as 1:1', () => {
+    expect(projectScope('podľa Figmy 1:1, napojenie na Realpad: synchronizácia cenníka')).toEqual([
+      { n: '01', text: 'Podľa Figmy 1:1' },
+      { n: '02', text: 'Napojenie na Realpad' },
+      { n: '03', text: 'Synchronizácia cenníka' },
+    ]);
+  });
+
   it('keeps parentheses and drops empty parts', () => {
     expect(projectScope('Multivendor marketplace (Dokan), stripe,, :')).toEqual([
       { n: '01', text: 'Multivendor marketplace (Dokan)' },

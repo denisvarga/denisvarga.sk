@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROJECT_INFO } from '../../shared/projects';
 import { buildInstructions, PROMPT_VERSION } from './prompt';
 
 const EN_DASH = String.fromCodePoint(0x2013);
@@ -34,6 +35,25 @@ describe('buildInstructions', () => {
     expect(text).toContain('- Skúsenosti: Denva (2018-dnes');
   });
 
+  it('derives one fact per project with its relationship, plus the full list in site order', () => {
+    expect(text.match(/^- Projekt /gm)).toHaveLength(PROJECT_INFO.length);
+    expect(text).toContain(
+      '- Projekt Brixx (brixx.cz, web rezidenčného projektu): robil ho ako zamestnanec GrandPano. Rozsah: Téma od základu podľa Figmy 1:1',
+    );
+    expect(text).toContain(
+      '- Projekt Národný futbalový štadión (narodnyfutbalovystadion.sk, web národného štadióna): robil ho na voľnej nohe pod značkou Denva (denva.studio).',
+    );
+    expect(text).toContain('- Projekt Routie (routie.sk, e-shop s mapovými artworkmi): je to jeho vlastný projekt.');
+    expect(text).toContain(`- Portfólio: spolu ${PROJECT_INFO.length} projektov: ${PROJECT_INFO.map((p) => p.name).join(', ')}.`);
+    expect(text).toContain('celý zoznam je v sekcii "Všetky projekty"');
+    expect(text).not.toContain('(Ticketportal)');
+  });
+
+  it('lists GrandPano next to Vibration and forbids inferring a client from an integration', () => {
+    expect(text).toContain('GrandPano (2026-dnes, WordPress špecialista, súbežne s Vibration s.r.o.');
+    expect(text).toContain('Ticketportal nie je klient. Uveď len vzťah, ktorý uvádzajú fakty');
+  });
+
   it('keeps the design structure: intro, FAKTY, PRAVIDLÁ', () => {
     expect(text.startsWith('Si AI agent na osobnom CV a portfóliu Denisa Vargu.')).toBe(true);
     expect(text.indexOf('\n\nFAKTY:\n- Denis Varga')).toBeGreaterThan(0);
@@ -43,6 +63,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-04.2');
+    expect(PROMPT_VERSION).toBe('2026-10-05.1');
   });
 });

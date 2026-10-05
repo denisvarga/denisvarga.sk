@@ -46,10 +46,10 @@ describe('copy parity', () => {
   });
 
   it('data has the design counts', () => {
-    expect(JOBS).toHaveLength(5);
-    expect(PROJECTS).toHaveLength(12);
+    expect(JOBS).toHaveLength(6);
+    expect(PROJECTS).toHaveLength(20);
     expect(SKILLS).toHaveLength(6);
-    expect(new Set(PROJECTS.map((p) => p.slug)).size).toBe(12);
+    expect(new Set(PROJECTS.map((p) => p.slug)).size).toBe(PROJECTS.length);
   });
 
   it('no string is empty or carries stray markup whitespace', () => {

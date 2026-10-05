@@ -5,6 +5,7 @@ import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { useReveal } from '../../motion/use-reveal';
 import { ProjectDrawer } from './project-drawer';
+import { ProjectIndex } from './project-index';
 import { ProjectRail } from './project-rail';
 import styles from './projects.module.css';
 import { useProjectDrawer } from './use-project-drawer';
@@ -32,6 +33,7 @@ export function ProjectsSection() {
           </p>
         </div>
         <ProjectRail onOpen={drawer.openAt} />
+        <ProjectIndex onOpen={drawer.openAt} />
       </div>
       {/* Outside every [data-reveal] wrapper: a transformed ancestor would break position: fixed. */}
       <ProjectDrawer drawer={drawer} />
