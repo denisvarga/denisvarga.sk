@@ -1,6 +1,6 @@
 .contact {
   position: relative;
-  padding: 14vh var(--side) 28px;
+  padding: var(--sec-top) var(--side) 28px;
 }
 
 .inner {

@@ -43,12 +43,24 @@
 
 .body {
   flex: 1;
+  display: grid;
+  align-content: start;
   padding: clamp(18px, 2.4vw, 26px) clamp(16px, 2.6vw, 28px);
   font-family: var(--ff-mono), monospace;
   font-size: clamp(12.5px, 0.6vw + 10px, 14.5px);
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.sizer,
+.live {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.sizer {
+  visibility: hidden;
 }
 
 .line[data-kind='cmd'] {

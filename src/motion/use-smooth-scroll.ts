@@ -6,8 +6,9 @@ import { setLenis } from './lenis-store';
 import { matchesMedia, REDUCED_MOTION_QUERY } from './use-media-query';
 
 const IDLE_FALLBACK_MS = 200;
+const SCROLL_LERP = 0.13;
 
-// Lenis with the design's options, ticked by the shared frame loop. Loaded after first paint;
+// Lenis, ticked by the shared frame loop. Loaded after first paint;
 // when the import fails the page keeps native scrolling. `reducedMotion` only re-triggers the
 // effect, the decision itself reads the live media query.
 export function useSmoothScroll(reducedMotion: boolean): void {
@@ -33,7 +34,8 @@ export function useSmoothScroll(reducedMotion: boolean): void {
       if (controller.signal.aborted) return;
       let instance: Lenis;
       try {
-        instance = new LenisClass({ lerp: 0.085, smoothWheel: true, autoRaf: false });
+        // A lighter lerp than the design's 0.085, which felt like it held the page back.
+        instance = new LenisClass({ lerp: SCROLL_LERP, smoothWheel: true, autoRaf: false });
       } catch (error) {
         console.error('lenis_init_failed', error);
         return;

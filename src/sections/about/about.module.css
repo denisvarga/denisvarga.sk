@@ -1,6 +1,6 @@
 .about {
   position: relative;
-  padding: 20vh var(--side) 10vh;
+  padding: var(--sec-top) var(--side) var(--sec-bottom);
 }
 
 .inner {
