@@ -10,6 +10,15 @@ export interface Job {
 
 export const JOBS: readonly Job[] = [
   {
+    period: { start: 2026, end: null },
+    company: 'GrandPano',
+    role: { sk: 'WordPress špecialista', en: 'WordPress specialist' },
+    text: {
+      sk: 'Staviam weby rezidenčných developerských projektov od základu, 1:1 podľa Figmy. Napájam ich na Realpad (cenník a leady) a ladím SEO, viditeľnosť v AI vyhľadávaní a výkon.',
+      en: 'I build websites for residential development projects from scratch, 1:1 from Figma. I connect them to Realpad (price lists and leads) and tune SEO, visibility in AI search and performance.',
+    },
+  },
+  {
     period: { start: 2018, end: null },
     company: 'Denva',
     role: { sk: 'AI engineer a fullstack developer', en: 'AI engineer & full-stack developer' },

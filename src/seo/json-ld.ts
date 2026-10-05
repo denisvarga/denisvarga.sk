@@ -52,6 +52,7 @@ export function profileJsonLd(lang: Lang, portraitPath: string): Record<string, 
           address: { '@type': 'PostalAddress', addressLocality: 'Bratislava', addressCountry: 'SK' },
           knowsLanguage: ['sk', 'en'],
           worksFor: [
+            { '@type': 'Organization', name: 'GrandPano', url: 'https://grandpano.sk/' },
             { '@type': 'Organization', name: 'Vibration s.r.o.', url: 'https://vibration.sk/' },
           ],
           knowsAbout: knowsAbout(lang),
