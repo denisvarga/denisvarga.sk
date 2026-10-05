@@ -82,7 +82,7 @@
       "mustInclude": [
         "Pangeas"
       ],
-      "note": "Site suggestion. Names projects from the portfolio fact only."
+      "note": "Site suggestion. Names projects from the project facts only."
     }
   },
   {
@@ -115,7 +115,74 @@
       "mustInclude": [
         "Pangeas"
       ],
-      "note": "Site suggestion. Names projects from the portfolio fact only."
+      "note": "Site suggestion. Names projects from the project facts only."
+    }
+  },
+  {
+    "id": "nfs-client-not-inferred",
+    "lang": "sk",
+    "question": "Pre koho robil web Národného futbalového štadióna?",
+    "expect": {
+      "mustInclude": [
+        "Denva"
+      ],
+      "mustNotInclude": [
+        "pre Ticketportal"
+      ],
+      "note": "The facts give only the relationship (freelance under Denva); Ticketportal supplies the ticket feed and is not the client."
+    }
+  },
+  {
+    "id": "all-projects-sk",
+    "lang": "sk",
+    "question": "Aké všetky projekty robil?",
+    "expect": {
+      "mustInclude": [
+        "Brixx",
+        "Zanzara",
+        "Monkey Studio",
+        "Rkovacovsky",
+        "Nová Trnitá",
+        "LEDpixel",
+        "Juraj Mikúš",
+        "Jaroslav Koštial"
+      ],
+      "note": "Asked for all projects: lists every project from the generated facts, the non-featured ones too."
+    }
+  },
+  {
+    "id": "brixx-employer-sk",
+    "lang": "sk",
+    "question": "Kde robil web Brixx?",
+    "expect": {
+      "mustInclude": [
+        "GrandPan"
+      ],
+      "note": "Brixx was built as a GrandPano employee, not freelance; the stem covers Slovak inflection."
+    }
+  },
+  {
+    "id": "monkey-studio-en",
+    "lang": "en",
+    "question": "What did Denis do on Monkey Studio?",
+    "expect": {
+      "mustInclude": [
+        "GSAP",
+        "WordPress"
+      ],
+      "note": "Custom WordPress theme 1:1 from the supplied design (not his own design), GSAP and custom animations, SEO and speed; freelance under Denva."
+    }
+  },
+  {
+    "id": "jurajmikus-collab-sk",
+    "lang": "sk",
+    "question": "Čo robil Denis na webe Juraja Mikúša?",
+    "expect": {
+      "mustInclude": [
+        "be-you",
+        "dizajn"
+      ],
+      "note": "Mayoral campaign site in collaboration with be-you.sk; Denis designed it and built the custom theme."
     }
   },
   {
@@ -321,14 +388,14 @@
       },
       {
         "role": "assistant",
-        "content": "Denis má za sebou viacero projektov pre klientov aj vlastné produkty. Pre Národný futbalový štadión pracoval na webe napojenom na Ticketportal. Pangeas je multivendor marketplace postavený na WooCommerce s Dokanom, platbami cez Stripe Express a dopravou cez Packetu. Routie je jeho vlastný e-shop, ktorý z GPX trás generuje mapové artworky v 2D aj 3D a vyrába ich aj 3D tlačou. Pre Dermateq robil web na mieru s vlastnou témou bez pagebuildera. Cherries predáva darčekové poukážky a má konfigurátor nechtov, ktorý si zákazník prejde krok za krokom. Ďalej sú v portfóliu weby Auto Omnium, Saunika, AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová, plus jeho osobný web Denva. Vo Vibration s.r.o. sa venuje WordPress multisite riešeniam, WooCommerce a frontendom e-shopov na platforme Sellio v PHP Yii a Vue.js. Pri všetkých projektoch stavia na vlastných témach, bez kúpených šablón, s dôrazom na rýchlosť, čistý kód a dlhodobú udržateľnosť. Vývoj robí AI-first, teda s Claude Code, vlastnými AI agentmi nad Claude Agent SDK a MCP servermi, ktoré mu pomáhajú s rutinnou prácou aj s kontrolou kvality. Weby, ktoré spravuje, má pod dohľadom v MainWP, kde sleduje aktualizácie a stav pluginov na všetkých inštaláciách naraz. Na deploy používa SSH, Docker a GitLab CI, zálohy rieši cez Restic a chyby sleduje v GlitchTip a Uptime Kuma. Automatizácie pre klientov stavia v Make, n8n a Zapier, s webhookmi a API integráciami, takže dáta medzi systémami tečú bez ručnej práce. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil a aké technológie použil."
+        "content": "Denis má v portfóliu 20 projektov, väčšinu z nich robil na voľnej nohe pod značkou Denva (denva.studio). Web Národného futbalového štadióna má tému na mieru a napojenie na feed vstupeniek z Ticketportalu. Pangeas je multivendor marketplace na Dokane so Stripe Express, Packetou a PDF fakturáciou. Monkey Studio, štúdio 3D architektonických vizualizácií, a LEDpixel, prenájom LED stien, majú WordPress témy na mieru podľa dodaného dizajnu 1:1 s GSAP a vlastnými animáciami, SEO a optimalizáciou rýchlosti. Rkovacovsky Photo je portfólio fotografa a grafika s témou podľa dodanej grafiky a pokročilými animáciami v GSAP. Cherries je e-shop s vlastným systémom darčekových poukážok a mini konfigurátorom nechtov. Pri kampaňových weboch Juraja Mikúša (v spolupráci s be-you.sk) a Jaroslava Koštiala robil aj návrh dizajnu a vlastnú tému. Ako zamestnanec GrandPano postavil weby rezidenčných projektov Brixx a Zanzara a novej mestskej štvrte Nová Trnitá, od základu podľa Figmy 1:1, s napojením na Realpad, SEO a LLM optimalizáciou, optimalizáciou výkonu a GSAP animáciami; pri Brixx a Zanzare napojenie na Realpad synchronizuje aj cenník. Ďalej sú v zozname Dermateq (WordPress na mieru, ACF bloky, Vite build), Auto Omnium, Saunika (e-shop na WooCommerce podľa dodanej grafiky), AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová. Jeho vlastné projekty sú Routie, e-shop s mapovými artworkmi z GPX trás, 2D a 3D generovaním a 3D tlačou, a Denva, jeho osobný web a meno, pod ktorým robí na voľnej nohe. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil."
       }
     ],
     "expect": {
       "mustInclude": [
         "GPX"
       ],
-      "note": "Follow-up after a 1600-char assistant turn; must stay within limits and mention GPX."
+      "note": "Follow-up after a ~1600-char assistant turn that states only true project facts; must stay within limits and mention GPX."
     }
   },
   {
