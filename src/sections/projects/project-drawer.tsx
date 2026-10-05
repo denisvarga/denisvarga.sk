@@ -38,7 +38,7 @@ function trapTab(event: KeyboardEvent<HTMLElement>): void {
 }
 
 export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
-  const { lang, ui } = useLang();
+  const { lang, t, ui } = useLang();
   const { open, last, close, step, openerRef } = drawer;
   const rootRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLElement>(null);
@@ -133,6 +133,9 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
             <h2 id={titleId} className={styles.name}>
               {project.name}
             </h2>
+            <p className={styles.kind}>
+              {project.kind[lang]} · {t.work.contexts[project.context]}
+            </p>
             <a className={styles.domain} href={project.url} target="_blank" rel="noopener">
               {projectDomain(project.url)} <span aria-hidden="true">↗</span>
             </a>

@@ -124,7 +124,13 @@
   line-height: 1.05;
 }
 
+/* Long descriptions would stretch the cards unevenly; the drawer lists the full scope. */
 .desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   font-size: 14.5px;
   line-height: 1.5;
   color: var(--grey-700);

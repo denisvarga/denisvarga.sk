@@ -68,6 +68,9 @@ export const copySk: Copy = {
     label: 'Projekty',
     title: 'Čo som *postavil*',
     body: 'Weby, e-shopy a aplikácie na mieru, bez page builderov a kúpených šablón. Dnes ich staviam aj spravujem s AI agentmi po boku.',
+    all: 'Všetky projekty',
+    hide: 'Skryť zoznam',
+    contexts: { denva: 'Denva.studio', grandpano: 'Zamestnanec GrandPano', own: 'Vlastný projekt' },
   },
   stack: { label: 'Nástroje', title: 'S čím *pracujem*' },
   contact: {

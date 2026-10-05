@@ -67,6 +67,9 @@ export const copyEn: Copy = {
     label: 'Work',
     title: "What I've *built*",
     body: 'Custom websites, online stores and apps. No page builders, no off-the-shelf templates. Today I build and run them with AI agents at my side.',
+    all: 'All projects',
+    hide: 'Hide list',
+    contexts: { denva: 'Denva.studio', grandpano: 'At GrandPano', own: 'Own project' },
   },
   stack: { label: 'Tools', title: 'What I *work with*' },
   contact: {

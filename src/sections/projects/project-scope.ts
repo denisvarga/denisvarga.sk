@@ -7,10 +7,13 @@ export function pad2(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-/** The drawer's "what I did" list: the description split on commas and colons, numbered 01.. */
+/**
+ * The drawer's "what I did" list: the description split on commas and colons, numbered 01..
+ * A colon splits only before whitespace or the end, so ratios like "1:1" stay whole.
+ */
 export function projectScope(description: string): ScopeItem[] {
   return description
-    .split(/,\s*|:\s*/)
+    .split(/,\s*|:(?!\S)\s*/)
     .filter(Boolean)
     .map((part, i) => ({ n: pad2(i + 1), text: part.charAt(0).toUpperCase() + part.slice(1) }));
 }

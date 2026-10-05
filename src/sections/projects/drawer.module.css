@@ -136,6 +136,13 @@
   line-height: 1;
 }
 
+.kind {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--grey-700);
+}
+
 .domain {
   align-self: flex-start;
   font-family: var(--ff-mono), monospace;

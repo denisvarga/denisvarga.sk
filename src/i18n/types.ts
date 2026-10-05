@@ -1,3 +1,5 @@
+import type { ProjectContext } from '../../shared/projects';
+
 export type Lang = 'sk' | 'en';
 
 export const LANGS: readonly Lang[] = ['sk', 'en'];
@@ -59,7 +61,14 @@ export interface Copy {
     readonly error: string;
     readonly suggestions: Four<string>;
   };
-  readonly work: { readonly label: string; readonly title: string; readonly body: string };
+  readonly work: {
+    readonly label: string;
+    readonly title: string;
+    readonly body: string;
+    readonly all: string;
+    readonly hide: string;
+    readonly contexts: Readonly<Record<ProjectContext, string>>;
+  };
   readonly stack: { readonly label: string; readonly title: string };
   readonly contact: {
     readonly title: string;
