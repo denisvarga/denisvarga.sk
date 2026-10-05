@@ -1,12 +1,13 @@
-// Golden-question eval for the chat agent. Calls the real OpenAI API with the same prompt and client
-// as the Worker. Local only (`pnpm eval`, keys from .dev.vars); never runs in CI.
+// Golden-question eval for the chat agent. Calls the real OpenAI API with the same prompt, client and
+// manipulation guards as the Worker. Local only (`pnpm eval`, keys from .dev.vars); never runs in CI.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { z } from 'zod';
+import { guardAnswer, isManipulation, manipulationReply } from '../worker/agent/guard.ts';
 import { buildInstructions, PROMPT_VERSION } from '../worker/agent/prompt.ts';
 import { callOpenAI, type ModelResult, REASONING_EFFORTS, TOTAL_BUDGET_MS } from '../worker/ask/openai.ts';
 import { safetyIdentifier } from '../worker/ask/safety-id.ts';
-import { askSchema } from '../worker/ask/schema.ts';
+import { askSchema, lastUserMessage } from '../worker/ask/schema.ts';
 
 const USD_PER_INPUT_TOKEN = 0.1 / 1_000_000;
 const USD_PER_OUTPUT_TOKEN = 0.5 / 1_000_000;
@@ -62,6 +63,8 @@ function softChecks(answer: string, expect: EvalCase['expect']): string[] {
   return [...misses, ...leaks];
 }
 
+const softLine = (checks: string[], note: string) => `  soft:   ${checks.length ? checks.join('; ') : 'pass'} (${note})`;
+
 const cost = (r: ModelResult) => (r.inputTokens ?? 0) * USD_PER_INPUT_TOKEN + (r.outputTokens ?? 0) * USD_PER_OUTPUT_TOKEN;
 
 async function main(): Promise<void> {
@@ -90,8 +93,18 @@ async function main(): Promise<void> {
       continue;
     }
 
+    if (isManipulation(lastUserMessage(request.data))) {
+      const reply = manipulationReply(testCase.lang);
+      const checks = softChecks(reply, testCase.expect);
+      if (checks.length > 0) softFailures++;
+      console.log(`  answer: ${reply}`);
+      console.log('  guard:  canned reply before the model, no API call');
+      console.log(`${softLine(checks, testCase.expect.note)}\n`);
+      continue;
+    }
+
     const startedAt = Date.now();
-    const result = await callOpenAI({
+    const answer = await callOpenAI({
       apiKey: opts.apiKey,
       model: opts.model,
       effort: opts.effort,
@@ -101,7 +114,8 @@ async function main(): Promise<void> {
       deadline: startedAt + TOTAL_BUDGET_MS,
     });
     const latency = Date.now() - startedAt;
-    const completed = result.outcome === 'ok' && result.responseStatus === 'completed';
+    const result = guardAnswer(answer, testCase.lang);
+    const completed = answer.outcome === 'ok' && answer.responseStatus === 'completed';
     const checks = result.text ? softChecks(result.text, testCase.expect) : [];
     if (!completed) hardFailures++;
     if (checks.length > 0) softFailures++;
@@ -110,8 +124,9 @@ async function main(): Promise<void> {
     totalCost += cost(result);
 
     console.log(`  answer: ${result.text ?? '(none)'}`);
+    if (result !== answer) console.log(`  guard:  leaked instructions replaced, model said: ${answer.text ?? ''}`);
     console.log(`  status: ${result.responseStatus ?? 'none'} | outcome ${result.outcome} | http ${result.httpStatus}${completed ? '' : ' | FAIL'}`);
-    console.log(`  soft:   ${checks.length ? checks.join('; ') : 'pass'} (${testCase.expect.note})`);
+    console.log(softLine(checks, testCase.expect.note));
     console.log(
       `  tokens: ${result.inputTokens ?? 0} in / ${result.outputTokens ?? 0} out | ${latency} ms | $${cost(result).toFixed(6)}\n`,
     );

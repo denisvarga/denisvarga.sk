@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { easterEgg } from '../agent/easter-eggs';
+import { guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
 import { buildInstructions } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
@@ -41,9 +42,10 @@ askRoute.post('/ask', async (c) => {
   }
   const signer = await createReplySigner(salt);
 
-  const egg = easterEgg(question, input.lang);
-  if (egg !== null) {
-    return c.json({ reply: egg, kind: 'easter_egg', sig: await signer.sign(input.lang, egg) } satisfies AskSuccess);
+  // Only the last message is checked, so an honest question after an attempt still reaches the model.
+  const canned = easterEgg(question, input.lang) ?? (isManipulation(question) ? manipulationReply(input.lang) : null);
+  if (canned !== null) {
+    return c.json({ reply: canned, kind: 'easter_egg', sig: await signer.sign(input.lang, canned) } satisfies AskSuccess);
   }
 
   const turnstile = { secret: env.TURNSTILE_SECRET_KEY, hostname: env.TURNSTILE_HOSTNAME, action: env.TURNSTILE_ACTION };
@@ -85,7 +87,7 @@ askRoute.post('/ask', async (c) => {
   }
 
   const modelStartedAt = Date.now();
-  const result = await callOpenAI({
+  const answer = await callOpenAI({
     apiKey: env.OPENAI_API_KEY.trim(),
     model: env.OPENAI_MODEL.trim(),
     effort: env.OPENAI_REASONING_EFFORT,
@@ -94,6 +96,7 @@ askRoute.post('/ask', async (c) => {
     safetyIdentifier: await safetyIdentifier(salt, key),
     deadline,
   });
+  const result = guardAnswer(answer, input.lang);
   c.executionCtx.waitUntil(
     finalizeRow(env.DB, reservation.id, result, Date.now() - modelStartedAt).catch(() => logEvent('d1_error', 500)),
   );

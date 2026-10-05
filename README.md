@@ -15,6 +15,7 @@ Personal CV site of Denis Varga, in Slovak at [denisvarga.sk](https://denisvarga
 
 - Strict Content Security Policy (`public/_headers`): `default-src 'none'`, scripts only from the site, Turnstile and, after consent, Google Tag Manager, and Trusted Types required (`goog#html` is the policy Google's tag scripts create).
 - Every chat request passes an origin check, a body size limit, schema validation, a Turnstile check, a rate limit of 5 requests per minute per IP address (per /64 for IPv6) and a daily cap on model calls.
+- Manipulation attempts (overriding or revealing the instructions, role-play, injected system blocks) get a canned reply before Turnstile and the model, and a model answer that repeats the instructions is replaced and logged as refused.
 - Every reply is signed with HMAC-SHA256. History sent back by the browser keeps only the assistant turns whose signature verifies, so earlier answers cannot be forged.
 - The question log stores the time, language, question, answer, model, latency, token counts and outcome. No IP address, user agent or other visitor identifier is stored.
 
