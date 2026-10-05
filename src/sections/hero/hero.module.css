@@ -29,11 +29,6 @@
   max-width: min(760px, calc(100% - min(44vw, 76vh, 760px)));
 }
 
-.sub {
-  font-size: 15px;
-  color: var(--grey-600);
-}
-
 .title {
   font-size: clamp(48px, 8.4vw, 128px);
   line-height: 0.94;
