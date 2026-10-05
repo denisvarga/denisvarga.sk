@@ -26,12 +26,13 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
   const items = [...doc.querySelectorAll('.project')];
   const itemOf = (name: string) => items.find((item) => item.querySelector('.project-name')?.textContent === name);
 
-  it('lists every company and every project, linking each public project to its domain', () => {
+  it('lists every company and every project with its domain as text, never as a link', () => {
     for (const job of JOBS) expect(text).toContain(job.company);
     expect(items).toHaveLength(PROJECTS.length);
     for (const project of PROJECTS) {
-      const links = [...(itemOf(project.name)?.querySelectorAll('a') ?? [])].map((a) => [a.getAttribute('href'), a.textContent]);
-      expect(links).toEqual(project.url ? [[project.url, displayUrl(project.url)]] : []);
+      const item = itemOf(project.name);
+      expect(item?.querySelector('a')).toBeNull();
+      if (project.url) expect(item?.querySelector('.domain')?.textContent).toBe(displayUrl(project.url));
     }
   });
 

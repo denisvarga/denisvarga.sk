@@ -7,14 +7,10 @@ import { cvLabels, displayUrl, typeset } from './cv-copy';
 const DETAILED = PROJECTS.filter((project) => project.context !== 'vibration');
 const COMPACT = PROJECTS.filter((project) => project.context === 'vibration');
 
+// Plain text, not a link: a PDF viewer may pass this CV on as the referrer, and the portfolio
+// sites must not see where a visit came from.
 function Domain({ project, lang }: { project: Project; lang: Lang }) {
-  return project.url ? (
-    <a className="domain" href={project.url}>
-      {displayUrl(project.url)}
-    </a>
-  ) : (
-    <span className="domain">{ui[lang].privateProject}</span>
-  );
+  return <span className="domain">{project.url ? displayUrl(project.url) : ui[lang].privateProject}</span>;
 }
 
 export function CvProjects({ lang }: { lang: Lang }) {

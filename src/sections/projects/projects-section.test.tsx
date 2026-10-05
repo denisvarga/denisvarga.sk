@@ -182,7 +182,9 @@ describe('project drawer', () => {
       const links = [...dialog().querySelectorAll('a')];
       if (project.url) {
         expect(links.map((a) => a.getAttribute('href'))).toEqual([project.url, project.url]);
-        expect(links.every((a) => a.target === '_blank' && a.rel === 'noopener')).toBe(true);
+        expect(
+          links.every((a) => a.target === '_blank' && a.rel === 'noopener noreferrer' && a.getAttribute('referrerpolicy') === 'no-referrer'),
+        ).toBe(true);
         expect(links.at(-1)?.textContent).toContain(ui.sk.open);
         expect(dialog().textContent).not.toContain(ui.sk.privateProject);
       } else {
