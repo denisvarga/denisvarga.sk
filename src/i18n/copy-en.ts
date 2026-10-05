@@ -75,4 +75,19 @@ export const copyEn: Copy = {
     cv: 'Download CV',
     top: 'Back to top',
   },
+  consent: {
+    label: 'Cookie consent',
+    text: 'Analytics cookies (Google Analytics) help me see how this site is used. They only load with your consent.',
+    accept: 'Accept',
+    reject: 'Reject',
+    granted: 'Current choice: accepted',
+    denied: 'Current choice: rejected',
+    details: 'Which cookies?',
+    cookies: [
+      { name: 'dv-consent', desc: 'localStorage, stores your choice, necessary' },
+      { name: '_ga', desc: 'Google Analytics, distinguishes visitors, 2 years' },
+      { name: '_ga_XMK9J72476', desc: 'Google Analytics, session state, 2 years' },
+    ],
+    settings: 'Cookie settings',
+  },
 };

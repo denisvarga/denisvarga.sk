@@ -3,8 +3,7 @@ import type { TrustedTypePolicy, TurnstileApi } from '../types/turnstile';
 export const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 export const TT_POLICY_NAME = 'turnstile-loader';
 
-// undefined = not created yet, null = browser without Trusted Types. A second createPolicy with
-// the same name throws under `trusted-types turnstile-loader`, so the policy lives for the page.
+// undefined = not created yet, null = browser without Trusted Types.
 let policy: TrustedTypePolicy | null | undefined;
 let scriptPromise: Promise<TurnstileApi> | null = null;
 

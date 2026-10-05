@@ -14,6 +14,11 @@ export interface AiTool {
   readonly desc: string;
 }
 
+export interface CookieInfo {
+  readonly name: string;
+  readonly desc: string;
+}
+
 type Four<T> = readonly [T, T, T, T];
 type Three<T> = readonly [T, T, T];
 
@@ -61,6 +66,17 @@ export interface Copy {
     readonly body: string;
     readonly cv: string;
     readonly top: string;
+  };
+  readonly consent: {
+    readonly label: string;
+    readonly text: string;
+    readonly accept: string;
+    readonly reject: string;
+    readonly granted: string;
+    readonly denied: string;
+    readonly details: string;
+    readonly cookies: Three<CookieInfo>;
+    readonly settings: string;
   };
 }
 
