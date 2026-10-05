@@ -1,5 +1,6 @@
 import { FINALIZE_SQL } from '../ask/chat-log';
 import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL } from '../ask/daily-cap';
+import { executeOverviewSql } from './fake-overview-sql';
 
 export interface ChatRow {
   id: number;
@@ -21,6 +22,8 @@ export class FakeD1 {
   rows: ChatRow[] = [];
   writes = 0;
   fail = false;
+  /** Every statement in execution order, so tests can assert bound parameters. */
+  executed: { sql: string; args: unknown[] }[] = [];
 
   seed(row: Partial<ChatRow> & Pick<ChatRow, 'outcome' | 'created_at'>): void {
     this.rows.push({
@@ -38,6 +41,7 @@ export class FakeD1 {
 
   private execute(sql: string, args: unknown[]): Record<string, unknown>[] {
     if (this.fail) throw new Error('D1_ERROR');
+    this.executed.push({ sql, args });
     switch (sql) {
       case INSERT_PENDING_SQL: {
         this.writes++;
@@ -66,8 +70,11 @@ export class FakeD1 {
         });
         return [];
       }
-      default:
+      default: {
+        const results = executeOverviewSql(sql, args, this.rows);
+        if (results) return results;
         throw new Error(`FakeD1: unexpected SQL ${sql}`);
+      }
     }
   }
 
@@ -77,13 +84,13 @@ export class FakeD1 {
   }
 
   prepare(sql: string) {
-    return {
-      bind: (...args: unknown[]) => ({
-        sql,
-        args,
-        run: async () => ({ success: true, results: this.execute(sql, args), meta: {} }),
-      }),
-    };
+    const statement = (args: unknown[]) => ({
+      sql,
+      args,
+      run: async () => ({ success: true, results: this.execute(sql, args), meta: {} }),
+      all: async () => ({ success: true, results: this.execute(sql, args), meta: {} }),
+    });
+    return { ...statement([]), bind: (...args: unknown[]) => statement(args) };
   }
 
   async batch(statements: { sql: string; args: unknown[] }[]) {
@@ -91,7 +98,7 @@ export class FakeD1 {
   }
 
   asBinding(): D1Database {
-    // Structural double covering only prepare/bind/run/batch; the full D1 surface is not needed here.
+    // Structural double covering only prepare/bind/run/all/batch; the full D1 surface is not needed here.
     return this as unknown as D1Database;
   }
 }

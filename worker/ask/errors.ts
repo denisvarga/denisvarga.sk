@@ -25,6 +25,8 @@ export type LogEvent =
   | 'turnstile_error'
   | 'd1_error'
   | 'config_error'
+  | 'access_jwks_error'
+  | 'access_denied'
   | 'internal_error';
 
 // Logs carry a fixed event code and an HTTP status only: never visitor text, upstream messages or identifiers.

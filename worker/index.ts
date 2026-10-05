@@ -3,6 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { secureHeaders } from 'hono/secure-headers';
 import { askError, logEvent } from './ask/errors';
 import { askRoute } from './routes/ask';
+import { overviewRoute } from './routes/overview';
 
 const MAX_BODY_BYTES = 48 * 1024;
 
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.route('/api', askRoute);
+app.route('/prehlad', overviewRoute);
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404));
 
