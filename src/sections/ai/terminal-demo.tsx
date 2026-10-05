@@ -9,6 +9,8 @@ import styles from './terminal.module.css';
 interface TerminalDemoProps {
   readonly id: string;
   readonly demo: Demo;
+  /** Every demo of the language: the body reserves the tallest, so switching never resizes it. */
+  readonly sizers: readonly Demo[];
   /** Shown under the terminal: the demos are scripted, not recorded runs. */
   readonly note: string;
   readonly tool: number;
@@ -39,7 +41,7 @@ function Prefix({ kind }: { readonly kind: DemoLineKind }) {
   );
 }
 
-export function TerminalDemo({ id, demo, note, tool, runKey, barRefs, onDone }: TerminalDemoProps) {
+export function TerminalDemo({ id, demo, sizers, note, tool, runKey, barRefs, onDone }: TerminalDemoProps) {
   const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
   const titleId = useId();
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -97,22 +99,37 @@ export function TerminalDemo({ id, demo, note, tool, runKey, barRefs, onDone }: 
           </span>
         </div>
         <div ref={bodyRef} className={styles.body} aria-hidden="true">
-          {lines.slice(0, frame.lineIndex + 1).map(([kind, text], i) => {
-            const current = i === frame.lineIndex;
-            return (
-              <div key={i} className={styles.line} data-kind={kind}>
-                <Prefix kind={kind} />
-                <span className={styles.text}>{current ? text.slice(0, frame.chars) : text}</span>
-                {current && frame.phase === 'typing' && <span className={styles.caret} />}
+          {sizers.map((sizer) => (
+            <div key={sizer.title} className={styles.sizer}>
+              {sizer.lines.map(([kind, text], i) => (
+                <div key={i} className={styles.line} data-kind={kind}>
+                  <Prefix kind={kind} />
+                  <span className={styles.text}>{text}</span>
+                </div>
+              ))}
+              <div>
+                <span className={styles.caret} />
               </div>
-            );
-          })}
-          {frame.phase === 'spinner' && <div className={styles.dim}>{SPINNER_FRAMES[frame.spinnerFrame]}</div>}
-          {frame.caretOn && (
-            <div>
-              <span className={styles.caret} />
             </div>
-          )}
+          ))}
+          <div className={styles.live}>
+            {lines.slice(0, frame.lineIndex + 1).map(([kind, text], i) => {
+              const current = i === frame.lineIndex;
+              return (
+                <div key={i} className={styles.line} data-kind={kind}>
+                  <Prefix kind={kind} />
+                  <span className={styles.text}>{current ? text.slice(0, frame.chars) : text}</span>
+                  {current && frame.phase === 'typing' && <span className={styles.caret} />}
+                </div>
+              );
+            })}
+            {frame.phase === 'spinner' && <div className={styles.dim}>{SPINNER_FRAMES[frame.spinnerFrame]}</div>}
+            {frame.caretOn && (
+              <div>
+                <span className={styles.caret} />
+              </div>
+            )}
+          </div>
         </div>
         <div className="visually-hidden">
           {demo.lines.map(([, text], i) => (

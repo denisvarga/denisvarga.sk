@@ -55,6 +55,7 @@ export function AiSection() {
             <TerminalDemo
               id={terminalId}
               demo={demo}
+              sizers={demos}
               note={t.ai.demoNote}
               tool={tool}
               runKey={`${lang}:${tool}:${run}`}

@@ -120,22 +120,39 @@
   color: var(--grey-600);
 }
 
+/* Every slot is as tall as the longest description and opens with the same easing as the one
+   closing, so the list keeps its height when the active tool changes and the page below never
+   jumps. */
 .tool-desc {
-  display: block;
-  max-height: 0;
-  overflow: hidden;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--grey-700);
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
   transition:
-    max-height 0.7s var(--ease),
+    grid-template-rows 0.7s var(--ease),
     opacity 0.5s ease;
 }
 
 .tool[data-on] .tool-desc {
-  max-height: 140px;
+  grid-template-rows: 1fr;
   opacity: 1;
+}
+
+.tool-desc-inner {
+  display: grid;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--grey-700);
+}
+
+.tool-desc-sizer,
+.tool-desc-text {
+  grid-area: 1 / 1;
+}
+
+.tool-desc-sizer {
+  visibility: hidden;
 }
 
 .tool-bar {

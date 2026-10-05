@@ -37,7 +37,16 @@ export function AiToolList({ tools, active, terminalId, barRefs, onPick }: AiToo
                 {String(i + 1).padStart(2, '0')}
               </span>
             </span>
-            <span className={styles.toolDesc}>{tool.desc}</span>
+            <span className={styles.toolDesc}>
+              <span className={styles.toolDescInner}>
+                {tools.map((other) => (
+                  <span key={other.name} className={styles.toolDescSizer} aria-hidden="true">
+                    {other.desc}
+                  </span>
+                ))}
+                <span className={styles.toolDescText}>{tool.desc}</span>
+              </span>
+            </span>
             <span
               ref={(el) => {
                 barRefs.current[i] = el;
