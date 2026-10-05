@@ -1,5 +1,5 @@
 import * as z from 'zod/mini';
-import { cleanContent } from './clean-text';
+import { cleanContent, plainReply } from './clean-text';
 
 // Runs in the Worker and in Node (scripts/eval-agent.ts): standard fetch and WebCrypto only.
 
@@ -104,11 +104,13 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
   const parts = (data.output ?? []).filter((item) => item.type === 'message').flatMap((item) => item.content ?? []);
   const reason = data.incomplete_details?.reason;
   // Cleaned here so the visitor, the reply signature and the log all see the same text.
-  const text = cleanContent(
-    parts
-      .filter((part) => part.type === 'output_text')
-      .map((part) => part.text ?? '')
-      .join(''),
+  const text = plainReply(
+    cleanContent(
+      parts
+        .filter((part) => part.type === 'output_text')
+        .map((part) => part.text ?? '')
+        .join(''),
+    ),
   );
   const base = {
     responseStatus: data.status ?? null,

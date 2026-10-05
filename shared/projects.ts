@@ -212,8 +212,8 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
       en: 'Four-language site with a 106-frame scroll-driven hero sequence and custom GSAP effects',
     },
     summary: {
-      sk: 'Web štúdia architektonických vizualizácií postavený na mieru podľa dodaného dizajnu 1:1. Úvod prehráva 3D animáciu budovy podľa scrollu a celý web žije desiatkami vlastných animácií.',
-      en: 'A site for an architectural visualization studio, custom-built 1:1 from the supplied design. The intro plays a 3D building animation as you scroll, and the whole site runs on dozens of custom animations.',
+      sk: 'WordPress web štúdia architektonických vizualizácií postavený na mieru podľa dodaného dizajnu 1:1. Úvod prehráva 3D animáciu budovy podľa scrollu a celý web žije desiatkami vlastných animácií.',
+      en: 'A WordPress site for an architectural visualization studio, custom-built 1:1 from the supplied design. The intro plays a 3D building animation as you scroll, and the whole site runs on dozens of custom animations.',
     },
     scope: {
       sk: [

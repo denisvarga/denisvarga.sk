@@ -575,7 +575,7 @@
     "expect": {
       "mustInclude": [
         "Vibration",
-        "multisite"
+        "70"
       ],
       "note": "The project facts say redcross.sk was built as a Vibration employee on a WordPress multisite."
     }
@@ -586,8 +586,8 @@
     "question": "Which stores did Denis build on the Sellio platform?",
     "expect": {
       "mustInclude": [
-        "Vibration",
-        "Najkoberce"
+        "Najkoberce",
+        "Voňavý domov"
       ],
       "note": "Sellio 1 and 2 stores are listed in the project facts as Vibration work."
     }
