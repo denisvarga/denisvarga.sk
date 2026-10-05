@@ -47,9 +47,16 @@ describe('copy parity', () => {
 
   it('data has the design counts', () => {
     expect(JOBS).toHaveLength(6);
-    expect(PROJECTS).toHaveLength(20);
+    expect(PROJECTS).toHaveLength(21);
     expect(SKILLS).toHaveLength(6);
     expect(new Set(PROJECTS.map((p) => p.slug)).size).toBe(PROJECTS.length);
+  });
+
+  it('every project lists the same number of scope items in SK and EN', () => {
+    for (const project of PROJECTS) {
+      expect(project.scope.sk.length, project.slug).toBeGreaterThan(0);
+      expect(project.scope.en, project.slug).toHaveLength(project.scope.sk.length);
+    }
   });
 
   it('no string is empty or carries stray markup whitespace', () => {

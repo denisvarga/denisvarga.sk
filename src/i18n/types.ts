@@ -93,6 +93,7 @@ export interface UiCopy {
   readonly more: string;
   readonly scope: string;
   readonly open: string;
+  readonly privateProject: string;
   readonly close: string;
   readonly menu: string;
   readonly menuClose: string;

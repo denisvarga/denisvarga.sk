@@ -3,7 +3,8 @@ import { PROJECT_INFO } from '../../shared/projects.ts';
 
 export interface ShotProject {
   readonly name: string;
-  readonly url: string;
+  /** Null for a private project: its raw images are rendered from spikes/project-shots/html instead. */
+  readonly url: string | null;
   readonly slug: string;
 }
 
@@ -20,7 +21,8 @@ export async function loadProjects(only: readonly string[] = []): Promise<ShotPr
   return all.filter((p) => only.includes(p.slug));
 }
 
-export function domainOf(url: string): string {
+export function domainOf({ url, slug }: ShotProject): string {
+  if (!url) return `${slug.replaceAll('-', ' ')} · private`;
   return new URL(url).hostname.replace(/^www\./, '');
 }
 

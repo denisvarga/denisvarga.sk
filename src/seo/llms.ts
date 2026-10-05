@@ -43,7 +43,7 @@ export function buildLlmsTxt(): string {
     ...contactLines(),
     '',
     '## Optional',
-    ...PROJECTS.map((p) => `- [${p.name}](${p.url}): ${p.desc.en}`),
+    ...PROJECTS.map((p) => (p.url ? `- [${p.name}](${p.url}): ${p.desc.en}` : `- ${p.name} (private project): ${p.desc.en}`)),
     '',
   ].join('\n');
 }
@@ -85,7 +85,10 @@ export function buildLlmsFullTxt(): string {
     ...SKILLS.map((group) => `- ${group.name.en}: ${group.items.map((item) => skillLabel(item, 'en')).join(', ')}`),
     '',
     '## Projects',
-    ...PROJECTS.map((p) => `- ${p.name} (${p.url}): ${p.kind.en}, ${PROJECT_CONTEXT[p.context]}. ${p.desc.en}.`),
+    ...PROJECTS.map(
+      (p) =>
+        `- ${p.name} (${p.url ?? 'private project, no public site'}): ${p.kind.en}, ${PROJECT_CONTEXT[p.context]}. ${p.summary.en} Scope: ${p.scope.en.join('; ')}.`,
+    ),
     '',
     '## Contact',
     ...contactLines(),
