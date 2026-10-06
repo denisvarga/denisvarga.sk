@@ -438,6 +438,24 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
   },
   {
+    name: 'Limo Prestige',
+    url: 'https://limo-prestige.sk',
+    slug: 'limoprestige',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Prémiová preprava s osobným šoférom', en: 'Premium chauffeur service' },
+    desc: { sk: 'WordPress téma na mieru podľa dodanej grafiky', en: 'Custom WordPress theme from the supplied design' },
+    summary: {
+      sk: 'Web prémiovej prepravy osôb s osobným šoférom, ktorý predstavuje služby, vozový park a obľúbené destinácie. Vlastná WordPress téma podľa dodanej grafiky.',
+      en: 'A website for a premium chauffeur service that presents its services, fleet and popular destinations, on a custom WordPress theme built from the supplied design.',
+    },
+    scope: {
+      sk: ['WordPress téma na mieru podľa dodanej grafiky'],
+      en: ['A custom WordPress theme built from the supplied design'],
+    },
+    credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',

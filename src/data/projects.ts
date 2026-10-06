@@ -11,6 +11,7 @@ import elektrarnapiestany from '../assets/projects/elektrarnapiestany.webp';
 import jaroslavkostial from '../assets/projects/jaroslavkostial.webp';
 import jurajmikus from '../assets/projects/jurajmikus.webp';
 import ledpixel from '../assets/projects/ledpixel.webp';
+import limoprestige from '../assets/projects/limoprestige.webp';
 import lekar from '../assets/projects/lekar.webp';
 import madad from '../assets/projects/madad.webp';
 import monkeystudios from '../assets/projects/monkeystudios.webp';
@@ -57,6 +58,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   jaroslavkostial,
   jurajmikus,
   ledpixel,
+  limoprestige,
   lekar,
   madad,
   monkeystudios,
