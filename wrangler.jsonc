@@ -13,8 +13,9 @@
   "assets": {
     "not_found_handling": "404-page",
     // Pages stay free static assets: the denisvarga.dev "/" -> "/en/" rewrite and the "/en*"
-    // redirects are zone rules in Cloudflare, so only the chat API invokes the Worker.
-    "run_worker_first": ["/api/*"]
+    // redirects are zone rules in Cloudflare, so only the chat API and the private question
+    // overview (behind Cloudflare Access) invoke the Worker.
+    "run_worker_first": ["/api/*", "/prehlad*"]
   },
   "observability": {
     "enabled": true,
@@ -45,6 +46,10 @@
     "DAILY_CAP": "300",
     "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
     "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",
-    "TURNSTILE_ACTION": "ask"
+    "TURNSTILE_ACTION": "ask",
+    // AUD tag of the "denisvarga prehlad" Access application (denisvarga.sk and .dev /prehlad);
+    // with an empty value /prehlad answers 404.
+    "ACCESS_TEAM_DOMAIN": "https://denva.cloudflareaccess.com",
+    "ACCESS_AUD": "b1f48cd087ed7fc17a30400939a7193c6aa2b1e7f649b7031685de3b76aff335"
   }
 }

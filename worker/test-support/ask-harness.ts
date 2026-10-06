@@ -30,6 +30,8 @@ export function makeEnv(overrides: Partial<AskEnv> = {}): { env: AskEnv; db: Fak
     ALLOWED_ORIGINS: ORIGIN,
     TURNSTILE_HOSTNAME: 'denisvarga.sk',
     TURNSTILE_ACTION: 'ask',
+    ACCESS_TEAM_DOMAIN: 'https://denva.cloudflareaccess.com',
+    ACCESS_AUD: '',
     OPENAI_API_KEY: 'sk-test',
     TURNSTILE_SECRET_KEY: '0x4AAAAAAA-real-secret',
     SAFETY_SALT: 'salt',

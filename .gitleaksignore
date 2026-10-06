@@ -1,1 +1,3 @@
 # Fingerprints of reviewed false positives, one per line.
+# ACCESS_AUD in wrangler.jsonc: the public tag of the Access application, not a secret.
+75d47ac2db599b52459d79317d271d28e37e45e6:wrangler.jsonc:generic-api-key:53

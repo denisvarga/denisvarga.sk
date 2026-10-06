@@ -5,6 +5,7 @@ User-agent: *
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 Disallow: /api/
+Disallow: /prehlad
 
 User-agent: GPTBot
 User-agent: OAI-SearchBot
@@ -28,5 +29,6 @@ User-agent: cohere-ai
 User-agent: CCBot
 Allow: /
 Disallow: /api/
+Disallow: /prehlad
 
 Sitemap: https://denisvarga.sk/sitemap.xml
