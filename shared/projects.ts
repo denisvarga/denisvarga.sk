@@ -456,6 +456,24 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
   },
   {
+    name: 'Marani',
+    url: 'https://maranibratislava.sk',
+    slug: 'maranibratislava',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Gruzínska reštaurácia', en: 'Georgian restaurant' },
+    desc: { sk: 'WordPress téma na mieru podľa dodanej grafiky', en: 'Custom WordPress theme from the supplied design' },
+    summary: {
+      sk: 'Web gruzínskej reštaurácie v Bratislave s jedálnym, nápojovým a vínnym lístkom a rezerváciou stola. Vlastná WordPress téma podľa dodanej grafiky.',
+      en: 'A website for a Georgian restaurant in Bratislava with its food, drinks and wine menus and table reservations, on a custom WordPress theme built from the supplied design.',
+    },
+    scope: {
+      sk: ['WordPress téma na mieru podľa dodanej grafiky'],
+      en: ['A custom WordPress theme built from the supplied design'],
+    },
+    credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',

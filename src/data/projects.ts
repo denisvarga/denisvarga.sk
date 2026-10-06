@@ -14,6 +14,7 @@ import ledpixel from '../assets/projects/ledpixel.webp';
 import limoprestige from '../assets/projects/limoprestige.webp';
 import lekar from '../assets/projects/lekar.webp';
 import madad from '../assets/projects/madad.webp';
+import maranibratislava from '../assets/projects/maranibratislava.webp';
 import monkeystudios from '../assets/projects/monkeystudios.webp';
 import najkoberce from '../assets/projects/najkoberce.webp';
 import narodnyfutbalovystadion from '../assets/projects/narodnyfutbalovystadion.webp';
@@ -61,6 +62,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   limoprestige,
   lekar,
   madad,
+  maranibratislava,
   monkeystudios,
   najkoberce,
   narodnyfutbalovystadion,

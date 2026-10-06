@@ -2,7 +2,7 @@ import { FACTS } from './facts';
 import { INTRO, RULES } from './rules';
 
 /** Bump on any wording change so eval runs and logged answers can be tied to a prompt revision. */
-export const PROMPT_VERSION = '2026-10-06.1';
+export const PROMPT_VERSION = '2026-10-06.2';
 
 const bullets = (lines: readonly string[]): string => lines.map((line) => `- ${line}`).join('\n');
 
