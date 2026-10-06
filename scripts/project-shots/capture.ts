@@ -4,8 +4,10 @@ import { CLICK_CONSENT, FIND_LEFTOVERS, HIDE_OVERLAYS, SCROLL_NUDGE, SITE_CSS, V
 import { FREEZE_PAGE, HIDE_CARETS, PIN_CLASS_SLIDERS, PIN_SLIDERS } from './page-pinning.ts';
 import { argList, loadProjects, RAW_DIR, type ShotProject } from './project-list.ts';
 
-// Usage: tsx scripts/project-shots/capture.ts [--only slug,slug] [--channel chrome]
+// Usage: tsx scripts/project-shots/capture.ts [--only slug,slug] [--channel chrome] [--from slug=url,...]
 // Private projects (url null) are skipped; their raw images come from spikes/project-shots/html.
+// --from shoots a project from another host, such as a staging copy, while the mockup still shows
+// its public domain. It is a flag rather than data so such hosts never land in this public repo.
 // Defaults to full Chromium (new headless), which renders large blurred shadows without the tile
 // seams of the headless shell. Use the chrome channel when a site relies on H.264 video.
 
@@ -58,7 +60,7 @@ async function shoot(browser: Browser, project: PublicProject, kind: Kind): Prom
   });
   try {
     const page = await context.newPage();
-    const response = await page.goto(project.url, { waitUntil: 'load', timeout: 45_000 });
+    const response = await page.goto(shootFrom.get(project.slug) ?? project.url, { waitUntil: 'load', timeout: 45_000 });
     if (!response) throw new Error('no response');
     if (response.status() >= 400) throw new Error(`HTTP ${response.status()}`);
     // Analytics beacons can keep the network busy forever, so idle is best effort.
@@ -102,6 +104,9 @@ const listed = await loadProjects(argList('--only'));
 for (const { slug } of listed.filter((p) => !p.url)) console.log(`${slug}: skipped, private project without a url`);
 const projects = listed.filter((p): p is PublicProject => p.url !== null);
 const channel = argList('--channel')[0] ?? 'chromium';
+const shootFrom = new Map(
+  argList('--from').map((pair): [string, string] => [pair.slice(0, pair.indexOf('=')), pair.slice(pair.indexOf('=') + 1)]),
+);
 await mkdir(RAW_DIR, { recursive: true });
 
 const browser = await chromium.launch({ channel, headless: true });
