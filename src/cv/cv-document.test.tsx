@@ -26,20 +26,24 @@ describe.each(LANGS)('CvDocument (%s)', (lang) => {
   const items = [...doc.querySelectorAll('.project')];
   const itemOf = (name: string) => items.find((item) => item.querySelector('.project-name')?.textContent === name);
 
-  it('lists every company and every project with its domain as text, never as a link', () => {
+  it('lists every company and every project, never as a link', () => {
     for (const job of JOBS) expect(text).toContain(job.company);
     expect(items).toHaveLength(PROJECTS.length);
     for (const project of PROJECTS) {
       const item = itemOf(project.name);
       expect(item?.querySelector('a')).toBeNull();
-      if (project.url) expect(item?.querySelector('.domain')?.textContent).toBe(displayUrl(project.url));
+      if (project.url && project.context !== 'vibration') {
+        expect(item?.querySelector('.domain')?.textContent).toBe(displayUrl(project.url));
+      }
     }
   });
 
   it('describes own and freelance work but lists Vibration work by name only', () => {
     for (const project of PROJECTS) {
       const item = itemOf(project.name);
-      expect(item?.querySelector('.project-desc') ?? null).toEqual(project.context === 'vibration' ? null : expect.anything());
+      const nameOnly = project.context === 'vibration' ? null : expect.anything();
+      expect(item?.querySelector('.domain') ?? null).toEqual(nameOnly);
+      expect(item?.querySelector('.project-desc') ?? null).toEqual(nameOnly);
       expect(item?.querySelector('.project-credit')?.textContent ?? null).toBe(
         project.context === 'vibration' || !project.credit ? null : typeset(project.credit[lang], lang),
       );

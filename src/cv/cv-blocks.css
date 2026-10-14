@@ -118,8 +118,13 @@
   color: var(--ink);
 }
 
-.project-list-compact {
-  gap: 2.4mm var(--gap);
+.project-list-inline .project {
+  display: inline;
+}
+
+.project-list-inline .project-name {
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 /* Footer */

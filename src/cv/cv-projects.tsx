@@ -3,7 +3,7 @@ import type { Lang } from '../i18n/types';
 import { ui } from '../i18n/ui-copy';
 import { cvLabels, displayUrl, typeset } from './cv-copy';
 
-// Vibration work is listed by name only: with every description the CV runs past three pages.
+// Vibration work is one run of names: with descriptions or domains the CV runs past three pages.
 const DETAILED = PROJECTS.filter((project) => project.context !== 'vibration');
 const COMPACT = PROJECTS.filter((project) => project.context === 'vibration');
 
@@ -27,10 +27,11 @@ export function CvProjects({ lang }: { lang: Lang }) {
         ))}
       </ul>
       <h3 className="project-group">{cvLabels[lang].employerProjects}</h3>
-      <ul className="project-list project-list-compact">
-        {COMPACT.map((project) => (
+      <ul className="project-list-inline">
+        {COMPACT.map((project, index) => (
           <li key={project.slug} className="project">
-            <span className="project-name">{project.name}</span> <Domain project={project} lang={lang} />
+            <span className="project-name">{project.name}</span>
+            {index < COMPACT.length - 1 && ', '}
           </li>
         ))}
       </ul>
