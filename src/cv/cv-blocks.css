@@ -85,7 +85,7 @@
 
 .project-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 3.4mm var(--gap);
 }
 
@@ -119,7 +119,6 @@
 }
 
 .project-list-compact {
-  grid-template-columns: repeat(3, 1fr);
   gap: 2.4mm var(--gap);
 }
 

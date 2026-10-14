@@ -3,6 +3,7 @@ import adrianastudio from '../assets/projects/adrianastudio.webp';
 import akbaltazarovic from '../assets/projects/akbaltazarovic.webp';
 import autoomnium from '../assets/projects/autoomnium.webp';
 import brixx from '../assets/projects/brixx.webp';
+import chatamyto from '../assets/projects/chatamyto.webp';
 import cherries from '../assets/projects/cherries.webp';
 import chiptech from '../assets/projects/chiptech.webp';
 import denva from '../assets/projects/denva.webp';
@@ -14,6 +15,7 @@ import ledpixel from '../assets/projects/ledpixel.webp';
 import limoprestige from '../assets/projects/limoprestige.webp';
 import lekar from '../assets/projects/lekar.webp';
 import madad from '../assets/projects/madad.webp';
+import maranibratislava from '../assets/projects/maranibratislava.webp';
 import monkeystudios from '../assets/projects/monkeystudios.webp';
 import najkoberce from '../assets/projects/najkoberce.webp';
 import narodnyfutbalovystadion from '../assets/projects/narodnyfutbalovystadion.webp';
@@ -28,6 +30,7 @@ import sadimebuducnost from '../assets/projects/sadimebuducnost.webp';
 import saunika from '../assets/projects/saunika.webp';
 import schoolofarts from '../assets/projects/schoolofarts.webp';
 import secondBrain from '../assets/projects/second-brain.webp';
+import slovandisponea from '../assets/projects/slovandisponea.webp';
 import tatranskyprofil from '../assets/projects/tatranskyprofil.webp';
 import tomaflora from '../assets/projects/tomaflora.webp';
 import vibration from '../assets/projects/vibration.webp';
@@ -50,6 +53,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   akbaltazarovic,
   autoomnium,
   brixx,
+  chatamyto,
   cherries,
   chiptech,
   denva,
@@ -61,6 +65,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   limoprestige,
   lekar,
   madad,
+  maranibratislava,
   monkeystudios,
   najkoberce,
   narodnyfutbalovystadion,
@@ -75,6 +80,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   saunika,
   schoolofarts,
   'second-brain': secondBrain,
+  slovandisponea,
   tatranskyprofil,
   tomaflora,
   vibration,
