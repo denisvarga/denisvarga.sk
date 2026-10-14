@@ -545,6 +545,42 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     },
   },
   {
+    name: 'Nerina',
+    url: 'https://nerina.sk',
+    slug: 'nerina',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Ubytovanie pri Donovaloch', en: 'Chalet stay near Donovaly' },
+    desc: {
+      sk: 'Štvorjazyčný web dvojchaty s automatizovaným blogom a štruktúrovanými dátami ubytovania',
+      en: 'Four-language twin chalet site with an automated blog and lodging structured data',
+    },
+    summary: {
+      sk: 'Web dvojchaty Nerina pri Donovaloch, dve chaty po 12 hostí, v slovenčine, angličtine, maďarčine a poľštine. Vlastná WordPress téma, ktorá nahradila pôvodný statický web, s rezerváciami cez formulár a blogom, ktorý píše a publikuje automatizovaná pipeline.',
+      en: 'The site of the Nerina twin chalet near Donovaly, two chalets for 12 guests each, in Slovak, English, Hungarian and Polish. A custom WordPress theme that replaced the earlier static site, with reservation requests through a form and a blog written and published by an automated pipeline.',
+    },
+    scope: {
+      sk: [
+        'Vlastná WordPress téma s 24 ACF blokmi namiesto pôvodného statického webu, 4 jazyky cez WPML',
+        'Automatizovaný blog: agent SEO špecialista a agent copywriter s nezávislou kontrolou faktov, ktorá zastaví nepodložené tvrdenia, publikovanie cez REST API',
+        'Vlastné REST endpointy pre pipeline: prepojenie prekladov vo WPML s kontrolou oprávnení na každý článok a purge cache WP Rocket',
+        'Štruktúrované dáta LodgingBusiness s dvomi ubytovacími jednotkami, hodnotením a recenziami a FAQPage z FAQ blokov',
+        'Recenzie z Google Places v cache s fotkami recenzentov v knižnici médií a WP-CLI príkazom',
+        'Vlastný llms.txt namiesto verzie z Yoastu, obnovený pri uložení ACF a raz denne cez cron',
+        'Rezervačný formulár s Turnstile a nonce, HTML e-maily majiteľovi aj hosťovi a komentáre vypnuté naprieč webom, REST API aj XML-RPC',
+      ],
+      en: [
+        'A custom WordPress theme with 24 ACF blocks in place of the earlier static site, 4 languages on WPML',
+        'An automated blog: an SEO specialist agent and a copywriter agent with an independent fact gate that stops unsourced claims, published over the REST API',
+        'Custom REST endpoints for the pipeline: WPML translation linking with per-post permission checks and a WP Rocket cache purge',
+        'LodgingBusiness structured data with two accommodation units, a rating and reviews, and an FAQPage built from FAQ blocks',
+        'Google Places reviews cached with reviewer photos saved to the media library and a WP-CLI command',
+        'An own llms.txt in place of the Yoast one, rebuilt on ACF save and daily by cron',
+        'A reservation form with Turnstile and a nonce, HTML emails to the owner and the guest, and comments switched off across the site, the REST API and XML-RPC',
+      ],
+    },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',
