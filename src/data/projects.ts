@@ -3,6 +3,7 @@ import adrianastudio from '../assets/projects/adrianastudio.webp';
 import akbaltazarovic from '../assets/projects/akbaltazarovic.webp';
 import autoomnium from '../assets/projects/autoomnium.webp';
 import brixx from '../assets/projects/brixx.webp';
+import chatamyto from '../assets/projects/chatamyto.webp';
 import cherries from '../assets/projects/cherries.webp';
 import chiptech from '../assets/projects/chiptech.webp';
 import denva from '../assets/projects/denva.webp';
@@ -52,6 +53,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   akbaltazarovic,
   autoomnium,
   brixx,
+  chatamyto,
   cherries,
   chiptech,
   denva,

@@ -511,6 +511,40 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
   },
   {
+    name: 'Chata Mýto',
+    url: 'https://chatamyto.sk',
+    slug: 'chatamyto',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Prenájom chát v Nízkych Tatrách', en: 'Chalet rentals in the Low Tatras' },
+    desc: {
+      sk: 'Web chát s wellness so štruktúrovanými dátami ubytovania a cookie lištou na mieru',
+      en: 'Wellness chalet site with lodging structured data and a custom cookie consent',
+    },
+    summary: {
+      sk: 'Web štyroch chát s wellness v Mýte pod Ďumbierom, ktorý má priniesť priame dopyty na rezerváciu. Vlastná WordPress téma, v ktorej údaje o chatách zadané raz poháňajú stránky, štruktúrované dáta, llms.txt aj sitemapu obrázkov.',
+      en: 'A site for four wellness chalets in Mýto pod Ďumbierom, built to bring in direct booking enquiries. A custom WordPress theme where chalet details entered once drive the pages, structured data, llms.txt and the image sitemap.',
+    },
+    scope: {
+      sk: [
+        'Štruktúrované dáta nad Rank Math free: LodgingBusiness s časmi príchodu a odchodu, vybavením, cenovým rozpätím a ponukou pre každú chatu, prepojený cez containsPlace na uzly House a Accommodation, kontakt ako ContactPage s FAQPage z ACF',
+        'Údaje o chatách zadané raz v ACF (izby, hostia, plocha, cena od, galéria) poháňajú šablóny, JSON-LD, llms.txt aj sitemapu obrázkov, do ktorej sa pridávajú aj obrázky z ACF blokov',
+        'Kontaktný formulár bez nonce, aby fungoval aj z cache: Turnstile s kontrolou akcie a hostname, ktorý bez kľúča zlyhá bezpečne, honeypot a potvrdenie hosťovi s Reply-To na majiteľa',
+        'Vlastná cookie lišta s Consent Mode v2 od stavu denied, mapy Google až po súhlase za rovnako veľkým placeholderom a súhlas uložený ako HTTP cookie, lebo Safari drží cookies z JavaScriptu najviac 7 dní',
+        'Deploy pre LiteSpeed v bezpečnom poradí: nové hashované bundly vedľa starých, purge cache a až potom mazanie starých, aby cache neuložila 404',
+        'Idempotentný WP-CLI skript na nastavenie Rank Math, meta údajov a chýbajúcich alt textov, 8 ACF blokov a Tailwind so SCSS cez webpack',
+      ],
+      en: [
+        'Structured data on top of Rank Math free: LodgingBusiness with check-in and check-out times, amenities, a price range and an offer per chalet, linked through containsPlace to House and Accommodation nodes, and the contact page as a ContactPage with an FAQPage from ACF',
+        'Chalet details entered once in ACF (rooms, guests, floor area, price from, gallery) drive the templates, JSON-LD, llms.txt and the image sitemap, which also picks up images from ACF blocks',
+        'A contact form without a nonce so it works from cache: Turnstile that checks action and hostname and fails closed without a key, a honeypot and a guest confirmation with Reply-To set to the owner',
+        'Own cookie consent with Consent Mode v2 starting from denied, Google Maps loaded only after consent behind a same-size placeholder, and consent stored as an HTTP cookie because Safari keeps JavaScript cookies for 7 days at most',
+        'A LiteSpeed-safe deploy order: new hashed bundles next to the old ones, a cache purge, and only then removal of the old ones so the cache never stores a 404',
+        'An idempotent WP-CLI script for Rank Math settings, meta and missing alt texts, 8 ACF blocks and Tailwind with SCSS through webpack',
+      ],
+    },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',
