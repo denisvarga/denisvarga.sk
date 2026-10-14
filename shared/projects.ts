@@ -474,6 +474,43 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
   },
   {
+    name: 'Slovan Bratislava',
+    url: 'https://slovan.disponea.sk',
+    slug: 'slovandisponea',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Objednávky fotiek a hráčskych kartičiek', en: 'Photo and player card orders' },
+    desc: {
+      sk: 'Vlastný objednávkový systém na WordPresse bez WooCommerce so Stripe a PDF faktúrami',
+      en: 'A custom WordPress order system without WooCommerce, with Stripe and PDF invoices',
+    },
+    summary: {
+      sk: 'Objednávková aplikácia, cez ktorú si rodičia a tréneri mládeže ŠK Slovan Bratislava objednávajú od BeYou fotografie a hráčske kartičky. Objednávky, platby kartou, faktúry aj ich správa bežia na vlastnom kóde vo WordPresse, bez WooCommerce.',
+      en: 'An ordering app where parents and coaches of ŠK Slovan Bratislava youth teams order photos and player cards from BeYou. Orders, card payments, invoices and their management run on custom code in WordPress, without WooCommerce.',
+    },
+    scope: {
+      sk: [
+        'Objednávky ako vlastný post typ s 10 stavmi a mapou povolených prechodov, zmena stavu jedným podmieneným UPDATE, takže pri súbehu webhooku a návratu zo Stripe vyhrá len jeden zápis',
+        'Stripe Checkout vložený v modálnom okne na webe so záložnou hostovanou stránkou, odkazom na opakovanú platbu a 2-hodinovou platnosťou relácie',
+        'Webhook s overeným podpisom pre 6 udalostí Stripe vrátane refundácií, ktorý pred označením platby kontroluje session, objednávku, sumu aj menu',
+        'PDF faktúry cez Dompdf s ročným číselným radom bez medzier strážených UNIQUE kľúčmi a režimom DPH podľa dátumu dodania a registrácie platiteľa',
+        'Zľavové kódy s atomickou rezerváciou použitia, plne zľavnená objednávka obíde Stripe a zvyšok pod minimálnou platbou 0,50 € sa odmietne',
+        'Správa objednávok vo wp-admin: filtre, uložené pohľady, hromadné zmeny stavu, CSV export pre Excel s ochranou pred formula injection a e-mail o pripravenej objednávke',
+        'Nonce, honeypot, Turnstile a rate limity na IP aj na celý web, PHPStan level 5 a CI v GitHub Actions',
+      ],
+      en: [
+        'Orders as a custom post type with 10 statuses and a map of allowed transitions, each change a single conditional UPDATE so only one write wins when the webhook and the return from Stripe race',
+        'Stripe Checkout embedded in a modal on the site, with a hosted page as fallback, a pay-again link and a 2-hour session expiry',
+        'A signature-verified webhook for 6 Stripe events including refunds that checks the session, order, amount and currency before marking a payment',
+        "Dompdf PDF invoices in a gap-free yearly number series guarded by UNIQUE keys, with the VAT regime set by the supply date and the seller's registration dates",
+        'Discount codes with an atomic usage reservation; a fully discounted order skips Stripe, and a remainder below the 0.50 EUR minimum charge is rejected',
+        'Order management in wp-admin: filters, saved views, bulk status changes, an Excel-ready CSV export guarded against formula injection and a ready-for-pickup email',
+        'Nonce, honeypot, Turnstile and per-IP plus site-wide rate limits, PHPStan level 5 and CI on GitHub Actions',
+      ],
+    },
+    credit: { sk: 'V spolupráci s be-you.sk.', en: 'In collaboration with be-you.sk.' },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',

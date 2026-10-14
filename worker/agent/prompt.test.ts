@@ -70,6 +70,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-06.2');
+    expect(PROMPT_VERSION).toBe('2026-10-14.1');
   });
 });

@@ -29,6 +29,7 @@ import sadimebuducnost from '../assets/projects/sadimebuducnost.webp';
 import saunika from '../assets/projects/saunika.webp';
 import schoolofarts from '../assets/projects/schoolofarts.webp';
 import secondBrain from '../assets/projects/second-brain.webp';
+import slovandisponea from '../assets/projects/slovandisponea.webp';
 import tatranskyprofil from '../assets/projects/tatranskyprofil.webp';
 import tomaflora from '../assets/projects/tomaflora.webp';
 import vibration from '../assets/projects/vibration.webp';
@@ -77,6 +78,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   saunika,
   schoolofarts,
   'second-brain': secondBrain,
+  slovandisponea,
   tatranskyprofil,
   tomaflora,
   vibration,
