@@ -19,6 +19,7 @@ import maranibratislava from '../assets/projects/maranibratislava.webp';
 import monkeystudios from '../assets/projects/monkeystudios.webp';
 import najkoberce from '../assets/projects/najkoberce.webp';
 import narodnyfutbalovystadion from '../assets/projects/narodnyfutbalovystadion.webp';
+import nerina from '../assets/projects/nerina.webp';
 import norahorvathova from '../assets/projects/norahorvathova.webp';
 import novatrnita from '../assets/projects/novatrnita.webp';
 import onlineziak from '../assets/projects/onlineziak.webp';
@@ -69,6 +70,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   monkeystudios,
   najkoberce,
   narodnyfutbalovystadion,
+  nerina,
   norahorvathova,
   novatrnita,
   onlineziak,
