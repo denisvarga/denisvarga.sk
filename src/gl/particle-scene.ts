@@ -16,6 +16,7 @@ import { FRAME_PRIORITY, subscribeFrame } from '../motion/frame-loop';
 import { getLayout } from '../motion/layout-cache';
 import { getPointer, isCoarsePointer, retainPointer } from '../motion/pointer';
 import { COARSE_POINTER_QUERY, matchesMedia } from '../motion/use-media-query';
+import { isScrollLocked, subscribeScrollLock } from '../motion/use-scroll-lock';
 import { getScrollVelocity, retainScrollVelocity } from '../motion/scroll-velocity';
 import { runIdleSlices, type InitSlice } from './init-slices';
 import { isMobileWidth, makePointAttributes, pointCount, SHAPE_BUILDERS } from './make-shapes';
@@ -201,9 +202,11 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   };
 
   let stopLoop: (() => void) | null = null;
+  let contextLost = false;
+  // The menu and the project drawer lock scroll while they cover the page; the loop sits out.
   const resume = () => {
     if (mode === 'static') renderStatic();
-    else stopLoop ??= subscribeFrame('particles', FRAME_PRIORITY.gl, frame);
+    else if (!contextLost && !isScrollLocked()) stopLoop ??= subscribeFrame('particles', FRAME_PRIORITY.gl, frame);
   };
   const pause = () => {
     stopLoop?.();
@@ -218,12 +221,16 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   };
   const onContextLost = (event: Event) => {
     event.preventDefault();
+    contextLost = true;
     pause();
   };
   // three rebuilds its GPU state on restore and re-uploads from the CPU-side buffers it keeps.
   const onContextRestored = () => {
     renderer.compileAsync(scene, camera).then(
-      () => !disposed && resume(),
+      () => {
+        contextLost = false;
+        if (!disposed) resume();
+      },
       (error: unknown) => console.error('gl_restore_failed', error),
     );
   };
@@ -248,6 +255,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   if (mode === 'animated') {
     // The intro burst is timed from the moment the scene starts moving, like the design's initGL.
     state.t0 = performance.now();
+    cleanups.push(subscribeScrollLock((locked) => (locked ? pause() : resume())));
     resume();
   }
   return { dispose };
