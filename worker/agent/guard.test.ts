@@ -85,6 +85,8 @@ const modelResult = (text: string | null): ModelResult => ({
   model: 'gpt-6-luna',
   inputTokens: 1200,
   outputTokens: 40,
+  cachedTokens: 1024,
+  cacheWriteTokens: 0,
   httpStatus: 200,
 });
 

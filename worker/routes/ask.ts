@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { easterEgg } from '../agent/easter-eggs';
 import { dropFlaggedTurns, guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
-import { buildInstructions } from '../agent/prompt';
+import { buildInstructions, PROMPT_VERSION } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
 import { parseDailyCap, reserveSlot, utcMidnight, type Reservation } from '../ask/daily-cap';
@@ -108,7 +108,7 @@ askRoute.post('/ask', async (c) => {
   });
   const result = guardAnswer(answer, input.lang);
   c.executionCtx.waitUntil(
-    finalizeRow(env.DB, reservation.id, result, Date.now() - modelStartedAt).catch(() => logEvent('d1_error', 500)),
+    finalizeRow(env.DB, reservation.id, result, Date.now() - modelStartedAt, PROMPT_VERSION).catch(() => logEvent('d1_error', 500)),
   );
 
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);

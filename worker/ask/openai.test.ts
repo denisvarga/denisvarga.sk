@@ -27,6 +27,12 @@ function request(fetchImpl: typeof fetch, overrides: Partial<OpenAIRequest> = {}
 
 afterEach(() => vi.restoreAllMocks());
 
+const usage = (details: unknown) =>
+  parseResponse(
+    { status: 'completed', output: message({ type: 'output_text', text: 'Ahoj.' }), usage: { input_tokens: 12_000, output_tokens: 9, input_tokens_details: details } },
+    'm',
+  );
+
 describe('buildRequestBody', () => {
   it('sends the hardened request shape with the shared prefix as the only cache breakpoint', () => {
     const body = buildRequestBody(request(fetch, { effort: 'bogus' }));
@@ -67,6 +73,17 @@ describe('parseResponse', () => {
       'gpt-6-luna',
     );
     expect(r).toMatchObject({ outcome: 'ok', text: 'Ahoj. Ako?', model: 'gpt-6-luna', inputTokens: 5, outputTokens: 2 });
+  });
+
+  it('reads cache reads and writes from the usage details, and null when they are missing or malformed', () => {
+    expect(usage({ cached_tokens: 11_000, cache_write_tokens: 0, cache_write_tokens_details: { ttl_30m_tokens: 0, ttl_12h_tokens: 0 } })).toMatchObject({
+      outcome: 'ok',
+      inputTokens: 12_000,
+      cachedTokens: 11_000,
+      cacheWriteTokens: 0,
+    });
+    expect(usage(undefined)).toMatchObject({ outcome: 'ok', cachedTokens: null, cacheWriteTokens: null });
+    expect(usage({ cached_tokens: 'lots' })).toMatchObject({ outcome: 'ok', text: 'Ahoj.', cachedTokens: null, cacheWriteTokens: null });
   });
 
   it('strips control characters from the answer, keeping newlines and tabs', () => {

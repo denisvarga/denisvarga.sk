@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { manipulationReply } from '../agent/guard';
-import { buildInstructions } from '../agent/prompt';
+import { buildInstructions, PROMPT_VERSION } from '../agent/prompt';
 import { askBody, CLIENT_IP, fakeLimiter, json, makeEnv, openaiCompleted, send, stubFetch, turnstileOk } from '../test-support/ask-harness';
 
 let logs: ReturnType<typeof vi.spyOn>;
@@ -228,7 +228,18 @@ describe('model call', () => {
     const res = await send({ env, body: askBody('Čo robí Denis?', { lang: 'sk' }) });
     expect(await res.json()).toEqual({ reply: 'Denis robí WordPress na mieru.', kind: 'answer', sig: SIG });
     expect(db.rows).toHaveLength(1);
-    expect(db.rows[0]).toMatchObject({ lang: 'sk', question: 'Čo robí Denis?', answer: 'Denis robí WordPress na mieru.', model: 'gpt-6-luna-2026-05-18', input_tokens: 1200, output_tokens: 40, outcome: 'ok' });
+    expect(db.rows[0]).toMatchObject({
+      lang: 'sk',
+      question: 'Čo robí Denis?',
+      answer: 'Denis robí WordPress na mieru.',
+      model: 'gpt-6-luna-2026-05-18',
+      input_tokens: 1200,
+      output_tokens: 40,
+      cached_tokens: 1024,
+      cache_write_tokens: 0,
+      prompt_version: PROMPT_VERSION,
+      outcome: 'ok',
+    });
     expect(JSON.stringify(db.rows)).not.toContain(CLIENT_IP);
 
     const openaiInit = fetchMock.mock.calls[1]?.[1];

@@ -27,7 +27,8 @@ ${card(`Posledných ${CHART_DAYS} dní`, formatCount(s.last30))}
 ${card('Slovensky / anglicky', `${formatCount(s.sk)} / ${formatCount(s.en)}`)}
 ${card('Priemerná latencia', s.avgLatencyMs === null ? '-' : `${formatCount(s.avgLatencyMs)} ms`)}
 ${card('Tokeny vstup / výstup', `${formatCount(s.inputTokens)} / ${formatCount(s.outputTokens)}`)}
-${card('Odhad ceny', usd.format(s.costUsd), 'bez zľavy za cache')}
+${card('Cache čítanie / zápis', `${formatCount(s.cachedTokens)} / ${formatCount(s.cacheWriteTokens)}`, 'tokenov zo vstupu')}
+${card('Odhad ceny', usd.format(s.costUsd))}
 </dl>
 <ul class="outcomes" aria-label="Výsledky">
 ${s.outcomes.map(({ outcome, count }) => html`<li>${outcomeBadge(outcome)}<span>${formatCount(count)}</span></li>`)}

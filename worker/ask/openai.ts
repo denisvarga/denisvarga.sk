@@ -35,6 +35,10 @@ export interface ModelResult {
   readonly model: string;
   readonly inputTokens: number | null;
   readonly outputTokens: number | null;
+  /** Input tokens billed as cache reads; part of `inputTokens`. */
+  readonly cachedTokens: number | null;
+  /** Input tokens billed as cache writes; part of `inputTokens`. */
+  readonly cacheWriteTokens: number | null;
   /** Upstream HTTP status, 0 for network errors and timeouts. */
   readonly httpStatus: number;
 }
@@ -88,6 +92,7 @@ export function buildRequestBody(req: OpenAIRequest): Record<string, unknown> {
 }
 
 const optionalString = z.optional(z.nullable(z.string()));
+const optionalCount = z.optional(z.nullable(z.number()));
 
 const responseSchema = z.object({
   status: optionalString,
@@ -101,7 +106,19 @@ const responseSchema = z.object({
     ),
   ),
   incomplete_details: z.optional(z.nullable(z.object({ reason: optionalString }))),
-  usage: z.optional(z.nullable(z.object({ input_tokens: z.number(), output_tokens: z.number() }))),
+  usage: z.optional(
+    z.nullable(
+      z.object({
+        input_tokens: z.number(),
+        output_tokens: z.number(),
+        // Telemetry only: an unexpected shape here must never turn an answer into an error.
+        input_tokens_details: z.catch(
+          z.optional(z.nullable(z.object({ cached_tokens: optionalCount, cache_write_tokens: optionalCount }))),
+          undefined,
+        ),
+      }),
+    ),
+  ),
 });
 
 const errorSchema = z.object({ error: z.object({ code: optionalString, type: optionalString }) });
@@ -113,7 +130,17 @@ export function trimToLastSentence(text: string): string {
 }
 
 function failure(outcome: ModelOutcome, model: string, httpStatus: number): ModelResult {
-  return { outcome, text: null, responseStatus: null, model, inputTokens: null, outputTokens: null, httpStatus };
+  return {
+    outcome,
+    text: null,
+    responseStatus: null,
+    model,
+    inputTokens: null,
+    outputTokens: null,
+    cachedTokens: null,
+    cacheWriteTokens: null,
+    httpStatus,
+  };
 }
 
 export function parseResponse(json: unknown, requestedModel: string, httpStatus = 200): ModelResult {
@@ -137,6 +164,8 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
     model: data.model ?? requestedModel,
     inputTokens: data.usage?.input_tokens ?? null,
     outputTokens: data.usage?.output_tokens ?? null,
+    cachedTokens: data.usage?.input_tokens_details?.cached_tokens ?? null,
+    cacheWriteTokens: data.usage?.input_tokens_details?.cache_write_tokens ?? null,
     httpStatus,
   };
 

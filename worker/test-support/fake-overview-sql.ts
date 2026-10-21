@@ -46,6 +46,8 @@ export function executeOverviewSql(sql: string, args: unknown[], rows: readonly 
           avg_latency_ms: timed.length ? total(timed, (r) => r.latency_ms) / timed.length : null,
           input_tokens: total(rows, (r) => r.input_tokens),
           output_tokens: total(rows, (r) => r.output_tokens),
+          cached_tokens: total(rows, (r) => r.cached_tokens),
+          cache_write_tokens: total(rows, (r) => r.cache_write_tokens),
         },
       ];
     }

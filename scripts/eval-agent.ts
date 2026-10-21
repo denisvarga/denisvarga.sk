@@ -64,7 +64,12 @@ function softChecks(answer: string, expect: EvalCase['expect']): string[] {
 
 const softLine = (checks: string[], note: string) => `  soft:   ${checks.length ? checks.join('; ') : 'pass'} (${note})`;
 
-const cost = (r: ModelResult) => estimateCostUsd(r.inputTokens ?? 0, r.outputTokens ?? 0);
+const usage = (r: ModelResult) => ({
+  inputTokens: r.inputTokens ?? 0,
+  cachedTokens: r.cachedTokens ?? 0,
+  cacheWriteTokens: r.cacheWriteTokens ?? 0,
+  outputTokens: r.outputTokens ?? 0,
+});
 
 async function main(): Promise<void> {
   const opts = options();
@@ -75,9 +80,7 @@ async function main(): Promise<void> {
 
   let hardFailures = 0;
   let softFailures = 0;
-  let inputTokens = 0;
-  let outputTokens = 0;
-  let totalCost = 0;
+  const totals = { inputTokens: 0, cachedTokens: 0, cacheWriteTokens: 0, outputTokens: 0 };
 
   for (const testCase of cases) {
     const request = askSchema.safeParse({
@@ -118,22 +121,26 @@ async function main(): Promise<void> {
     const checks = result.text ? softChecks(result.text, testCase.expect) : [];
     if (!completed) hardFailures++;
     if (checks.length > 0) softFailures++;
-    inputTokens += result.inputTokens ?? 0;
-    outputTokens += result.outputTokens ?? 0;
-    totalCost += cost(result);
+    const used = usage(result);
+    totals.inputTokens += used.inputTokens;
+    totals.cachedTokens += used.cachedTokens;
+    totals.cacheWriteTokens += used.cacheWriteTokens;
+    totals.outputTokens += used.outputTokens;
 
     console.log(`  answer: ${result.text ?? '(none)'}`);
     if (result !== answer) console.log(`  guard:  leaked instructions replaced, model said: ${answer.text ?? ''}`);
     console.log(`  status: ${result.responseStatus ?? 'none'} | outcome ${result.outcome} | http ${result.httpStatus}${completed ? '' : ' | FAIL'}`);
     console.log(softLine(checks, testCase.expect.note));
     console.log(
-      `  tokens: ${result.inputTokens ?? 0} in / ${result.outputTokens ?? 0} out | ${latency} ms | $${cost(result).toFixed(6)}\n`,
+      `  tokens: ${used.inputTokens} in (${used.cachedTokens} cached, ${used.cacheWriteTokens} written) / ${used.outputTokens} out | ` +
+        `${latency} ms | $${estimateCostUsd(used).toFixed(6)}\n`,
     );
   }
 
   console.log(
     `summary: ${cases.length - hardFailures}/${cases.length} completed | soft check misses in ${softFailures} case(s) | ` +
-      `${inputTokens} in / ${outputTokens} out tokens | est. $${totalCost.toFixed(5)} (no cache discount)`,
+      `${totals.inputTokens} in (${totals.cachedTokens} cached, ${totals.cacheWriteTokens} written) / ${totals.outputTokens} out tokens | ` +
+      `est. $${estimateCostUsd(totals).toFixed(5)}`,
   );
   if (hardFailures > 0) process.exit(1);
 }
