@@ -61,7 +61,6 @@ export const copySk: Copy = {
       'S akými AI nástrojmi pracuje?',
       'Ako vznikol tento web?',
       'Na akých projektoch robil?',
-      'Je otvorený novej pozícii?',
     ],
   },
   work: {
