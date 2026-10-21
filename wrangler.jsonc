@@ -37,6 +37,20 @@
       "name": "ASK_LIMITER",
       "namespace_id": "1001",
       "simple": { "limit": 5, "period": 60 }
+    },
+    {
+      "name": "CONTACT_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 3, "period": 60 }
+    }
+  ],
+  // Contact messages from the chat go only to this verified Email Routing destination, so the
+  // endpoint can never relay mail to anyone else. The sender (CONTACT_FROM) must be on a domain
+  // with Email Routing enabled.
+  "send_email": [
+    {
+      "name": "CONTACT_MAIL",
+      "destination_address": "hello@denisvarga.sk"
     }
   ],
   "secrets": {
@@ -55,6 +69,17 @@
     "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
     "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",
     "TURNSTILE_ACTION": "ask",
+    // Kill switch for the contact hand-off: while not "true" the model is not offered the tool and
+    // /api/contact answers 503 unavailable. Enable only after the Email Routing subdomain, the
+    // verified destination and the WAF rule for POST /api/contact are in place.
+    "CONTACT_ENABLED": "false",
+    "CONTACT_FROM": "web@notify.denisvarga.sk",
+    // Must equal destination_address of the CONTACT_MAIL binding.
+    "CONTACT_TO": "hello@denisvarga.sk",
+    "TURNSTILE_CONTACT_ACTION": "contact",
+    // Contact messages per client (IPv4 address or IPv6 /64) and in total per UTC day.
+    "CONTACT_CLIENT_DAILY_CAP": "3",
+    "CONTACT_DAILY_CAP": "30",
     // Comma-separated emails the Worker admits to /prehlad on top of the Access policy; empty admits
     // every identity the policy lets through.
     "ACCESS_ALLOWED_EMAILS": "",

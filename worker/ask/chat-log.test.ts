@@ -45,6 +45,23 @@ describe('chat log hygiene', () => {
     });
   });
 
+  it('logs a proposed contact message as ok with reply_kind handoff_draft and never stores the draft', async () => {
+    const db = new FakeD1();
+    const reservation = await reserveSlot(db.asBinding(), { now: Date.now(), lang: 'sk', question: 'Áno, pripravte správu.', cap: 10, clientCap: 10, quotaKey: 'k' });
+    if (reservation.status !== 'reserved') throw new Error('expected a reserved slot');
+    const handoff: ModelResult = {
+      ...result('Návrh správy pre Denisa:\n\nChcem e-shop.'),
+      outcome: 'handoff',
+      draft: { message: 'Chcem e-shop.', name: 'Jana', email: 'jana@firma.sk' },
+    };
+    await finalizeRow(db.asBinding(), reservation.id, handoff, 9, 'v-test');
+    expect(db.rows[0]).toMatchObject({ answer: null, outcome: 'ok', reply_kind: 'handoff_draft', model: 'gpt-6-luna' });
+    expect(JSON.stringify(db.rows)).not.toMatch(/Chcem e-shop|Jana|jana@firma/);
+
+    await finalizeRow(db.asBinding(), reservation.id, result('Denis robí weby.'), 9, 'v-test');
+    expect(db.rows[0]).toMatchObject({ answer: 'Denis robí weby.', outcome: 'ok', reply_kind: null });
+  });
+
   it('records the prompt revision and the cache reads and writes with the answer', async () => {
     const db = new FakeD1();
     const reservation = await reserveSlot(db.asBinding(), { now: Date.now(), lang: 'sk', question: 'Kto je Denis?', cap: 10, clientCap: 10, quotaKey: 'k' });

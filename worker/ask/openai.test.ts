@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildRequestBody, callOpenAI, type OpenAIRequest, parseResponse, retryDelayMs, trimToLastSentence } from './openai';
+import { buildRequestBody, callOpenAI, CONTACT_TOOL, type OpenAIRequest, parseResponse, retryDelayMs, trimToLastSentence } from './openai';
 
 const json = (body: unknown, status = 200, headers: Record<string, string> = {}) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } });
@@ -52,6 +52,21 @@ describe('buildRequestBody', () => {
     });
     expect(body).not.toHaveProperty('instructions');
     expect(buildRequestBody(request(fetch, { effort: 'low' }))).toMatchObject({ reasoning: { effort: 'low' } });
+  });
+
+  it('offers the strict contact tool only on request, one call at a time', () => {
+    expect(buildRequestBody(request(fetch))).not.toHaveProperty('tools');
+    expect(buildRequestBody(request(fetch, { contact: false }))).not.toHaveProperty('tools');
+    const body = buildRequestBody(request(fetch, { contact: true }));
+    expect(body).toMatchObject({ tools: [CONTACT_TOOL], tool_choice: 'auto', parallel_tool_calls: false });
+    expect(CONTACT_TOOL).toMatchObject({
+      type: 'function',
+      name: 'propose_contact_message',
+      strict: true,
+      parameters: { required: ['message', 'name', 'email'], additionalProperties: false },
+    });
+    expect(CONTACT_TOOL.parameters.properties.name.type).toEqual(['string', 'null']);
+    expect(CONTACT_TOOL.parameters.properties.email.type).toEqual(['string', 'null']);
   });
 
   it('keeps the turns after both developer messages, in order', () => {
@@ -119,6 +134,61 @@ describe('parseResponse', () => {
     expect(parseResponse({ status: 'completed', output: message({ type: 'output_text', text: '  ' }) }, 'm').outcome).toBe('error');
     expect(parseResponse({ status: 'failed', output: [] }, 'm').outcome).toBe('error');
     expect(parseResponse('nonsense', 'm').outcome).toBe('error');
+  });
+});
+
+const call = (name: string, args: unknown) => ({
+  type: 'function_call',
+  id: 'fc_1',
+  call_id: 'call_1',
+  name,
+  arguments: typeof args === 'string' ? args : JSON.stringify(args),
+  status: 'completed',
+});
+const withCall = (item: unknown, text?: string, status = 'completed') => ({
+  status,
+  output: [{ type: 'reasoning', summary: [] }, ...(text ? message({ type: 'output_text', text }).slice(1) : []), item],
+  usage: { input_tokens: 50, output_tokens: 20 },
+});
+
+describe('parseResponse with the contact tool', () => {
+
+  it('turns a valid call into a handoff with the draft and no text', () => {
+    const r = parseResponse(withCall(call('propose_contact_message', { message: ' Chcem e-shop  na kávu. ', name: 'Jana', email: 'jana@firma.sk' })), 'm');
+    expect(r).toMatchObject({ outcome: 'handoff', text: null, inputTokens: 50, outputTokens: 20 });
+    expect(r.draft).toEqual({ message: 'Chcem e-shop  na kávu.', name: 'Jana', email: 'jana@firma.sk' });
+  });
+
+  it('prefers the call over text the model wrote next to it', () => {
+    const r = parseResponse(withCall(call('propose_contact_message', { message: 'Chcem web.', name: null, email: null }), 'Pripravil som návrh.'), 'm');
+    expect(r).toMatchObject({ outcome: 'handoff', text: null, draft: { message: 'Chcem web.', name: null, email: null } });
+  });
+
+  it('falls back to the text for an unknown tool or invalid arguments, else to error', () => {
+    for (const item of [
+      call('send_email', { message: 'x', name: null, email: null }),
+      call('propose_contact_message', '{"message": "x"'),
+      call('propose_contact_message', { message: '   ', name: null, email: null }),
+      call('propose_contact_message', { message: 'x'.repeat(601), name: null, email: null }),
+      call('propose_contact_message', { message: 1, name: null, email: null }),
+    ]) {
+      expect(parseResponse(withCall(item, 'Denis robí weby.'), 'm')).toMatchObject({ outcome: 'ok', text: 'Denis robí weby.' });
+      const bare = parseResponse(withCall(item), 'm');
+      expect(bare).toMatchObject({ outcome: 'error', text: null });
+      expect(bare.draft).toBeUndefined();
+    }
+  });
+
+  it('ignores a call in a response that did not complete', () => {
+    const r = parseResponse(withCall(call('propose_contact_message', { message: 'Chcem web.', name: null, email: null }), undefined, 'incomplete'), 'm');
+    expect(r.outcome).toBe('error');
+  });
+
+  it('drops a name or email that does not pass instead of the whole draft', () => {
+    const r = parseResponse(withCall(call('propose_contact_message', { message: 'Chcem web.', name: 'A\r\nBcc: x', email: 'not an email' })), 'm');
+    expect(r.draft).toEqual({ message: 'Chcem web.', name: 'A Bcc: x', email: null });
+    const long = parseResponse(withCall(call('propose_contact_message', { message: 'Chcem web.', name: 'x'.repeat(101), email: ' ' })), 'm');
+    expect(long.draft).toEqual({ message: 'Chcem web.', name: null, email: null });
   });
 });
 

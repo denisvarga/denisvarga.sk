@@ -17,6 +17,7 @@ export interface ChatRow {
   prompt_version: string | null;
   cached_tokens: number | null;
   cache_write_tokens: number | null;
+  reply_kind: string | null;
 }
 
 export interface QuotaRow {
@@ -49,6 +50,7 @@ export class FakeD1 {
       prompt_version: null,
       cached_tokens: null,
       cache_write_tokens: null,
+      reply_kind: null,
       ...row,
     });
   }
@@ -89,7 +91,8 @@ export class FakeD1 {
         return [];
       case FINALIZE_SQL: {
         this.writes++;
-        const [answer, model, latency_ms, input_tokens, output_tokens, outcome, cached_tokens, cache_write_tokens, prompt_version, id] = args;
+        const [answer, model, latency_ms, input_tokens, output_tokens, outcome, cached_tokens, cache_write_tokens, prompt_version, reply_kind, id] =
+          args;
         this.update(Number(id), {
           answer: answer as string | null,
           model: model as string | null,
@@ -100,6 +103,7 @@ export class FakeD1 {
           cached_tokens: cached_tokens as number | null,
           cache_write_tokens: cache_write_tokens as number | null,
           prompt_version: prompt_version as string | null,
+          reply_kind: reply_kind as string | null,
         });
         return [];
       }
