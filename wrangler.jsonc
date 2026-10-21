@@ -50,7 +50,7 @@
     // spend the whole DAILY_CAP.
     "CLIENT_DAILY_CAP": "20",
     // Days a question stays in chat_log before the daily cron deletes it; under 30 or malformed,
-    // the cron logs config_error and deletes nothing. The privacy notice states the same period.
+    // the cron logs retention_config_error and deletes nothing. The privacy notice states the same period.
     "CHAT_LOG_RETENTION_DAYS": "365",
     "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
     "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",

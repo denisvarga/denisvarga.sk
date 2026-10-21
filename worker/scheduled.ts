@@ -16,13 +16,13 @@ export function parseRetentionDays(value: string | undefined): number | null {
 
 /**
  * Deletes question log rows older than the retention period and client counters older than
- * yesterday (UTC), in one batch. A malformed or too short period logs `config_error` and deletes
- * nothing. Throws on a D1 error so the caller can log it.
+ * yesterday (UTC), in one batch. A malformed or too short period logs `retention_config_error` and
+ * deletes nothing. Throws on a D1 error so the caller can log it.
  */
 export async function runRetention(db: D1Database, nowMs: number, retentionDays: string | undefined): Promise<void> {
   const days = parseRetentionDays(retentionDays);
   if (days === null) {
-    logEvent('config_error', 500);
+    logEvent('retention_config_error', 500);
     return;
   }
   await db.batch([

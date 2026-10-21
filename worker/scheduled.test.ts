@@ -29,10 +29,10 @@ function seeded(): FakeD1 {
   return db;
 }
 
-async function fire(db: FakeD1) {
+async function fire(db: FakeD1, retention = '365') {
   const pending: Promise<unknown>[] = [];
   const ctx = { waitUntil: (p: Promise<unknown>) => void pending.push(p), passThroughOnException: () => undefined, props: {} } as unknown as ExecutionContext;
-  const { env } = makeEnv({ DB: db.asBinding() });
+  const { env } = makeEnv({ DB: db.asBinding(), CHAT_LOG_RETENTION_DAYS: retention });
   const controller = { scheduledTime: NOW, cron: '17 3 * * *', noRetry: () => undefined } as ScheduledController;
   await worker.scheduled(controller, env as CloudflareBindings, ctx);
   await Promise.all(pending);
@@ -54,13 +54,14 @@ describe('runRetention', () => {
     expect(db.quota.map((q) => q.key)).toEqual(['yesterday', 'today']);
   });
 
-  it.each(['29', '', 'abc', undefined])('logs config_error and deletes nothing for %j', async (value) => {
+  it.each(['29', '', 'abc', undefined])('logs retention_config_error and deletes nothing for %j', async (value) => {
     const db = seeded();
     await runRetention(db.asBinding(), NOW, value);
     expect(db.executed).toEqual([]);
     expect(db.rows).toHaveLength(4);
     expect(db.quota).toHaveLength(3);
-    expect(logs).toHaveBeenCalledWith({ event: 'config_error', status: 500 });
+    expect(logs).toHaveBeenCalledWith({ event: 'retention_config_error', status: 500 });
+    expect(logs).not.toHaveBeenCalledWith({ event: 'config_error', status: expect.any(Number) });
   });
 });
 
@@ -70,6 +71,14 @@ describe('scheduled handler', () => {
     await fire(db);
     expect(db.rows).toHaveLength(2);
     expect(db.quota).toHaveLength(2);
+  });
+
+  it('deletes nothing and logs retention_config_error when the deployed period is too short', async () => {
+    const db = seeded();
+    await fire(db, '7');
+    expect(db.rows).toHaveLength(4);
+    expect(db.quota).toHaveLength(3);
+    expect(logs).toHaveBeenCalledWith({ event: 'retention_config_error', status: 500 });
   });
 
   it('logs retention_error when D1 fails', async () => {
