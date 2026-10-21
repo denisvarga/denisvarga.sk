@@ -61,6 +61,12 @@ describe('parseResponse', () => {
     expect(r).toMatchObject({ outcome: 'ok', text: '[2JAhoj\n\tsvet' });
   });
 
+  it('leaves no outer space when the answer starts or ends with a dash', () => {
+    const em = String.fromCodePoint(0x2014);
+    const r = parseResponse({ status: 'completed', output: message({ type: 'output_text', text: `${em}Denis builds AI agents ${em}` }) }, 'm');
+    expect(r.text).toBe('- Denis builds AI agents -');
+  });
+
   it('trims an answer cut by max_output_tokens to the last full sentence', () => {
     const r = parseResponse(
       { status: 'incomplete', incomplete_details: { reason: 'max_output_tokens' }, output: message({ type: 'output_text', text: 'Prvá veta. Druhá veta! Tretia ne' }) },

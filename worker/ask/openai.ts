@@ -103,7 +103,8 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
   const data = parsed.data;
   const parts = (data.output ?? []).filter((item) => item.type === 'message').flatMap((item) => item.content ?? []);
   const reason = data.incomplete_details?.reason;
-  // Cleaned here so the visitor, the reply signature and the log all see the same text.
+  // Cleaned here so the visitor, the reply signature and the log all see the same text. The final
+  // trim matters: a reply ending in a dash turns into "... - " and the client and schema trim it.
   const text = plainReply(
     cleanContent(
       parts
@@ -111,7 +112,7 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
         .map((part) => part.text ?? '')
         .join(''),
     ),
-  );
+  ).trim();
   const base = {
     responseStatus: data.status ?? null,
     model: data.model ?? requestedModel,
