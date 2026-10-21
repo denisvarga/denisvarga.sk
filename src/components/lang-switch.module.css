@@ -1,8 +1,12 @@
-/* Dark tone (menu overlay footer): active #ECECE9, inactive #5A5C60. */
+/* The current language takes the surrounding text colour (#ECECE9 in the menu overlay, the header's
+   ink or #ECECE9 while the menu is open); the other one and the slash stay muted at #5A5C60. */
 .switch {
   display: flex;
   gap: 4px;
   align-items: center;
+}
+
+.sep {
   color: var(--grey-600);
 }
 
@@ -13,5 +17,5 @@
 }
 
 .link[aria-current='page'] {
-  color: var(--bg);
+  color: inherit;
 }

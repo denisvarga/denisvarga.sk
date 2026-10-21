@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { LangSwitch } from '../components/lang-switch';
 import { useLang } from '../i18n/lang-context';
 import type { ScrollTarget } from '../motion/scroll-to';
 import styles from './site-header.module.css';
@@ -22,6 +23,7 @@ export function SiteHeader({ open, menuId, toggleRef, onToggle, onGo }: SiteHead
         Denis Varga
       </button>
       <div className={styles.actions}>
+        <LangSwitch />
         <button type="button" className={styles.contact} onClick={() => onGo(CONTACT_SECTION)}>
           {t.nav.contact}
         </button>
