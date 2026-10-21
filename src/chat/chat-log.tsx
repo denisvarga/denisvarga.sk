@@ -93,8 +93,10 @@ export function ChatLog({ messages, loading, typingId, labels, onRetry }: ChatLo
       {visible && (
         <div ref={logRef} className={styles.log} data-lenis-prevent="" aria-busy={loading}>
           <div ref={stackRef} className={styles.stack}>
-            {messages.map((m) => {
+            {messages.map((m, i) => {
               const user = m.role === 'user';
+              // Only the latest turn: an older failure was already followed by another question.
+              const canRetry = m.retryable === true && i === messages.length - 1;
               return (
                 <div key={m.id} data-message-id={m.id} className={`${styles.message} ${user ? styles.user : styles.agent}`}>
                   <span className={styles.who}>{user ? labels.you : labels.agent}</span>
@@ -107,7 +109,7 @@ export function ChatLog({ messages, loading, typingId, labels, onRetry }: ChatLo
                       animate={m.id === typingId}
                     />
                   )}
-                  {m.retryable && (
+                  {canRetry && (
                     <button
                       type="button"
                       className={styles.retry}

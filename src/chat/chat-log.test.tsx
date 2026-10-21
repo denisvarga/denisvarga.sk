@@ -131,19 +131,24 @@ describe('ChatLog', () => {
     expect(log.scrollTop).toBe(1400 - VIEW);
   });
 
-  it('offers a retry only on a retryable failed reply and reports its id', () => {
+  it('offers a retry only on the last message when it failed retryably, and reports its id', () => {
     const onRetry = vi.fn();
-    const messages: ChatMessage[] = [
-      { id: 1, role: 'user', text: 'q1', failed: false },
-      { id: 2, role: 'assistant', text: 'Busy, try again in a minute.', failed: true, retryable: true },
-      { id: 3, role: 'user', text: 'q2', failed: false },
-      { id: 4, role: 'assistant', text: 'Done for today.', failed: true },
-    ];
-    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={onRetry} />));
+    const busy: ChatMessage = { id: 2, role: 'assistant', text: 'Busy, try again in a minute.', failed: true, retryable: true };
+    const history: ChatMessage[] = [{ id: 1, role: 'user', text: 'q1', failed: false }, busy];
+    const show = (messages: ChatMessage[]) =>
+      act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={onRetry} />));
+
+    show(history);
     const buttons = container.querySelectorAll('button');
     expect(buttons).toHaveLength(1);
     expect(buttons[0]?.textContent).toBe('Try again');
     act(() => buttons[0]?.click());
     expect(onRetry).toHaveBeenCalledWith(2);
+
+    show([...history, { id: 3, role: 'user', text: 'q2', failed: false }, { id: 4, role: 'assistant', text: 'Sure.', failed: false }]);
+    expect(container.querySelectorAll('button')).toHaveLength(0);
+
+    show([...history, { id: 3, role: 'user', text: 'q2', failed: false }, { id: 4, role: 'assistant', text: 'Done for today.', failed: true }]);
+    expect(container.querySelectorAll('button')).toHaveLength(0);
   });
 });
