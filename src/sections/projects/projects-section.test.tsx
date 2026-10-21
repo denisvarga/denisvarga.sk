@@ -161,6 +161,19 @@ describe('all projects grid', () => {
 });
 
 describe('project drawer', () => {
+  it('mounts its content on the first open and keeps it while it slides closed', () => {
+    expect(dialog().querySelector('h2, img')).toBeNull();
+    expect(dialog().hasAttribute('aria-labelledby')).toBe(false);
+    click(toggle());
+    click(cards()[1]!);
+    const title = dialog().querySelector('h2')!;
+    expect(title.textContent).toBe(PROJECTS[1]!.name);
+    expect(dialog().getAttribute('aria-labelledby')).toBe(title.id);
+    press('Escape');
+    expect(dialog().closest('[inert]')).not.toBeNull();
+    expect(dialog().querySelector('h2')?.textContent).toBe(PROJECTS[1]!.name);
+  });
+
   it('opens with the summary, the numbered scope and the credit only when the project has one', () => {
     click(toggle());
     click(cards()[0]!);
@@ -209,6 +222,12 @@ describe('prerendered markup', () => {
     const images = [...list.querySelectorAll('img')];
     expect(images.map((img) => img.getAttribute('src'))).toEqual(PROJECTS.map((p) => p.image));
     expect(images.every((img) => img.getAttribute('loading') === 'lazy')).toBe(true);
+  });
+
+  it('has the section title as its only h2, with no content in the closed drawer', () => {
+    const doc = new DOMParser().parseFromString(renderToString(page('sk')), 'text/html');
+    expect([...doc.querySelectorAll('h2')].map((h) => h.textContent)).toEqual(['Čo som postavil']);
+    expect(doc.querySelector('[role="dialog"]')!.querySelector('h2, img, p')).toBeNull();
   });
 
   it('uses the English labels on the English page', () => {
