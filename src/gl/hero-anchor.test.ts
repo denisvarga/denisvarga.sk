@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { designInitGL, designRenderGL, seededRandom, type OracleEnv } from '../../scripts/oracles/design-gl-math';
+import { DESIGN_SECTIONS } from '../sections/section-order';
 import { blendFromAnchor, heroAnchor } from './hero-anchor';
 import { createFrameState, groupTargets, stepFrame } from './morph';
 
 const EMPTY = new Float32Array(3);
+const DESIGN_SHAPES = DESIGN_SECTIONS.map((_, shape) => shape);
 
 function oracleFirstFrame(env: OracleEnv, mobile: boolean) {
   const G = designInitGL(1, 1, [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY], { dir: EMPTY, ph: new Float32Array(1), col: EMPTY, size: new Float32Array(1) }, 0);
@@ -25,7 +27,7 @@ describe('hero anchoring parity', () => {
       const G = oracleFirstFrame(env, mobile);
       const state = createFrameState(0);
       stepFrame(state, {
-        time: 5000, tops, viewportWidth: width, viewportHeight: height, hero, velocity: 0,
+        time: 5000, tops, sectionShapes: DESIGN_SHAPES, viewportWidth: width, viewportHeight: height, hero, velocity: 0,
         scrollY: 0, mouseX: 0, mouseY: 0, coarse: false, mobile,
       });
       expect([state.ox, state.oy, state.os, state.op]).toEqual([G.ox, G.oy, G.os, G.op]);

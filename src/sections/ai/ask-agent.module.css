@@ -119,12 +119,16 @@
   color: #fff;
 }
 
-/* Two per row on phones, so four suggestions take two rows instead of four. */
+/* Two per row on phones; an odd last suggestion takes the full row. */
 @media (max-width: 639.98px) {
   .chips {
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: 100%;
+  }
+
+  .chip:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .chip {

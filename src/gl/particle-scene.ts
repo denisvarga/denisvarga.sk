@@ -16,6 +16,7 @@ import { FRAME_PRIORITY, subscribeFrame } from '../motion/frame-loop';
 import { getLayout } from '../motion/layout-cache';
 import { getPointer, isCoarsePointer, retainPointer } from '../motion/pointer';
 import { getScrollVelocity, retainScrollVelocity } from '../motion/scroll-velocity';
+import { SECTION_SHAPES } from './goff';
 import { runIdleSlices, type InitSlice } from './init-slices';
 import { isMobileWidth, makePointAttributes, pointCount, SHAPE_BUILDERS } from './make-shapes';
 import { createFrameState, groupTargets, stepFrame, writeMorphPositions, type FrameInput } from './morph';
@@ -159,7 +160,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   const tops: number[] = [];
   const heroRect = { left: 0, top: 0, width: 0, height: 0 };
   const input: FrameInput = {
-    time: 0, tops, viewportWidth: 0, viewportHeight: 0, hero: null, velocity: 0,
+    time: 0, tops, sectionShapes: SECTION_SHAPES, viewportWidth: 0, viewportHeight: 0, hero: null, velocity: 0,
     scrollY: 0, mouseX: 0, mouseY: 0, coarse: false, mobile,
   };
   const frame = (time: number) => {

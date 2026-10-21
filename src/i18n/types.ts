@@ -59,7 +59,7 @@ export interface Copy {
     readonly agent: string;
     readonly note: string;
     readonly error: string;
-    readonly suggestions: Four<string>;
+    readonly suggestions: Three<string>;
   };
   readonly work: {
     readonly label: string;

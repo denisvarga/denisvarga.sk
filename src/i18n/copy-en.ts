@@ -60,7 +60,6 @@ export const copyEn: Copy = {
       'Which AI tools does he use?',
       'How was this site built?',
       'What projects has he worked on?',
-      'Is he open to a new role?',
     ],
   },
   work: {

@@ -1,5 +1,5 @@
 import { clamp01 } from '../lib/math';
-import { groupOffset, SHAPE_COUNT } from './goff';
+import { groupOffset } from './goff';
 import { blendFromAnchor, heroAnchor, type GroupTarget, type ViewportRect } from './hero-anchor';
 
 // Smoothed values carried between frames; initial values match the design's initGL.
@@ -29,6 +29,8 @@ export interface FrameInput {
   time: number;
   // Section tops relative to the viewport, in document order.
   tops: ArrayLike<number>;
+  // Shape index of each section in tops.
+  sectionShapes: readonly number[];
   viewportWidth: number;
   viewportHeight: number;
   hero: ViewportRect | null;
@@ -85,7 +87,8 @@ export function groupTargets(
 // One frame of the design's renderGL scalar math; mutates the state like the design mutates G.
 export function stepFrame(s: FrameState, f: FrameInput): FrameResult {
   s.Ts += (morphProgress(f.tops, f.viewportHeight) - s.Ts) * 0.06;
-  const last = SHAPE_COUNT - 1, a = Math.min(last, Math.floor(s.Ts)), b = Math.min(last, a + 1), m = clamp01(s.Ts - a);
+  const shapes = f.sectionShapes, last = shapes.length - 1, i = Math.min(last, Math.floor(s.Ts)), m = clamp01(s.Ts - i);
+  const a = shapes[i]!, b = shapes[Math.min(last, i + 1)]!;
   const it = clamp01((f.time - s.t0) / 2600), intro = Math.pow(1 - it, 3);
   const burst = Math.sin(m * Math.PI) * 0.5 + intro * 2.8 + Math.min(0.35, Math.abs(f.velocity) * 0.004);
   const lineOpacity = s.op;

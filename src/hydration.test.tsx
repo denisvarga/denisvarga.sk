@@ -2,6 +2,7 @@ import { act } from 'react';
 import { hydrateRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LANGS, type Lang } from './i18n/types';
+import { SECTIONS } from './sections/section-order';
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
@@ -43,7 +44,7 @@ describe.each(LANGS)('prerendered App (%s)', (lang) => {
 
     expect(onRecoverableError).not.toHaveBeenCalled();
     expect(consoleError).not.toHaveBeenCalled();
-    expect(container.querySelectorAll('section[data-sec]')).toHaveLength(7);
+    expect(container.querySelectorAll('section[data-sec]')).toHaveLength(SECTIONS.length);
     // Prerendered with the production domains; jsdom runs on localhost, so hydration swaps in the
     // relative paths without a mismatch.
     expect(html).toContain('href="https://denisvarga.dev/"');
