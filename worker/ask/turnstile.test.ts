@@ -45,3 +45,25 @@ describe('verifyTurnstile hostname allow list', () => {
     expect(await verify('', { success: true, hostname: 'example.com', action: 'ask' })).toEqual({ ok: true });
   });
 });
+
+describe('verifyTurnstile response checks', () => {
+  it('rejects a token minted for another action or without one', async () => {
+    expect(await verify(HOSTS, { success: true, hostname: 'denisvarga.sk', action: 'contact' })).toEqual({ ok: false, httpStatus: null });
+    expect(await verify(HOSTS, { success: true, hostname: 'denisvarga.sk' })).toEqual({ ok: false, httpStatus: null });
+  });
+
+  it('fails closed on a siteverify body that is not JSON or not the expected shape', async () => {
+    const notJson = await verifyTurnstile({
+      secret: REAL_SECRET,
+      hostname: HOSTS,
+      action: 'ask',
+      token: 't',
+      remoteIp: null,
+      timeoutMs: 1000,
+      fetchImpl: async () => new Response('<html>Bad gateway</html>', { status: 200 }),
+    });
+    expect(notJson).toEqual({ ok: false, httpStatus: 0 });
+    expect(await verify(HOSTS, { success: 'true', hostname: 'denisvarga.sk', action: 'ask' })).toEqual({ ok: false, httpStatus: 200 });
+    expect(await verify(HOSTS, null)).toEqual({ ok: false, httpStatus: 200 });
+  });
+});
