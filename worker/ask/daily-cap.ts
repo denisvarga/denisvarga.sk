@@ -8,6 +8,9 @@ export const INSERT_PENDING_SQL =
 export const COUNT_TODAY_SQL =
   "SELECT COUNT(*) AS n FROM (SELECT 1 FROM chat_log WHERE created_at >= ?1 AND outcome IN ('pending', 'ok', 'truncated', 'refused', 'error') LIMIT ?2)";
 
+export const UPSERT_QUOTA_SQL =
+  'INSERT INTO client_quota (day, key, n) VALUES (?1, ?2, 1) ON CONFLICT (day, key) DO UPDATE SET n = n + 1 RETURNING n';
+
 export const MARK_CAPPED_SQL = "UPDATE chat_log SET outcome = 'capped' WHERE id = ?1";
 
 export function utcMidnight(nowMs: number): number {
@@ -21,30 +24,45 @@ export function parseDailyCap(value: string | undefined): number | null {
   return value?.trim() && Number.isInteger(cap) && cap >= 0 ? cap : null;
 }
 
-export type Reservation = { readonly status: 'reserved'; readonly id: number } | { readonly status: 'capped' };
+export type CapScope = 'client' | 'global';
+
+export type Reservation =
+  | { readonly status: 'reserved'; readonly id: number }
+  | { readonly status: 'capped'; readonly scope: CapScope };
 
 export interface ReserveInput {
   readonly now: number;
   readonly lang: AskLang;
   readonly question: string;
   readonly cap: number;
+  /** Model calls one client may reserve per UTC day. */
+  readonly clientCap: number;
+  /** `quotaKey` of the client for the UTC day of `now`. */
+  readonly quotaKey: string;
 }
 
 /**
- * Inserts a pending row, then counts today's billable rows including it. Over the cap the row
- * becomes `capped`. Throws on any D1 error so the caller can fail closed. The question is stored
- * without control characters whatever the caller validated.
+ * Inserts a pending row, counts the client's calls today and counts today's billable rows, all
+ * including this one, in one batch (a single D1 transaction, so concurrent requests cannot
+ * overshoot). Over either limit the row becomes `capped`. Throws on any D1 error so the caller can
+ * fail closed. The question is stored without control characters whatever the caller validated.
  */
 export async function reserveSlot(db: D1Database, input: ReserveInput): Promise<Reservation> {
-  const [inserted, counted] = await db.batch<{ id?: number; n?: number }>([
+  const day = utcMidnight(input.now);
+  const [inserted, quota, counted] = await db.batch<{ id?: number; n?: number }>([
     db.prepare(INSERT_PENDING_SQL).bind(input.now, input.lang, cleanContent(input.question)),
-    db.prepare(COUNT_TODAY_SQL).bind(utcMidnight(input.now), input.cap + 1),
+    db.prepare(UPSERT_QUOTA_SQL).bind(day, input.quotaKey),
+    db.prepare(COUNT_TODAY_SQL).bind(day, input.cap + 1),
   ]);
   const id = inserted?.results[0]?.id;
+  const clientCount = quota?.results[0]?.n;
   const count = counted?.results[0]?.n;
-  if (typeof id !== 'number' || typeof count !== 'number') throw new Error('unexpected D1 result');
-  if (count <= input.cap) return { status: 'reserved', id };
+  if (typeof id !== 'number' || typeof clientCount !== 'number' || typeof count !== 'number') {
+    throw new Error('unexpected D1 result');
+  }
+  const scope: CapScope | null = clientCount > input.clientCap ? 'client' : count > input.cap ? 'global' : null;
+  if (scope === null) return { status: 'reserved', id };
 
   await db.prepare(MARK_CAPPED_SQL).bind(id).run();
-  return { status: 'capped' };
+  return { status: 'capped', scope };
 }

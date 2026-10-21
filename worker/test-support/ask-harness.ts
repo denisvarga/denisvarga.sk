@@ -27,6 +27,7 @@ export function makeEnv(overrides: Partial<AskEnv> = {}): { env: AskEnv; db: Fak
     OPENAI_MODEL: 'gpt-6-luna',
     OPENAI_REASONING_EFFORT: 'none',
     DAILY_CAP: '300',
+    CLIENT_DAILY_CAP: '20',
     ALLOWED_ORIGINS: ORIGIN,
     TURNSTILE_HOSTNAME: 'denisvarga.sk',
     TURNSTILE_ACTION: 'ask',

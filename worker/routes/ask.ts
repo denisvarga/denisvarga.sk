@@ -5,12 +5,12 @@ import { guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
 import { buildInstructions } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
-import { parseDailyCap, reserveSlot, type Reservation } from '../ask/daily-cap';
+import { parseDailyCap, reserveSlot, utcMidnight, type Reservation } from '../ask/daily-cap';
 import { askError, logEvent } from '../ask/errors';
 import { callOpenAI, TOTAL_BUDGET_MS } from '../ask/openai';
 import { isAllowedRequest } from '../ask/origin';
 import { createReplySigner, keepSignedTurns } from '../ask/reply-sig';
-import { safetyIdentifier } from '../ask/safety-id';
+import { quotaKey, safetyIdentifier } from '../ask/safety-id';
 import { askSchema, lastUserMessage } from '../ask/schema';
 import { isTurnstileConfigValid, TURNSTILE_TIMEOUT_MS, verifyTurnstile } from '../ask/turnstile';
 
@@ -55,7 +55,8 @@ askRoute.post('/ask', async (c) => {
   }
   // Checked before siteverify so a broken deploy neither burns the visitor's token nor writes a row.
   const cap = parseDailyCap(env.DAILY_CAP);
-  if (cap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim()) {
+  const clientCap = parseDailyCap(env.CLIENT_DAILY_CAP);
+  if (cap === null || clientCap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim()) {
     logEvent('config_error', 503);
     return askError(c, 'unavailable');
   }
@@ -74,15 +75,17 @@ askRoute.post('/ask', async (c) => {
   // Forged or foreign-language assistant turns are dropped silently; the request still goes through.
   const messages = await keepSignedTurns(signer, input.lang, input.messages);
 
+  const now = Date.now();
+  const clientQuotaKey = await quotaKey(salt, utcMidnight(now), key);
   let reservation: Reservation;
   try {
-    reservation = await reserveSlot(env.DB, { now: Date.now(), lang: input.lang, question, cap });
+    reservation = await reserveSlot(env.DB, { now, lang: input.lang, question, cap, clientCap, quotaKey: clientQuotaKey });
   } catch {
     logEvent('d1_error', 503);
     return askError(c, 'unavailable');
   }
   if (reservation.status === 'capped') {
-    logEvent('cap_reached', 429);
+    logEvent(reservation.scope === 'client' ? 'client_cap_reached' : 'cap_reached', 429);
     return askError(c, 'daily_cap');
   }
 

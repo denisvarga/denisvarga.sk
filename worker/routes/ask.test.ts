@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { manipulationReply } from '../agent/guard';
 import { buildInstructions } from '../agent/prompt';
-import { askBody, CLIENT_IP, json, makeEnv, openaiCompleted, send, stubFetch, turnstileOk } from '../test-support/ask-harness';
+import { askBody, CLIENT_IP, fakeLimiter, json, makeEnv, openaiCompleted, send, stubFetch, turnstileOk } from '../test-support/ask-harness';
 
 let logs: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
@@ -162,6 +162,29 @@ describe('daily cap reservation', () => {
     db.seed({ created_at: Date.now(), outcome: 'capped' });
     db.seed({ created_at: Date.now() - 2 * 86_400_000, outcome: 'ok' });
     expect((await send({ env, body: askBody('Kto je Denis?') })).status).toBe(200);
+  });
+
+  it('gives one client daily_cap after 20 model calls while another client still gets answers', async () => {
+    stubFetch({ siteverify: turnstileOk, openai: () => openaiCompleted() });
+    const { env, db } = makeEnv({ ASK_LIMITER: fakeLimiter(100) });
+    for (let i = 0; i < 20; i++) expect((await send({ env, body: askBody(`Otázka ${i}`) })).status).toBe(200);
+    await expectError(await send({ env, body: askBody('Ešte jedna?') }), 429, 'daily_cap');
+    expect(db.rows.at(-1)).toMatchObject({ question: 'Ešte jedna?', outcome: 'capped' });
+    expect(logs).toHaveBeenCalledWith({ event: 'client_cap_reached', status: 429 });
+
+    const other = await send({ env, body: askBody('Kto je Denis?'), headers: { 'CF-Connecting-IP': '198.51.100.1' } });
+    expect(await other.json()).toMatchObject({ kind: 'answer' });
+    expect(db.quota.map((q) => q.n).toSorted((a, b) => a - b)).toEqual([1, 21]);
+    expect(JSON.stringify(db.quota)).not.toContain(CLIENT_IP);
+  });
+
+  it('fails closed with 503 before siteverify when the client budget is malformed', async () => {
+    const fetchMock = stubFetch({});
+    const { env, db } = makeEnv({ CLIENT_DAILY_CAP: 'twenty' });
+    await expectError(await send({ env, body: askBody('Kto je Denis?') }), 503, 'unavailable');
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(db.writes).toBe(0);
+    expect(logs).toHaveBeenCalledWith({ event: 'config_error', status: 503 });
   });
 
   it('fails closed with 503 on a D1 error', async () => {

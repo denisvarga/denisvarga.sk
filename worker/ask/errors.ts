@@ -20,6 +20,7 @@ export function askError(c: Context, code: AskErrorCode, status: ErrorStatus = S
 
 export type LogEvent =
   | 'cap_reached'
+  | 'client_cap_reached'
   | 'openai_quota'
   | 'openai_error'
   | 'turnstile_error'
