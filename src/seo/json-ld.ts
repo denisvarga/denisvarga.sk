@@ -1,4 +1,4 @@
-import { SKILLS, skillLabel } from '../data/skills';
+import { SKILLS, skillLabel } from '../../shared/skills';
 import { canonicalUrl, GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 

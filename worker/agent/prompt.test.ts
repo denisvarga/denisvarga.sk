@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { JOBS } from '../../shared/jobs';
 import { PROJECT_INFO } from '../../shared/projects';
+import { SKILLS, skillLabel } from '../../shared/skills';
 import { buildInstructions, PROMPT_VERSION } from './prompt';
 
 const EN_DASH = String.fromCodePoint(0x2013);
@@ -39,16 +41,33 @@ describe('buildInstructions', () => {
   it('gives location, languages and education as facts and no rule forbids stating them', () => {
     expect(text).toContain('- Lokalita: Bratislava, Slovensko.');
     expect(text).toContain('- Jazyky: slovenčina (materinský jazyk) a angličtina na pracovnej úrovni');
-    expect(text).toContain('- Vzdelanie: Stredná odborná škola polygrafická');
+    expect(text).toContain('- Vzdelanie: Stredná odborná škola polygrafická (anglicky Secondary School of Printing)');
     expect(text).toContain('Nikdy si nič nevymýšľaj (ceny, sadzby, termíny, klientov, osobné údaje).');
-    expect(text).toContain('- Skúsenosti: Denva (2018-dnes');
+  });
+
+  it('derives one experience fact per job from the site data, quoting the job text as Denis wrote it', () => {
+    expect(text.match(/^- Skúsenosť: /gm)).toHaveLength(JOBS.length);
+    expect(text).toContain('- Skúsenosť: Denva (2018-dnes), AI engineer a full-stack developer. Denis o nej píše: "Pod značkou Denva');
+    expect(text).toContain('viditeľnosť v AI vyhľadávaní a výkon."');
+    expect(text).toContain('Štyri roky remote pre neziskovú organizáciu');
+    expect(text).toContain('- Skúsenosť: TENENET o.z. (2021-2025)');
+    expect(text).toContain('- Súbežne dnes pôsobí na 3 miestach: GrandPano, Denva, Vibration s.r.o.\n');
+  });
+
+  it('lists every skill of the site, grouped as on the site, in one stack fact', () => {
+    const stack = text.split('\n').find((line) => line.startsWith('- Stack podľa oblastí: ')) ?? '';
+    for (const group of SKILLS) {
+      expect(stack).toContain(`${group.name.sk}: `);
+      for (const item of group.items) expect(stack).toContain(skillLabel(item, 'sk'));
+    }
+    expect(stack).toContain('pgvector');
   });
 
   it('derives one fact per project with its relationship, plus the full list in site order', () => {
     expect(text.match(/^- Projekt /gm)).toHaveLength(PROJECT_INFO.length);
-    expect(text).toContain(
-      '- Projekt Brixx (brixx.cz, web rezidenčného projektu): robil ho ako zamestnanec GrandPano. Realizované ako zamestnanec GrandPano. Web rezidenčného projektu v Brne',
-    );
+    expect(text).toContain('- Projekt Brixx (brixx.cz, web rezidenčného projektu): robil ho ako zamestnanec GrandPano. Web rezidenčného projektu v Brne');
+    expect(text).not.toContain('Realizované ako zamestnanec');
+    expect(text).toContain('robil ho na voľnej nohe pod značkou Denva (denva.studio). V spolupráci s be-you.sk.');
     expect(text).toContain(
       '- Projekt Národný futbalový štadión (narodnyfutbalovystadion.sk, web národného štadióna): robil ho na voľnej nohe pod značkou Denva (denva.studio).',
     );
@@ -59,7 +78,7 @@ describe('buildInstructions', () => {
   });
 
   it('lists GrandPano next to Vibration and forbids inferring a client from an integration', () => {
-    expect(text).toContain('GrandPano (2026-dnes, WordPress špecialista, súbežne s Vibration s.r.o.');
+    expect(text).toContain('- Skúsenosť: GrandPano (2026-dnes), WordPress špecialista.');
     expect(text).toContain('Ticketportal nie je klient. Uveď len vzťah, ktorý uvádzajú fakty');
   });
 

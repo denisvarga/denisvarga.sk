@@ -1,4 +1,7 @@
-import type { Lang, Localized } from '../i18n/types';
+// Skill groups shared by the site, the PDF CVs, JSON-LD, llms.txt and the chat agent's facts.
+
+type Lang = 'sk' | 'en';
+type Localized<T> = Readonly<Record<Lang, T>>;
 
 export type SkillItem = string | Localized<string>;
 

@@ -1,6 +1,6 @@
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { JOBS } from '../../data/jobs';
+import { JOBS } from '../../../shared/jobs';
 import { LangProvider } from '../../i18n/lang-context';
 import { LANGS } from '../../i18n/types';
 import { ExperienceSection } from './experience-section';

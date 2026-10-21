@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { formatPeriod } from '../../shared/jobs';
 import { PROJECT_DETAILS_EN } from '../../shared/project-details-en';
-import { formatPeriod } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { BUILD_YEAR } from '../lib/use-current-year';
 import { buildLlmsFullTxt, buildLlmsTxt } from './llms';
