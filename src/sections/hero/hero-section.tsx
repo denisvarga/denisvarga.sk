@@ -22,7 +22,7 @@ export function HeroSection() {
   const workRef = useRef<HTMLAnchorElement>(null);
   const askRef = useRef<HTMLButtonElement>(null);
 
-  // The desktop image (fade, 350 + 1600 ms) is display:none on mobile, so it is left out; it
+  // The desktop image (fade, 0 + 1600 ms) is display:none on mobile, so it is left out; it
   // never ends last anyway (the badge ends at 2100 ms).
   const steps: EntranceStep[] = [
     { kind: 'split', delay: 200, words: parseTitleMarkup(t.hero.title).length, target: () => textRef.current?.querySelector('h1') ?? null },
@@ -40,7 +40,7 @@ export function HeroSection() {
       <div className={styles.inner}>
         <div ref={textRef} className={styles.text}>
           <SplitHeading as="h1" text={t.hero.title} className={styles.title} delay={200} enter />
-          <p ref={leadRef} className={styles.lead} data-enter="" data-delay="550">
+          <p ref={leadRef} className={styles.lead} data-enter="rise" data-delay="550">
             {t.hero.lead}
           </p>
           <div ref={ctaRef} className={styles.ctas} data-enter="" data-delay="700">
@@ -68,7 +68,7 @@ export function HeroSection() {
       </div>
       <div className={styles.overlay}>
         <div className={styles.overlayInner}>
-          <div className={`${styles.mask} ${styles.desktopImage}`} data-enter="fade" data-delay="350">
+          <div className={`${styles.mask} ${styles.desktopImage}`} data-enter="fade" data-delay="0">
             <HeroImage />
           </div>
         </div>

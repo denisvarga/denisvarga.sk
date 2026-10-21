@@ -21,7 +21,7 @@ function Hero({ words }: { words: number }) {
   useHeroEntranceDone(hostRef, steps);
   return (
     <section ref={hostRef}>
-      <span ref={subRef} id="sub" data-enter="" />
+      <span ref={subRef} id="sub" data-enter="rise" />
       <h1 ref={titleRef} data-enter-split="">
         {Array.from({ length: words }, (_, i) => (
           <span key={i} className="word-mask">
@@ -66,7 +66,7 @@ describe('lastEntrance', () => {
     const badge = { kind: 'rise', delay: 800 } as const;
     expect(entranceEnd(badge)).toBe(2100);
     expect(entranceEnd({ kind: 'split', delay: 200, words: 3 })).toBe(1560);
-    expect(entranceEnd({ kind: 'fade', delay: 350 })).toBe(1950);
+    expect(entranceEnd({ kind: 'fade', delay: 0 })).toBe(1600);
     expect(lastEntrance([sub, { kind: 'split', delay: 200, words: 3 }, badge])).toBe(badge);
     const longTitle = { kind: 'split', delay: 200, words: 14 } as const;
     expect(lastEntrance([sub, longTitle, badge])).toBe(longTitle);
