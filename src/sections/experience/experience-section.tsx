@@ -29,10 +29,11 @@ export function ExperienceSection() {
           {JOBS.map((job) => (
             <div key={job.company} className={styles.job}>
               <span className={styles.period}>{formatPeriod(job.period, year)}</span>
-              <div className={styles.who}>
-                <span className={styles.company}>{job.company}</span>
+              {/* The space keeps company and role apart in the heading text; the flex column hides it. */}
+              <h3 className={styles.who}>
+                <span className={styles.company}>{job.company}</span>{' '}
                 <span className={styles.role}>{job.role[lang]}</span>
-              </div>
+              </h3>
               <p className={styles.text}>{job.text[lang]}</p>
             </div>
           ))}
