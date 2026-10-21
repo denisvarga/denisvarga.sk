@@ -3,8 +3,12 @@ import type { PromptParts } from '../ask/openai';
 import { FACTS } from './facts';
 import { INTRO, RULES } from './rules';
 
-/** Bump on any wording change so eval runs and logged answers can be tied to a prompt revision. */
-export const PROMPT_VERSION = '2026-10-21.1';
+/**
+ * Bump on any change to the prompt text, facts generated from the site data included, so eval
+ * runs and logged answers can be tied to a prompt revision. prompt.test.ts pins a hash of the
+ * text next to this value and fails until both are updated.
+ */
+export const PROMPT_VERSION = '2026-10-21.2';
 
 const bullets = (lines: readonly string[]): string => lines.map((line) => `- ${line}`).join('\n');
 

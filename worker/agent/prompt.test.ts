@@ -4,6 +4,16 @@ import { PROJECT_INFO } from '../../shared/projects';
 import { SKILLS, skillLabel } from '../../shared/skills';
 import { buildInstructions, PROMPT_VERSION } from './prompt';
 
+/** Update both together whenever the prompt text changes; the test below says when. */
+const PINNED = { version: '2026-10-21.2', hash: '772ef9ab867d' };
+
+async function promptHash(): Promise<string> {
+  const year = 2026;
+  const text = [buildInstructions('sk', year).shared, buildInstructions('sk', year).perRequest, buildInstructions('en', year).perRequest].join('\n');
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('').slice(0, 12);
+}
+
 const EN_DASH = String.fromCodePoint(0x2013);
 const EM_DASH = String.fromCodePoint(0x2014);
 
@@ -157,7 +167,12 @@ describe('buildInstructions', () => {
     expect(text).toContain('"Vie Denis zabezpečiť AI chat proti prompt injection?", nie sú útok: odpovedz na ne vecne a pozitívne.');
   });
 
-  it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-21.1');
+  it('ties the prompt text to its version', async () => {
+    const hash = await promptHash();
+    const advice =
+      hash !== PINNED.hash && PROMPT_VERSION === PINNED.version
+        ? `The prompt text changed (hash ${hash}) but PROMPT_VERSION is still ${PROMPT_VERSION}. Bump PROMPT_VERSION in worker/agent/prompt.ts first, then set PINNED in this file to the new version and hash ${hash}.`
+        : `PROMPT_VERSION or the prompt text changed. Set PINNED in this file to { version: '${PROMPT_VERSION}', hash: '${hash}' } once PROMPT_VERSION names this revision.`;
+    expect({ version: PROMPT_VERSION, hash }, advice).toEqual(PINNED);
   });
 });
