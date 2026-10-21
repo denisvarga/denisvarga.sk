@@ -62,6 +62,13 @@ describe('project rail', () => {
     );
   });
 
+  it('describes each rail image by the project name and kind', () => {
+    const featured = PROJECTS.filter((p) => p.featured);
+    // Index thumbnails are decorative (alt=""), and the closed drawer has no image yet.
+    const alts = [...container.querySelectorAll('img')].map((img) => img.getAttribute('alt')).filter(Boolean);
+    expect(alts).toEqual(featured.map((p) => `${p.name}, ${p.kind.sk}`));
+  });
+
   it('adds the credit under the description only on cards whose project has one', () => {
     const featured = PROJECTS.filter((p) => p.featured);
     const credits = [...container.querySelectorAll('h3')].map((h) => h.parentElement?.querySelector('small')?.textContent);
