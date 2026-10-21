@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { PROJECT_DETAILS_EN } from '../shared/project-details-en';
 import { checkDist, localAssetPath } from './check-dist';
 
 let dist: string;
@@ -172,6 +173,22 @@ describe('checkDist', () => {
       'client/assets/index-A1.js',
       `render({sitekey:"0x4AAAAAAA${'x'.repeat(14)}"});el.style.setProperty("--tw-mask-linear-from-position","0")`,
     );
+    expect(await checkDist(dist)).toEqual([]);
+  });
+});
+
+describe('checkDist entry chunk', () => {
+  it('rule 9: project drawer texts in the entry chunk', async () => {
+    const scope = Object.values(PROJECT_DETAILS_EN).flatMap((project) => project.scope);
+    const plain = scope.find((item) => /^[\w ,.:()-]+$/.test(item));
+    expect(plain).toBeDefined();
+    await put('client/assets/index-A1.js', `const s=["${plain}"];`);
+    expect(await checkDist(dist)).toEqual(['client/assets/index-A1.js: carries project drawer texts, which belong in their lazy chunks']);
+  });
+
+  it('rule 9: drawer texts in a lazy chunk pass', async () => {
+    const [first] = Object.values(PROJECT_DETAILS_EN);
+    await put('client/assets/project-details-en-A1.js', JSON.stringify(first));
     expect(await checkDist(dist)).toEqual([]);
   });
 });

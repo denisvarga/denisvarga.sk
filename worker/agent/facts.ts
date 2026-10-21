@@ -1,4 +1,5 @@
-import { PROJECT_INFO, type ProjectContext, type ProjectInfo } from '../../shared/projects';
+import { PROJECTS_WITH_DETAILS as PROJECT_INFO, type ProjectWithDetails as ProjectInfo } from '../../shared/project-details';
+import type { ProjectContext } from '../../shared/projects';
 
 export const CONTACT_EMAIL_SK = 'hello@denisvarga.sk';
 export const CONTACT_EMAIL_EN = 'hello@denisvarga.dev';
