@@ -7,12 +7,35 @@ import { INTRO, RULES } from './rules';
 // types by accident. Anything subtler is left to the prompt rule, so honest questions about
 // prompts, rules or security never get a canned reply.
 
+// Cyrillic and Greek letters that look Latin, so "ignore" spelled with a Cyrillic "о" still matches.
+const LOOKALIKES: Readonly<Record<string, string>> = {
+  '\u0430': 'a',
+  '\u0435': 'e',
+  '\u043e': 'o',
+  '\u0440': 'p',
+  '\u0441': 'c',
+  '\u0443': 'y',
+  '\u0445': 'x',
+  '\u0456': 'i',
+  '\u0458': 'j',
+  '\u0455': 's',
+  '\u03bf': 'o',
+  '\u03b1': 'a',
+  '\u03b5': 'e',
+  '\u03b9': 'i',
+  '\u03ba': 'k',
+  '\u03c1': 'p',
+  '\u03c4': 't',
+};
+const LOOKALIKE = new RegExp(`[${Object.keys(LOOKALIKES).join('')}]`, 'g');
+
 /** NFKD also folds fullwidth and styled letters; format characters hide zero-width splits. */
 export function normalize(text: string): string {
   return text
     .normalize('NFKD')
     .replace(/[\p{M}\p{Cf}]/gu, '')
     .toLowerCase()
+    .replace(LOOKALIKE, (ch) => LOOKALIKES[ch] ?? ch)
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -21,13 +44,18 @@ const toWords = (text: string): string => normalize(text).replace(/[^a-z0-9]+/g,
 
 // Matched against the word form: ASCII letters and digits separated by single spaces.
 const PHRASES: readonly RegExp[] = [
-  /\b(?:ignore|disregard|forget|override|bypass)(?: \w+){0,3} (?:previous|prior|above|earlier|all|your|these|those|system)(?: \w+){0,2} (?:instructions?|rules|prompts?|guidelines)\b/,
-  /\b(?:ignoruj|ignorujte|zabudni|zabudnite|prepis|prepiste|obid|obidte|zrus|zruste)(?: \w+){0,3} (?:pokyn|instrukci|pravid|prompt|obmedzeni)/,
-  /\b(?:show|reveal|print|repeat|output|dump|leak|display|disclose|recite|paste|copy|translate|encode|summarize|tell|give|send|share)(?: (?:me|us|all|of|the|full|entire|whole|complete|exact))* (?:your (?:\w+ )?(?:system prompt|prompt|instructions|rules|guidelines)|(?:hidden|secret|initial|original|internal) (?:prompt|instructions)|system prompt)\b/,
+  /\b(?:ignore|disregard|forget|override|bypass)(?: \w+){0,3} (?:previous|prior|above|earlier|all|your|these|those|system)(?: \w+){0,2} (?:instructions?|rules|prompts?|guidelines|directions)\b/,
+  // "before" alone would catch "ignore everything before 2020", so it needs an end or a pointer word.
+  /\b(?:ignore|disregard|forget)(?: all)? everything (?:above\b|before(?: (?:this|that|it|now)\b|$))/,
+  /\b(?:ignoruj|ignorujte|zabudni|zabudnite|prepis|prepiste|obid|obidte|zrus|zruste)(?: \w+){0,3} (?:pokyn|instrukc|pravid|prompt|obmedzeni)/,
+  // "your rules for choosing projects" asks about Denis's practice, not about the prompt.
+  /\b(?:show|reveal|print|repeat|output|dump|leak|display|disclose|recite|paste|copy|translate|encode|summarize|tell|give|send|share)(?: (?:me|us|all|of|the|full|entire|whole|complete|exact))* (?:your (?:\w+ )?(?:system prompt|prompt|instructions|(?:rules|guidelines)(?! (?:for|on|about|regarding)\b))|(?:hidden|secret|initial|original|internal) (?:prompt|instructions)|system prompt)\b/,
   /\b(?:vypis|vypiste|ukaz|ukazte|zobraz|zobrazte|prezrad|prezradte|zopakuj|zopakujte|skopiruj|skopirujte|povedz|povedzte|posli|poslite|preloz|prelozte)(?: (?:mi|nam|prosim|cely|celu|cele|presne|doslova|vsetky|obsah|znenie|svoj|tvoj|svoje|tvoje))* (?:system(?:ovy|oveho)? promptu?\b|(?:svoje|tvoje|svojich|tvojich|skryte|skrytych|interne|systemove|povodne) (?:pokyn|instrukci|pravidl|pravidiel|nastaveni))/,
-  // "Developer mode" alone is a Chrome or Android setting, so it needs a switch verb or a status.
-  /\b(?:enable|activate|enter|switch|turn on|prepni|zapni|aktivuj|prejdi)(?: \w+){0,2} (?:developer|admin|god|dan|jailbreak|unrestricted|vyvojarsk\w*|administratorsk\w*|neobmedzen\w*) (?:mode|mod|modu|rezim|rezimu)\b/,
-  /\b(?:developer|dan|jailbreak) mode (?:enabled|activated|on)\b/,
+  /\b(?:enable|activate|enter|switch|turn on|prepni|zapni|aktivuj|prejdi)(?: \w+){0,2} (?:admin|god|dan|jailbreak|unrestricted|vyvojarsk\w*|administratorsk\w*|neobmedzen\w*) (?:mode|mod|modu|rezim|rezimu)\b/,
+  /\b(?:dan|jailbreak) mode (?:enabled|activated|on)\b/,
+  // "Developer mode" is also an Android and Chrome setting, so it counts only when aimed at the agent.
+  /\b(?:enable|activate|enter|switch|turn on)(?: \w+)? (?:you|your|yourself)(?: \w+)? developer mode\b/,
+  /\b(?:you(?: are| re)(?: now)?(?: in)?|your) developer mode\b/,
   /\bdan mode\b/,
   /\bdo anything now\b/,
 ];
