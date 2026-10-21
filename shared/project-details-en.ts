@@ -5,13 +5,13 @@ import type { ProjectDetailsBySlug } from './projects';
 // Every scope item is backed by the project's source code; keep it that way when editing.
 export const PROJECT_DETAILS_EN: ProjectDetailsBySlug = {
   'second-brain': {
-    summary: 'A personal system that collects notes, emails, articles, voice messages and photos, classifies them with Claude and turns them into a searchable knowledge base. It runs in two places: the control plane on a Hetzner VPS, local models and agents on an always-on Mac, connected over Tailscale.',
+    summary: 'A personal system that collects notes, emails, articles, voice messages and photos, classifies them with Claude and turns them into a searchable knowledge base. It runs in two places: the control plane on a Hetzner VPS, speech to text, OCR and agents on an always-on Mac, connected over Tailscale.',
     scope: [
       'RAG on PostgreSQL 17 and pgvector: bge-m3 embeddings in an HNSW index, hybrid search (vectors, full text and trigrams) merged with reciprocal rank fusion and a bge-reranker-v2-m3 reranker',
       'Answers with cited sources and its own MCP server with tools for search, questions, note capture and tasks',
       'Telegram bot for capturing content, chatting with the assistant and approving agent steps',
       'Coding agent on the Claude Agent SDK in separate git worktrees, sandboxed without credentials, with plans approved in Telegram and pull requests opened by a GitHub App',
-      'Local models on Apple Silicon: speech to text with mlx-whisper (Slovak included), OCR with Apple Vision and generation with mlx-lm',
+      'On Apple Silicon: speech to text with mlx-whisper (Slovak included) and OCR with Apple Vision',
       'Scheduled jobs on a pg-boss queue: daily digests, knowledge base page compilation, maintenance and self-healing tasks',
       'Docker Compose, Caddy and Cloudflare Access, deploys with a database backup, health check and automatic rollback, nightly backups with a weekly restore test',
     ],

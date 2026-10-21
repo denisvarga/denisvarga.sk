@@ -129,6 +129,10 @@ describe('buildInstructions', () => {
     expect(text).not.toContain('poobedie');
   });
 
+  it('claims no local language models, which Denis does not use', () => {
+    expect(text).not.toMatch(/ollama|lokáln\w* model|mlx-lm/i);
+  });
+
   it('gives the CV downloads, the profiles and the chat commands', () => {
     expect(text).toContain('denisvarga.sk/cv/denis-varga-cv.pdf');
     expect(text).toContain('denisvarga.dev/cv/denis-varga-cv-en.pdf');

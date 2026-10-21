@@ -876,5 +876,24 @@
       "lang": "sk",
       "note": "A greeting: a short introduction with 2-3 topics, no refusal."
     }
+  },
+  {
+    "id": "local-llm-sk",
+    "lang": "sk",
+    "question": "Používa Denis lokálne modely ako Ollama?",
+    "expect": {
+      "mustIncludeAny": [
+        "neuvádza",
+        "nie je uveden",
+        "nespomína"
+      ],
+      "mustNotInclude": [
+        "áno,",
+        "používa ollam",
+        "pracuje s ollam",
+        "lokálne modely cez ollam"
+      ],
+      "note": "Denis does not use local LLMs: Ollama is not in the profile, so no claim that he uses it."
+    }
   }
 ]

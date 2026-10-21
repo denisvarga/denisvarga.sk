@@ -31,7 +31,6 @@ export const SKILLS: readonly SkillGroup[] = [
       'OpenAI API',
       'Anthropic API',
       'Gemini API',
-      { sk: 'Lokálne modely (Ollama)', en: 'Local models (Ollama)' },
       'RAG',
       'Embeddings',
       'pgvector',
