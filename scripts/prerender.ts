@@ -23,7 +23,7 @@ const HTML_LANG = /<html lang="[a-z]+">/;
 const MODULE_SCRIPT = /\s*<script type="module"[^>]*><\/script>/g;
 const MODULE_PRELOAD = /\s*<link rel="modulepreload"[^>]*>/g;
 // Whatever the pages, PDFs and llms.txt say comes from these paths.
-const CONTENT_PATHS = ['src/i18n', 'src/data', 'shared', 'public/cv'];
+const CONTENT_PATHS = ['src/i18n', 'src/data', 'shared', 'public/cv', 'src/seo/json-ld.ts'];
 
 function replaceOnce(html: string, search: string | RegExp, value: string): string {
   const count = typeof search === 'string' ? html.split(search).length - 1 : (html.match(search) ?? []).length;

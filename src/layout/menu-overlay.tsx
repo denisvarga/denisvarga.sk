@@ -5,12 +5,8 @@ import { contact, sectionIds, type SectionIds } from '../i18n/ui-copy';
 import { onScrollLinkClick, type ScrollTarget } from '../motion/scroll-to';
 import styles from './menu-overlay.module.css';
 
-// Section indices and anchors of the three menu items (O mne, AI, Projekty).
-const NAV_SECTIONS: ReadonlyArray<readonly [index: number, anchor: keyof SectionIds]> = [
-  [1, 'about'],
-  [3, 'ai'],
-  [4, 'work'],
-];
+// Anchors of the three menu items (O mne, AI, Projekty); clicks and new tabs share the same target.
+const NAV_SECTIONS: readonly (keyof SectionIds)[] = ['about', 'ai', 'work'];
 
 interface MenuOverlayProps {
   readonly id: string;
@@ -36,9 +32,9 @@ export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
       inert={!open}
     >
       <nav className={styles.nav}>
-        {NAV_SECTIONS.map(([index, anchor], i) => (
-          <div key={index} className={styles.row}>
-            <a href={`#${ids[anchor]}`} className={styles.item} onClick={(event) => onScrollLinkClick(event, () => onGo(index))}>
+        {NAV_SECTIONS.map((anchor, i) => (
+          <div key={anchor} className={styles.row}>
+            <a href={`#${ids[anchor]}`} className={styles.item} onClick={(event) => onScrollLinkClick(event, () => onGo(`#${ids[anchor]}`))}>
               <span className={styles.index} aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>

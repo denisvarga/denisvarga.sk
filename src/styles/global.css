@@ -34,6 +34,11 @@ html.lenis body {
   scroll-behavior: auto !important;
 }
 
+/* Deep links (/#kontakt) land where goTo's -40 px offset puts a clicked section. */
+section[data-sec][id] {
+  scroll-margin-top: 40px;
+}
+
 input::placeholder {
   color: var(--grey-500);
 }

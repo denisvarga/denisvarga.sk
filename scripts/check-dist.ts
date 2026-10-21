@@ -22,6 +22,7 @@ const REQUIRED_ARTIFACTS = [
   'og-image.jpg',
   'og-image-en.jpg',
   'favicon.svg',
+  'favicon.ico',
   'apple-touch-icon.png',
   'cv/denis-varga-cv.pdf',
   'cv/denis-varga-cv-en.pdf',

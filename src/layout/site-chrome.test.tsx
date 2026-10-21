@@ -114,7 +114,7 @@ describe('menu overlay', () => {
     act(() => vi.advanceTimersByTime(379));
     expect(goTo).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(1));
-    expect(goTo).toHaveBeenCalledWith(4);
+    expect(goTo).toHaveBeenCalledWith('#projekty');
   });
 
   it('leaves a modified click on a nav item to the browser, for a new tab', () => {
@@ -132,7 +132,7 @@ describe('menu overlay', () => {
     const event = plainClick();
     act(() => contactPill().dispatchEvent(event));
     expect(event.defaultPrevented).toBe(true);
-    expect(goTo).toHaveBeenCalledWith(6);
+    expect(goTo).toHaveBeenCalledWith('#kontakt');
   });
 
   it('header name links to #top and scrolls there', () => {

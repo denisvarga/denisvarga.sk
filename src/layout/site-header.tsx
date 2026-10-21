@@ -5,8 +5,6 @@ import { sectionIds } from '../i18n/ui-copy';
 import { onScrollLinkClick, type ScrollTarget } from '../motion/scroll-to';
 import styles from './site-header.module.css';
 
-const CONTACT_SECTION = 6;
-
 interface SiteHeaderProps {
   readonly open: boolean;
   readonly menuId: string;
@@ -28,7 +26,7 @@ export function SiteHeader({ open, menuId, toggleRef, onToggle, onGo }: SiteHead
         <a
           href={`#${sectionIds[lang].contact}`}
           className={styles.contact}
-          onClick={(event) => onScrollLinkClick(event, () => onGo(CONTACT_SECTION))}
+          onClick={(event) => onScrollLinkClick(event, () => onGo(`#${sectionIds[lang].contact}`))}
         >
           {t.nav.contact}
         </a>

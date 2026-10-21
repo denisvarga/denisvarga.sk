@@ -12,8 +12,6 @@ import { HeroImage } from './hero-image';
 import { useHeroEntranceDone, type EntranceStep } from './use-hero-entrance-done';
 import { useHeroParallax } from './use-hero-parallax';
 
-const PROJECTS_SECTION = 4;
-
 export function HeroSection() {
   const { lang, t } = useLang();
   const sectionRef = useRef<HTMLElement>(null);
@@ -50,7 +48,7 @@ export function HeroSection() {
               ref={workRef}
               href={`#${sectionIds[lang].work}`}
               className={`${pill.pill} ${pill.dark} ${styles.cta}`}
-              onClick={(event) => onScrollLinkClick(event, () => goTo(PROJECTS_SECTION))}
+              onClick={(event) => onScrollLinkClick(event, () => goTo(`#${sectionIds[lang].work}`))}
             >
               <span>{t.hero.cta1}</span>
               <span aria-hidden="true">↓</span>
