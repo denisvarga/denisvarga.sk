@@ -17,6 +17,7 @@ describe('llms.txt', () => {
     const summary = buildLlmsTxt().split('\n')[2];
     expect(summary).toContain('AI & full-stack developer in Bratislava, Slovakia.');
     expect(summary).toContain('WordPress and WooCommerce');
+    expect(summary?.match(/AI & full-stack developer/g)).toHaveLength(1);
   });
 
   it('carries the whole CV without markup', () => {

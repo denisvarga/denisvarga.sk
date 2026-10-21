@@ -32,7 +32,7 @@ export function buildLlmsTxt(): string {
   return [
     '# Denis Varga',
     '',
-    `> ${EN.jobTitle}. ${EN.description}`,
+    `> ${EN.description}`,
     '',
     `Personal CV site, in English at ${EN.origin}/ and in Slovak at ${SK.origin}/. Both pages carry the same content.`,
     '',
@@ -56,7 +56,7 @@ export function buildLlmsFullTxt(): string {
   return [
     '# Denis Varga',
     '',
-    `> ${EN.jobTitle}. ${EN.description}`,
+    `> ${EN.description}`,
     '',
     '## Profile',
     plain(t.hero.lead),
