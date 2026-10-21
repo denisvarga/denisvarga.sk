@@ -20,6 +20,7 @@ export function askError(c: Context, code: AskErrorCode, status: ErrorStatus = S
 
 export type LogEvent =
   | 'cap_reached'
+  | 'client_cap_reached'
   | 'openai_quota'
   | 'openai_error'
   | 'turnstile_error'
@@ -27,6 +28,8 @@ export type LogEvent =
   | 'config_error'
   | 'access_jwks_error'
   | 'access_denied'
+  | 'retention_error'
+  | 'retention_config_error'
   | 'internal_error';
 
 // Logs carry a fixed event code and an HTTP status only: never visitor text, upstream messages or identifiers.

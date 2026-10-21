@@ -145,3 +145,20 @@
   max-width: 520px;
   line-height: 1.5;
 }
+
+.noteLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--grey-200);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .noteLink:hover {
+    color: #fff;
+  }
+}

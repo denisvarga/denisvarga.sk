@@ -4,6 +4,7 @@ import { secureHeaders } from 'hono/secure-headers';
 import { askError, logEvent } from './ask/errors';
 import { askRoute } from './routes/ask';
 import { overviewRoute } from './routes/overview';
+import { runRetention } from './scheduled';
 
 const MAX_BODY_BYTES = 48 * 1024;
 
@@ -38,4 +39,12 @@ app.onError((_err, c) => {
   return askError(c, 'internal');
 });
 
-export default app;
+// workerd refuses a main module whose exports are not handlers, so the app stays private here.
+export default {
+  fetch: app.fetch,
+  scheduled(controller, env, ctx) {
+    ctx.waitUntil(
+      runRetention(env.DB, controller.scheduledTime, env.CHAT_LOG_RETENTION_DAYS).catch(() => logEvent('retention_error', 500)),
+    );
+  },
+} satisfies ExportedHandler<CloudflareBindings>;

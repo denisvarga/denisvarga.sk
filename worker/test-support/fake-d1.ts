@@ -1,5 +1,6 @@
 import { FINALIZE_SQL } from '../ask/chat-log';
-import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL } from '../ask/daily-cap';
+import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL, UPSERT_QUOTA_SQL } from '../ask/daily-cap';
+import { DELETE_OLD_CHATS_SQL, DELETE_OLD_QUOTA_SQL } from '../scheduled';
 import { executeOverviewSql } from './fake-overview-sql';
 
 export interface ChatRow {
@@ -15,11 +16,18 @@ export interface ChatRow {
   outcome: string;
 }
 
+export interface QuotaRow {
+  day: number;
+  key: string;
+  n: number;
+}
+
 const BILLABLE = new Set(['pending', 'ok', 'truncated', 'refused', 'error']);
 
 /** Executes exactly the statements the Worker issues; anything else throws so new SQL cannot go untested. */
 export class FakeD1 {
   rows: ChatRow[] = [];
+  quota: QuotaRow[] = [];
   writes = 0;
   fail = false;
   /** Every statement in execution order, so tests can assert bound parameters. */
@@ -53,6 +61,22 @@ export class FakeD1 {
         const n = this.rows.filter((r) => r.created_at >= since && BILLABLE.has(r.outcome)).length;
         return [{ n: Math.min(n, Number(args[1])) }];
       }
+      case UPSERT_QUOTA_SQL: {
+        this.writes++;
+        const [day, key] = [Number(args[0]), String(args[1])];
+        const row = this.quota.find((q) => q.day === day && q.key === key);
+        if (row) row.n++;
+        else this.quota.push({ day, key, n: 1 });
+        return [{ n: row?.n ?? 1 }];
+      }
+      case DELETE_OLD_CHATS_SQL:
+        this.writes++;
+        this.rows = this.rows.filter((r) => r.created_at >= Number(args[0]));
+        return [];
+      case DELETE_OLD_QUOTA_SQL:
+        this.writes++;
+        this.quota = this.quota.filter((q) => q.day >= Number(args[0]));
+        return [];
       case MARK_CAPPED_SQL:
         this.writes++;
         this.update(Number(args[0]), { outcome: 'capped' });

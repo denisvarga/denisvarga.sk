@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { safetyIdentifier } from './safety-id';
+import { hmacHex, quotaKey, safetyIdentifier } from './safety-id';
 
 describe('safetyIdentifier', () => {
   it('matches the RFC 4231 HMAC-SHA256 test vector', async () => {
@@ -14,5 +14,22 @@ describe('safetyIdentifier', () => {
     expect(await safetyIdentifier('salt', '203.0.113.7')).toBe(a);
     expect(await safetyIdentifier('other', '203.0.113.7')).not.toBe(a);
     expect(a).not.toContain('203');
+  });
+});
+
+describe('quotaKey', () => {
+  it('is an HMAC over the prefixed day and client key, never containing the address', async () => {
+    const day = Date.UTC(2026, 9, 21);
+    const key = await quotaKey('salt', day, '203.0.113.7');
+    expect(key).toBe(await hmacHex('salt', `quota:v1:${day}:203.0.113.7`));
+    expect(key).toMatch(/^[0-9a-f]{64}$/);
+    expect(key).not.toContain('203');
+  });
+
+  it('changes every day and differs from the safety identifier', async () => {
+    const day = Date.UTC(2026, 9, 21);
+    const today = await quotaKey('salt', day, '203.0.113.7');
+    expect(await quotaKey('salt', day + 86_400_000, '203.0.113.7')).not.toBe(today);
+    expect(await safetyIdentifier('salt', '203.0.113.7')).not.toBe(today);
   });
 });

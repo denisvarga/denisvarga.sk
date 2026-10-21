@@ -1,4 +1,4 @@
-import type { AskLang } from '../../shared/ask-contract';
+import type { AskLang, AskRole } from '../../shared/ask-contract';
 import type { ModelResult } from '../ask/openai';
 import { CONTACT_EMAIL_EN, CONTACT_EMAIL_SK } from './facts';
 import { INTRO, RULES } from './rules';
@@ -7,11 +7,23 @@ import { INTRO, RULES } from './rules';
 // types by accident. Anything subtler is left to the prompt rule, so honest questions about
 // prompts, rules or security never get a canned reply.
 
+// Cyrillic and Greek letters that look Latin, so "ignore" spelled with a Cyrillic "о" still matches.
+// Folded before lowercasing: capitals such as the Cyrillic T only look Latin in upper case.
+const LOOKALIKE_PAIRS: readonly (readonly [from: string, to: string])[] = [
+  ['\u0410\u0412\u0415\u041a\u041c\u041d\u041e\u0420\u0421\u0422\u0423\u0425\u0406\u0408\u0405', 'ABEKMHOPCTYXIJS'],
+  ['\u0430\u0432\u0435\u043a\u043c\u043d\u043e\u0440\u0441\u0442\u0443\u0445\u0456\u0458\u0455', 'abekmhopctyxijs'],
+  ['\u0391\u0392\u0395\u0396\u0397\u0399\u039a\u039c\u039d\u039f\u03a1\u03a4\u03a5\u03a7', 'ABEZHIKMNOPTYX'],
+  ['\u03b1\u03b5\u03b9\u03ba\u03bd\u03bf\u03c1\u03c4', 'aeikvopt'],
+];
+const LOOKALIKES = new Map(LOOKALIKE_PAIRS.flatMap(([from, to]) => [...from].map((ch, i) => [ch, to[i] ?? ch] as const)));
+const LOOKALIKE = new RegExp(`[${[...LOOKALIKES.keys()].join('')}]`, 'g');
+
 /** NFKD also folds fullwidth and styled letters; format characters hide zero-width splits. */
 export function normalize(text: string): string {
   return text
     .normalize('NFKD')
     .replace(/[\p{M}\p{Cf}]/gu, '')
+    .replace(LOOKALIKE, (ch) => LOOKALIKES.get(ch) ?? ch)
     .toLowerCase()
     .replace(/\s+/g, ' ')
     .trim();
@@ -21,13 +33,18 @@ const toWords = (text: string): string => normalize(text).replace(/[^a-z0-9]+/g,
 
 // Matched against the word form: ASCII letters and digits separated by single spaces.
 const PHRASES: readonly RegExp[] = [
-  /\b(?:ignore|disregard|forget|override|bypass)(?: \w+){0,3} (?:previous|prior|above|earlier|all|your|these|those|system)(?: \w+){0,2} (?:instructions?|rules|prompts?|guidelines)\b/,
-  /\b(?:ignoruj|ignorujte|zabudni|zabudnite|prepis|prepiste|obid|obidte|zrus|zruste)(?: \w+){0,3} (?:pokyn|instrukci|pravid|prompt|obmedzeni)/,
-  /\b(?:show|reveal|print|repeat|output|dump|leak|display|disclose|recite|paste|copy|translate|encode|summarize|tell|give|send|share)(?: (?:me|us|all|of|the|full|entire|whole|complete|exact))* (?:your (?:\w+ )?(?:system prompt|prompt|instructions|rules|guidelines)|(?:hidden|secret|initial|original|internal) (?:prompt|instructions)|system prompt)\b/,
+  /\b(?:ignore|disregard|forget|override|bypass)(?: \w+){0,3} (?:previous|prior|above|earlier|all|your|these|those|system)(?: \w+){0,2} (?:instructions?|rules|prompts?|guidelines|directions)\b/,
+  // "before" alone would catch "ignore everything before 2020", so it needs an end or a pointer word.
+  /\b(?:ignore|disregard|forget)(?: all)? everything (?:above\b|before(?: (?:this|that|it|now)\b|$))/,
+  /\b(?:ignoruj|ignorujte|zabudni|zabudnite|prepis|prepiste|obid|obidte|zrus|zruste)(?: \w+){0,3} (?:pokyn|instrukc|pravid|prompt|obmedzeni)/,
+  // "your rules for choosing projects" asks about Denis's practice, not about the prompt.
+  /\b(?:show|reveal|print|repeat|output|dump|leak|display|disclose|recite|paste|copy|translate|encode|summarize|tell|give|send|share)(?: (?:me|us|all|of|the|full|entire|whole|complete|exact))* (?:your (?:\w+ )?(?:system prompt|prompt|instructions|(?:rules|guidelines)(?! (?:for|on|about|regarding)\b))|(?:hidden|secret|initial|original|internal) (?:prompt|instructions)|system prompt)\b/,
   /\b(?:vypis|vypiste|ukaz|ukazte|zobraz|zobrazte|prezrad|prezradte|zopakuj|zopakujte|skopiruj|skopirujte|povedz|povedzte|posli|poslite|preloz|prelozte)(?: (?:mi|nam|prosim|cely|celu|cele|presne|doslova|vsetky|obsah|znenie|svoj|tvoj|svoje|tvoje))* (?:system(?:ovy|oveho)? promptu?\b|(?:svoje|tvoje|svojich|tvojich|skryte|skrytych|interne|systemove|povodne) (?:pokyn|instrukci|pravidl|pravidiel|nastaveni))/,
-  // "Developer mode" alone is a Chrome or Android setting, so it needs a switch verb or a status.
-  /\b(?:enable|activate|enter|switch|turn on|prepni|zapni|aktivuj|prejdi)(?: \w+){0,2} (?:developer|admin|god|dan|jailbreak|unrestricted|vyvojarsk\w*|administratorsk\w*|neobmedzen\w*) (?:mode|mod|modu|rezim|rezimu)\b/,
-  /\b(?:developer|dan|jailbreak) mode (?:enabled|activated|on)\b/,
+  /\b(?:enable|activate|enter|switch|turn on|prepni|zapni|aktivuj|prejdi)(?: \w+){0,2} (?:admin|god|dan|jailbreak|unrestricted|vyvojarsk\w*|administratorsk\w*|neobmedzen\w*) (?:mode|mod|modu|rezim|rezimu)\b/,
+  /\b(?:dan|jailbreak) mode (?:enabled|activated|on)\b/,
+  // "Developer mode" is also an Android and Chrome setting, so it counts only when aimed at the agent.
+  /\b(?:enable|activate|enter|switch|turn on)(?: \w+)? (?:you|your|yourself)(?: \w+)? developer mode\b/,
+  /\b(?:you(?: are| re)(?: now)?(?: in)?|your) developer mode\b/,
   /\bdan mode\b/,
   /\bdo anything now\b/,
 ];
@@ -49,6 +66,20 @@ export function isManipulation(text: string): boolean {
   const plain = normalize(text);
   const words = toWords(text);
   return MARKERS.some((re) => re.test(plain)) || PHRASES.some((re) => re.test(words));
+}
+
+/**
+ * Drops earlier user turns that look like manipulation together with the assistant turns after
+ * them. The last message stays: the caller answers an attempt there with a canned reply.
+ */
+export function dropFlaggedTurns<T extends { readonly role: AskRole; readonly content: string }>(messages: readonly T[]): T[] {
+  const last = messages.length - 1;
+  let flagged = false;
+  return messages.filter((m, i) => {
+    if (i === last) return true;
+    if (m.role === 'user') flagged = isManipulation(m.content);
+    return !flagged;
+  });
 }
 
 const SHINGLE_WORDS = 8;

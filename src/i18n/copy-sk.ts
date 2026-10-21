@@ -55,6 +55,8 @@ export const copySk: Copy = {
     you: 'Vy',
     agent: 'Agent',
     note: 'Agent pozná moje CV. Keď si nie je istý, povie to a dá vám na mňa kontakt.',
+    privacyNote: 'Otázky a odpovede uchovávam 365 dní bez vašej IP adresy či iného identifikátora, odpovedá na ne OpenAI.',
+    privacyLink: 'Viac o súkromí',
     error:
       'Teraz sa mi nepodarilo odpovedať. Napíšte Denisovi priamo na hello@denisvarga.sk alebo zavolajte na +421 902 074 830.',
     suggestions: [
@@ -92,5 +94,46 @@ export const copySk: Copy = {
       { name: '_ga_XMK9J72476', desc: 'Google Analytics, stav relácie, 2 roky' },
     ],
     settings: 'Nastavenia cookies',
+  },
+  privacy: {
+    title: 'Súkromie',
+    sections: [
+      {
+        title: 'Kto spracúva údaje',
+        text: 'Prevádzkovateľom je Denis Varga. Otázky k súkromiu mi posielajte na hello@denisvarga.sk.',
+      },
+      {
+        title: 'Čo ukladá AI chat',
+        text: 'Ku každej otázke pre agenta ukladám čas, jazyk, text otázky a odpovede, použitý model, čas odozvy, počet tokenov a výsledok, napríklad či odpoveď prišla. IP adresu, údaje o prehliadači ani iný identifikátor k otázkam neukladám. Prosím, nepíšte do chatu osobné údaje.',
+      },
+      {
+        title: 'Prečo',
+        text: 'Aby agent mohol odpovedať, aby som chat chránil pred zneužitím a aby som zlepšoval odpovede. Právnym základom je môj oprávnený záujem podľa čl. 6 ods. 1 písm. f) GDPR.',
+      },
+      {
+        title: 'Ako dlho',
+        text: 'Otázky a odpovede sa automaticky mažú po 365 dňoch. V zálohách databázy (Cloudflare D1 Time Travel) sa dajú obnoviť ešte najviac 30 dní. CSV exporty, ktoré si stiahnem z môjho neverejného prehľadu otázok, uchovávam sám na rovnaký účel.',
+      },
+      {
+        title: 'OpenAI',
+        text: 'Odpovede generuje OpenAI ako môj sprostredkovateľ. Údaje z EÚ spracúva spoločnosť OpenAI Ireland Limited, ktorá ich odovzdáva aj do USA na základe štandardných zmluvných doložiek EÚ v zmluve OpenAI o spracúvaní údajov. OpenAI dostane vašu otázku a predchádzajúce otázky a odpovede z toho istého rozhovoru. Konverzáciu si podľa môjho nastavenia neukladá a na trénovanie modelov ju nepoužíva. Záznamy na odhaľovanie zneužitia uchováva najviac 30 dní, dlhšie len vtedy, keď to vyžaduje zákon alebo ochrana pred škodou.',
+      },
+      {
+        title: 'Pseudonymné identifikátory',
+        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Druhý sa mení každý deň, počíta vaše otázky (najviac 20 za deň) a do troch dní sa zmaže.',
+      },
+      {
+        title: 'Cloudflare',
+        text: 'Web beží na Cloudflare a záznamy otázok sú v databáze Cloudflare D1 v jurisdikcii EÚ. Pred odoslaním otázky Cloudflare Turnstile podľa signálov prehliadača a IP adresy overí, že nie ste robot. IP adresa slúži aj na limit 5 otázok za minútu a neukladám ju.',
+      },
+      {
+        title: 'Analytika',
+        text: 'Google Analytics sa načíta iba po vašom súhlase v lište cookies. Voľbu môžete kedykoľvek zmeniť cez Nastavenia cookies v pätičke.',
+      },
+      {
+        title: 'Vaše práva',
+        text: 'Máte právo na prístup, opravu, vymazanie a obmedzenie spracúvania a právo namietať. Napíšte mi na hello@denisvarga.sk. Keďže k otázkam neukladám identifikátor, uveďte približný čas a znenie otázky. Sťažnosť môžete podať Úradu na ochranu osobných údajov SR.',
+      },
+    ],
   },
 };

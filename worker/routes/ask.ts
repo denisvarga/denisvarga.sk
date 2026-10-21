@@ -1,16 +1,16 @@
 import { Hono } from 'hono';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { easterEgg } from '../agent/easter-eggs';
-import { guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
+import { dropFlaggedTurns, guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
 import { buildInstructions } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
-import { parseDailyCap, reserveSlot, type Reservation } from '../ask/daily-cap';
+import { parseDailyCap, reserveSlot, utcMidnight, type Reservation } from '../ask/daily-cap';
 import { askError, logEvent } from '../ask/errors';
 import { callOpenAI, TOTAL_BUDGET_MS } from '../ask/openai';
 import { isAllowedRequest } from '../ask/origin';
 import { createReplySigner, keepSignedTurns } from '../ask/reply-sig';
-import { safetyIdentifier } from '../ask/safety-id';
+import { quotaKey, safetyIdentifier } from '../ask/safety-id';
 import { askSchema, lastUserMessage } from '../ask/schema';
 import { isTurnstileConfigValid, TURNSTILE_TIMEOUT_MS, verifyTurnstile } from '../ask/turnstile';
 
@@ -32,9 +32,11 @@ askRoute.post('/ask', async (c) => {
 
   const ip = c.req.header('CF-Connecting-IP') ?? null;
   const key = clientKey(ip);
-  if (env.ASK_LIMITER && !(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
+  // Without the binding the request still goes on: the client budget and the daily cap bound the cost.
+  if (!env.ASK_LIMITER) logEvent('config_error', 503);
+  else if (!(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
 
-  // Every reply is signed, easter eggs included, so the salt is required before any of them.
+  // Easter eggs are signed like answers, so the salt is required before any reply.
   const salt = env.SAFETY_SALT?.trim();
   if (!salt) {
     logEvent('config_error', 503);
@@ -42,10 +44,14 @@ askRoute.post('/ask', async (c) => {
   }
   const signer = await createReplySigner(salt);
 
-  // Only the last message is checked, so an honest question after an attempt still reaches the model.
-  const canned = easterEgg(question, input.lang) ?? (isManipulation(question) ? manipulationReply(input.lang) : null);
-  if (canned !== null) {
-    return c.json({ reply: canned, kind: 'easter_egg', sig: await signer.sign(input.lang, canned) } satisfies AskSuccess);
+  const egg = easterEgg(question, input.lang);
+  if (egg !== null) {
+    const sig = await signer.sign({ lang: input.lang, anchor: question, reply: egg }, Date.now());
+    return c.json({ reply: egg, kind: 'easter_egg', sig } satisfies AskSuccess);
+  }
+  // Left unsigned, so a later request can never carry the attempt as an answered question.
+  if (isManipulation(question)) {
+    return c.json({ reply: manipulationReply(input.lang), kind: 'easter_egg' } satisfies AskSuccess);
   }
 
   const turnstile = { secret: env.TURNSTILE_SECRET_KEY, hostname: env.TURNSTILE_HOSTNAME, action: env.TURNSTILE_ACTION };
@@ -55,7 +61,8 @@ askRoute.post('/ask', async (c) => {
   }
   // Checked before siteverify so a broken deploy neither burns the visitor's token nor writes a row.
   const cap = parseDailyCap(env.DAILY_CAP);
-  if (cap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim()) {
+  const clientCap = parseDailyCap(env.CLIENT_DAILY_CAP);
+  if (cap === null || clientCap === null || !env.OPENAI_API_KEY?.trim() || !env.OPENAI_MODEL?.trim()) {
     logEvent('config_error', 503);
     return askError(c, 'unavailable');
   }
@@ -71,18 +78,21 @@ askRoute.post('/ask', async (c) => {
     return askError(c, 'verification_failed');
   }
 
-  // Forged or foreign-language assistant turns are dropped silently; the request still goes through.
-  const messages = await keepSignedTurns(signer, input.lang, input.messages);
+  // Forged, replayed and unanswered turns are dropped silently, and so are earlier attempts with the
+  // replies after them, so an honest question after an attempt still reaches the model.
+  const now = Date.now();
+  const messages = dropFlaggedTurns(await keepSignedTurns(signer, input.lang, input.messages, now));
 
+  const clientQuotaKey = await quotaKey(salt, utcMidnight(now), key);
   let reservation: Reservation;
   try {
-    reservation = await reserveSlot(env.DB, { now: Date.now(), lang: input.lang, question, cap });
+    reservation = await reserveSlot(env.DB, { now, lang: input.lang, question, cap, clientCap, quotaKey: clientQuotaKey });
   } catch {
     logEvent('d1_error', 503);
     return askError(c, 'unavailable');
   }
   if (reservation.status === 'capped') {
-    logEvent('cap_reached', 429);
+    logEvent(reservation.scope === 'client' ? 'client_cap_reached' : 'cap_reached', 429);
     return askError(c, 'daily_cap');
   }
 
@@ -104,5 +114,9 @@ askRoute.post('/ask', async (c) => {
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);
   if (result.outcome === 'error') logEvent('openai_error', result.httpStatus);
   if (result.text === null) return askError(c, 'upstream_unavailable');
-  return c.json({ reply: result.text, kind: 'answer', sig: await signer.sign(input.lang, result.text) } satisfies AskSuccess);
+  // A refused answer here is the canned reply that replaced a leak. Like the input guard's reply it
+  // stays unsigned, so the question that drew the leak never returns as answered history.
+  if (result.outcome === 'refused') return c.json({ reply: result.text, kind: 'answer' } satisfies AskSuccess);
+  const sig = await signer.sign({ lang: input.lang, anchor: question, reply: result.text }, Date.now());
+  return c.json({ reply: result.text, kind: 'answer', sig } satisfies AskSuccess);
 });

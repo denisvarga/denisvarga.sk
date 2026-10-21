@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { OPENAI_URL } from '../ask/openai';
 import { SITEVERIFY_URL } from '../ask/turnstile';
-import app from '../index';
+import worker from '../index';
 import type { AskEnv } from '../routes/ask';
 import { FakeD1 } from './fake-d1';
 
@@ -27,11 +27,14 @@ export function makeEnv(overrides: Partial<AskEnv> = {}): { env: AskEnv; db: Fak
     OPENAI_MODEL: 'gpt-6-luna',
     OPENAI_REASONING_EFFORT: 'none',
     DAILY_CAP: '300',
+    CLIENT_DAILY_CAP: '20',
+    CHAT_LOG_RETENTION_DAYS: '365',
     ALLOWED_ORIGINS: ORIGIN,
     TURNSTILE_HOSTNAME: 'denisvarga.sk',
     TURNSTILE_ACTION: 'ask',
     ACCESS_TEAM_DOMAIN: 'https://denva.cloudflareaccess.com',
     ACCESS_AUD: '',
+    ACCESS_ALLOWED_EMAILS: '',
     OPENAI_API_KEY: 'sk-test',
     TURNSTILE_SECRET_KEY: '0x4AAAAAAA-real-secret',
     SAFETY_SALT: 'salt',
@@ -102,7 +105,7 @@ export async function send({ env, body, rawBody, headers = {}, path = '/api/ask'
   }
   const init: RequestInit = { method, headers: merged };
   if (method !== 'GET') init.body = rawBody ?? JSON.stringify(body);
-  const res = await app.request(path, init, env, ctx);
+  const res = await worker.fetch(new Request(new URL(path, 'http://localhost'), init), env, ctx);
   await Promise.all(pending);
   return res;
 }

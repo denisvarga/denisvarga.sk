@@ -10,6 +10,12 @@ describe('cleanContent', () => {
     expect(cleanContent('\u001b[31mred\u001b[0m\u0007')).toBe('[31mred[0m');
   });
 
+  it('drops bidi embedding, override and isolate controls so text reads in typed order', () => {
+    const bidi = [0x202a, 0x202b, 0x202c, 0x202d, 0x202e, 0x2066, 0x2067, 0x2068, 0x2069].map((c) => String.fromCodePoint(c));
+    expect(cleanContent(`a${bidi.join('')}b`)).toBe('ab');
+    expect(cleanContent(`Kto je ${bidi[4]}sineD${bidi[2]}?`)).toBe('Kto je sineD?');
+  });
+
   it('is idempotent, so a cleaned reply survives a second pass unchanged', () => {
     const once = cleanContent('  Ahoj\r\n\u0000svet\t ');
     expect(cleanContent(once)).toBe(once);
