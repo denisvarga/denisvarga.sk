@@ -8,11 +8,14 @@ import {
   type OracleEnv,
   type OracleSelf,
 } from '../../scripts/oracles/design-gl-math';
+import { DESIGN_SECTIONS } from '../sections/section-order';
 import { makePointAttributes, makeShapes } from './make-shapes';
 import { createFrameState, morphProgress, stepFrame, writeMorphPositions, type FrameInput } from './morph';
 import { createLineBuffers, makeLineNodes, writeNetworkLines } from './network-lines';
 
 const SECTION_TOPS = [0, 900, 2100, 3000, 4300, 5600, 6400];
+// The design renders every section, so its morph walks every shape.
+const DESIGN_SHAPES = DESIGN_SECTIONS.map((_, i) => i);
 
 // Index of the first differing element, -1 when identical; much faster than toEqual per frame.
 function firstMismatch(a: ArrayLike<number>, b: ArrayLike<number>, length = a.length): number {
@@ -63,7 +66,7 @@ function runParity(n: number, NN: number, seed: number, frames: number) {
     Object.assign(self, { vel: s.vel, mouse: s.mouse, coarse: s.coarse, mobile });
     designRenderGL(G, self, { innerWidth: s.width, innerHeight: s.height, scrollY: s.scrollY, tops, hero: s.hero }, s.time);
     const input: FrameInput = {
-      time: s.time, tops, viewportWidth: s.width, viewportHeight: s.height, hero: s.hero, velocity: s.vel,
+      time: s.time, tops, sectionShapes: DESIGN_SHAPES, viewportWidth: s.width, viewportHeight: s.height, hero: s.hero, velocity: s.vel,
       scrollY: s.scrollY, mouseX: s.mouse.x, mouseY: s.mouse.y, coarse: s.coarse, mobile,
     };
     const r = stepFrame(state, input);
@@ -105,5 +108,17 @@ describe('morphProgress', () => {
 
   it('returns 0 when no sections are measured', () => {
     expect(morphProgress([], 900)).toBe(0);
+  });
+});
+
+describe('stepFrame with a hidden section', () => {
+  it('morphs from the experience shape straight to the projects shape when the AI section is not rendered', () => {
+    const state = createFrameState(0);
+    state.Ts = 2.5;
+    const r = stepFrame(state, {
+      time: 0, tops: [-3000, -2000, -1000, 0, 2000, 3000], sectionShapes: [0, 1, 2, 4, 5, 6], viewportWidth: 1440,
+      viewportHeight: 900, hero: null, velocity: 0, scrollY: 0, mouseX: 0, mouseY: 0, coarse: false, mobile: false,
+    });
+    expect([r.a, r.b]).toEqual([2, 4]);
   });
 });

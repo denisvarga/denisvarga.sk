@@ -6,12 +6,13 @@ import { useLang } from '../../i18n/lang-context';
 import { parseTitleMarkup } from '../../lib/title-markup';
 import { goTo } from '../../motion/scroll-to';
 import { useMagnet } from '../../motion/use-magnet';
+import { sectionIndex, SHOW_AI } from '../section-order';
 import styles from './hero.module.css';
 import { HeroImage } from './hero-image';
 import { useHeroEntranceDone, type EntranceStep } from './use-hero-entrance-done';
 import { useHeroParallax } from './use-hero-parallax';
 
-const PROJECTS_SECTION = 4;
+const PROJECTS_SECTION = sectionIndex('projects');
 
 export function HeroSection() {
   const { t } = useLang();
@@ -49,9 +50,11 @@ export function HeroSection() {
               <span>{t.hero.cta1}</span>
               <span aria-hidden="true">↓</span>
             </button>
-            <button ref={askRef} type="button" className={`${pill.pill} ${pill.outline} ${styles.cta}`} onClick={() => goTo('#ask')}>
-              {t.hero.cta2}
-            </button>
+            {SHOW_AI && (
+              <button ref={askRef} type="button" className={`${pill.pill} ${pill.outline} ${styles.cta}`} onClick={() => goTo('#ask')}>
+                {t.hero.cta2}
+              </button>
+            )}
           </div>
           <div ref={badgeRef} className={styles.badge} data-enter="" data-delay="800">
             <PulseDot />

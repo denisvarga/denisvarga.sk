@@ -1,6 +1,8 @@
+import { DESIGN_SECTIONS, SECTIONS } from '../sections/section-order';
+
 export type GroupOffset = readonly [x: number, y: number, scale: number, opacity: number];
 
-// Group placement per section shape, indexed like the [data-sec] sections.
+// Group placement per section shape, indexed like DESIGN_SECTIONS.
 export const GOFF: readonly GroupOffset[] = [
   [2.15, 0.35, 0.95, 0.85],
   [-2.6, 0, 0.85, 1],
@@ -12,6 +14,9 @@ export const GOFF: readonly GroupOffset[] = [
 ];
 
 export const SHAPE_COUNT = GOFF.length;
+
+// Shape index of each rendered [data-sec] section; hidden sections leave their shape out of the morph.
+export const SECTION_SHAPES: readonly number[] = SECTIONS.map((key) => DESIGN_SECTIONS.indexOf(key));
 
 export function groupOffset(index: number): GroupOffset {
   return GOFF[Math.min(SHAPE_COUNT - 1, Math.max(0, index))]!;

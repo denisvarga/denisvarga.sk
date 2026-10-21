@@ -1,5 +1,6 @@
 import { headCopy } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
+import { SHOW_AI } from '../sections/section-order';
 import { ASCII_PORTRAIT } from '../seo/ascii-portrait';
 
 const ART_STYLE = 'font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7px;line-height:1;color:#8a8c90';
@@ -13,5 +14,6 @@ export function logConsoleGreeting(lang: Lang): void {
   greeted = true;
   console.log(`%c${ASCII_PORTRAIT}`, ART_STYLE);
   console.log('%cDenis Varga', NAME_STYLE);
-  console.info(`%c${headCopy[lang].consoleGreeting}`, TEXT_STYLE);
+  const { consoleGreeting, consoleChatHint } = headCopy[lang];
+  console.info(`%c${SHOW_AI ? `${consoleGreeting} ${consoleChatHint}` : consoleGreeting}`, TEXT_STYLE);
 }

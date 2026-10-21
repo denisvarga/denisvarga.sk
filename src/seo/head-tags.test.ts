@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SKILLS, skillLabel } from '../data/skills';
+import { SHOW_AI } from '../sections/section-order';
 import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from './head-tags';
 import { knowsAbout, profileJsonLd, serializeJsonLd } from './json-ld';
 import { buildSitemap } from './sitemap';
@@ -83,7 +84,7 @@ describe('buildHeadTags', () => {
     expect(attrs(doc, 'link[rel="preload"][as="font"][crossorigin]', 'href')).toEqual(FONTS);
     expect(html).toMatch(/^<!--/);
     expect(html).toContain('Ahoj, zvedavec. / Hi, curious one.');
-    expect(html).toContain('sudo hire denis');
+    expect(html.includes('sudo hire denis')).toBe(SHOW_AI);
     expect(html).toContain('hello@denisvarga.sk / hello@denisvarga.dev');
     expect(html).not.toMatch(/charset|viewport/);
   });
