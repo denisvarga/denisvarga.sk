@@ -55,6 +55,9 @@
     "ALLOWED_ORIGINS": "https://denisvarga.sk,https://denisvarga.dev",
     "TURNSTILE_HOSTNAME": "denisvarga.sk,denisvarga.dev",
     "TURNSTILE_ACTION": "ask",
+    // Comma-separated emails the Worker admits to /prehlad on top of the Access policy; empty admits
+    // every identity the policy lets through.
+    "ACCESS_ALLOWED_EMAILS": "",
     // AUD tag of the "denisvarga prehlad" Access application (denisvarga.sk and .dev /prehlad);
     // with an empty value /prehlad answers 404.
     "ACCESS_TEAM_DOMAIN": "https://denva.cloudflareaccess.com",

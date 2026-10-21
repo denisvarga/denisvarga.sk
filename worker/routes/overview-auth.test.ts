@@ -1,6 +1,6 @@
 import { sign } from 'hono/jwt';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { JWKS_TTL_MS } from '../admin/access';
+import { JWKS_REFETCH_AFTER_MS, JWKS_TTL_MS } from '../admin/access';
 import { accessHeaders, accessToken, AUD, rsaKey, stubJwks, TEAM_DOMAIN, type TestKey } from '../test-support/access-token';
 import { makeEnv, send } from '../test-support/ask-harness';
 
@@ -93,6 +93,11 @@ describe('overview Access JWT', () => {
     await expectForbidden(await get(configured(), await accessToken(forger)));
   });
 
+  it('rejects a token issued in the future', async () => {
+    const now = Math.floor(Date.now() / 1000);
+    await expectForbidden(await get(configured(), await accessToken(key, { iat: now + 300 })));
+  });
+
   it('rejects an unknown kid and symmetric algorithms', async () => {
     const stranger = await rsaKey('kid-unknown');
     await expectForbidden(await get(configured(), await accessToken(stranger)));
@@ -130,5 +135,64 @@ describe('overview JWKS', () => {
     const domain = team('empty');
     stubJwks([{ kty: 'EC', kid: 'kid-1', crv: 'P-256', x: 'x', y: 'y' }], domain);
     await expectForbidden(await get(configured({ ACCESS_TEAM_DOMAIN: domain }), await tokenFor(domain)));
+  });
+});
+
+const b64url = (value: unknown) => btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+describe('overview Access algorithm pinning', () => {
+  it('rejects RS512, PS256 and none headers even with a known kid and a key without alg', async () => {
+    const domain = team('alg');
+    const { alg: _alg, ...publicWithoutAlg } = key.publicJwk;
+    stubJwks([publicWithoutAlg], domain);
+    const env = configured({ ACCESS_TEAM_DOMAIN: domain });
+    const valid = await tokenFor(domain);
+    expect((await get(env, valid)).status).toBe(200);
+
+    const claims = { aud: [AUD], iss: domain, email: 'denis@example.com', exp: Math.floor(Date.now() / 1000) + 600 };
+    await expectForbidden(await get(env, await sign(claims, { ...key.privateJwk, alg: 'RS512' })));
+    await expectForbidden(await get(env, await sign(claims, { ...key.privateJwk, alg: 'PS256' })));
+    const payload = valid.split('.')[1];
+    await expectForbidden(await get(env, `${b64url({ alg: 'none', typ: 'JWT', kid: 'kid-1' })}.${payload}.`));
+  });
+});
+
+describe('overview Access email pin', () => {
+  beforeEach(() => void stubJwks([key.publicJwk]));
+
+  it('admits only listed emails, case-insensitively, when the list is set', async () => {
+    const env = configured({ ACCESS_ALLOWED_EMAILS: ' Denis@Example.com , other@example.com ' });
+    expect((await get(env, await accessToken(key))).status).toBe(200);
+    await expectForbidden(await get(env, await accessToken(key, { email: 'intruder@example.com' })));
+    await expectForbidden(await get(env, await accessToken(key, { email: undefined })));
+    expect(logs).toHaveBeenCalledWith({ event: 'access_denied', status: 403 });
+  });
+
+  it('admits any identity the Access policy lets through while the list is empty', async () => {
+    expect((await get(configured(), await accessToken(key, { email: undefined }))).status).toBe(200);
+  });
+});
+
+describe('overview JWKS rotation', () => {
+  it('fetches the keys again once for an unknown kid when the cache is at least 30 s old', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const domain = team('rotate');
+    const rotated = await rsaKey('kid-2');
+    const env = configured({ ACCESS_TEAM_DOMAIN: domain });
+    stubJwks([key.publicJwk], domain);
+    expect((await get(env, await tokenFor(domain))).status).toBe(200);
+
+    const fetchMock = stubJwks([key.publicJwk, rotated.publicJwk], domain);
+    const rotatedToken = await accessToken(rotated, { iss: domain });
+    await expectForbidden(await get(env, rotatedToken));
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    vi.setSystemTime(Date.now() + JWKS_REFETCH_AFTER_MS);
+    expect((await get(env, rotatedToken)).status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const stranger = await rsaKey('kid-unknown');
+    await expectForbidden(await get(env, await accessToken(stranger, { iss: domain })));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
