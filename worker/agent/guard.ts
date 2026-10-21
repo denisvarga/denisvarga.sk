@@ -8,34 +8,23 @@ import { INTRO, RULES } from './rules';
 // prompts, rules or security never get a canned reply.
 
 // Cyrillic and Greek letters that look Latin, so "ignore" spelled with a Cyrillic "о" still matches.
-const LOOKALIKES: Readonly<Record<string, string>> = {
-  '\u0430': 'a',
-  '\u0435': 'e',
-  '\u043e': 'o',
-  '\u0440': 'p',
-  '\u0441': 'c',
-  '\u0443': 'y',
-  '\u0445': 'x',
-  '\u0456': 'i',
-  '\u0458': 'j',
-  '\u0455': 's',
-  '\u03bf': 'o',
-  '\u03b1': 'a',
-  '\u03b5': 'e',
-  '\u03b9': 'i',
-  '\u03ba': 'k',
-  '\u03c1': 'p',
-  '\u03c4': 't',
-};
-const LOOKALIKE = new RegExp(`[${Object.keys(LOOKALIKES).join('')}]`, 'g');
+// Folded before lowercasing: capitals such as the Cyrillic T only look Latin in upper case.
+const LOOKALIKE_PAIRS: readonly (readonly [from: string, to: string])[] = [
+  ['\u0410\u0412\u0415\u041a\u041c\u041d\u041e\u0420\u0421\u0422\u0423\u0425\u0406\u0408\u0405', 'ABEKMHOPCTYXIJS'],
+  ['\u0430\u0432\u0435\u043a\u043c\u043d\u043e\u0440\u0441\u0442\u0443\u0445\u0456\u0458\u0455', 'abekmhopctyxijs'],
+  ['\u0391\u0392\u0395\u0396\u0397\u0399\u039a\u039c\u039d\u039f\u03a1\u03a4\u03a5\u03a7', 'ABEZHIKMNOPTYX'],
+  ['\u03b1\u03b5\u03b9\u03ba\u03bd\u03bf\u03c1\u03c4', 'aeikvopt'],
+];
+const LOOKALIKES = new Map(LOOKALIKE_PAIRS.flatMap(([from, to]) => [...from].map((ch, i) => [ch, to[i] ?? ch] as const)));
+const LOOKALIKE = new RegExp(`[${[...LOOKALIKES.keys()].join('')}]`, 'g');
 
 /** NFKD also folds fullwidth and styled letters; format characters hide zero-width splits. */
 export function normalize(text: string): string {
   return text
     .normalize('NFKD')
     .replace(/[\p{M}\p{Cf}]/gu, '')
+    .replace(LOOKALIKE, (ch) => LOOKALIKES.get(ch) ?? ch)
     .toLowerCase()
-    .replace(LOOKALIKE, (ch) => LOOKALIKES[ch] ?? ch)
     .replace(/\s+/g, ' ')
     .trim();
 }
