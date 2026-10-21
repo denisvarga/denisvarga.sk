@@ -1,5 +1,6 @@
 import { FINALIZE_SQL } from '../ask/chat-log';
 import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL, UPSERT_QUOTA_SQL } from '../ask/daily-cap';
+import { DELETE_OLD_CHATS_SQL, DELETE_OLD_QUOTA_SQL } from '../scheduled';
 import { executeOverviewSql } from './fake-overview-sql';
 
 export interface ChatRow {
@@ -68,6 +69,14 @@ export class FakeD1 {
         else this.quota.push({ day, key, n: 1 });
         return [{ n: row?.n ?? 1 }];
       }
+      case DELETE_OLD_CHATS_SQL:
+        this.writes++;
+        this.rows = this.rows.filter((r) => r.created_at >= Number(args[0]));
+        return [];
+      case DELETE_OLD_QUOTA_SQL:
+        this.writes++;
+        this.quota = this.quota.filter((q) => q.day >= Number(args[0]));
+        return [];
       case MARK_CAPPED_SQL:
         this.writes++;
         this.update(Number(args[0]), { outcome: 'capped' });

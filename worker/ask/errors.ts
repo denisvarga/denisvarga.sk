@@ -28,6 +28,7 @@ export type LogEvent =
   | 'config_error'
   | 'access_jwks_error'
   | 'access_denied'
+  | 'retention_error'
   | 'internal_error';
 
 // Logs carry a fixed event code and an HTTP status only: never visitor text, upstream messages or identifiers.
