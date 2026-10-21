@@ -12,6 +12,9 @@ import { TerminalDemo } from './terminal-demo';
 
 const DEMOS = { sk: demosSk, en: demosEn } as const;
 
+// Temporarily off in production: true brings back the heading, the AI tools and the terminal demo above the chat.
+export const SHOW_INTRO_AND_DEMO = false;
+
 interface ToolRun {
   readonly tool: number;
   /** Bumped on every pick so clicking the active tool restarts its demo, as in the design. */
@@ -38,32 +41,36 @@ export function AiSection() {
   return (
     <section data-sec className={styles.section}>
       <div className={styles.inner}>
-        <div className={styles.head}>
-          <div className={styles.headText}>
-            <span ref={labelRef} data-reveal className={styles.label}>
-              {t.ai.label}
-            </span>
-            <SplitHeading as="h2" text={t.ai.title} className={`${heading.sectionTitle} ${styles.title}`} />
-          </div>
-          <p ref={leadRef} data-reveal className={styles.lead}>
-            {t.ai.lead}
-          </p>
-        </div>
-        <div ref={rowRef} data-reveal className={styles.row}>
-          <AiToolList tools={t.ai.tools} active={tool} terminalId={terminalId} barRefs={barRefs} onPick={pick} />
-          {demo && (
-            <TerminalDemo
-              id={terminalId}
-              demo={demo}
-              sizers={demos}
-              note={t.ai.demoNote}
-              tool={tool}
-              runKey={`${lang}:${tool}:${run}`}
-              barRefs={barRefs}
-              onDone={advance}
-            />
-          )}
-        </div>
+        {SHOW_INTRO_AND_DEMO && (
+          <>
+            <div className={styles.head}>
+              <div className={styles.headText}>
+                <span ref={labelRef} data-reveal className={styles.label}>
+                  {t.ai.label}
+                </span>
+                <SplitHeading as="h2" text={t.ai.title} className={`${heading.sectionTitle} ${styles.title}`} />
+              </div>
+              <p ref={leadRef} data-reveal className={styles.lead}>
+                {t.ai.lead}
+              </p>
+            </div>
+            <div ref={rowRef} data-reveal className={styles.row}>
+              <AiToolList tools={t.ai.tools} active={tool} terminalId={terminalId} barRefs={barRefs} onPick={pick} />
+              {demo && (
+                <TerminalDemo
+                  id={terminalId}
+                  demo={demo}
+                  sizers={demos}
+                  note={t.ai.demoNote}
+                  tool={tool}
+                  runKey={`${lang}:${tool}:${run}`}
+                  barRefs={barRefs}
+                  onDone={advance}
+                />
+              )}
+            </div>
+          </>
+        )}
         <AskAgent />
       </div>
     </section>
