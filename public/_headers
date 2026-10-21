@@ -13,3 +13,7 @@
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
+/cv/denis-varga-cv.pdf
+  Link: <https://denisvarga.sk/cv/denis-varga-cv.pdf>; rel="canonical"
+/cv/denis-varga-cv-en.pdf
+  Link: <https://denisvarga.dev/cv/denis-varga-cv-en.pdf>; rel="canonical"

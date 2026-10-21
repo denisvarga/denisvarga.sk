@@ -3,7 +3,11 @@ import { copySk } from '../i18n/copy-sk';
 import type { Copy, Lang, Localized } from '../i18n/types';
 
 export const CV_NAME = 'Denis Varga';
-export const CV_TITLE = `${CV_NAME} - CV`;
+// The PDF title; distinct per language, so search results tell the two files apart.
+export const CV_TITLE: Localized<string> = {
+  sk: `${CV_NAME} - CV, AI a full-stack developer`,
+  en: `${CV_NAME} - CV, AI & full-stack developer`,
+};
 
 const TIME_ZONE = 'Europe/Bratislava';
 const DATE_LOCALE: Localized<string> = { sk: 'sk-SK', en: 'en-GB' };
