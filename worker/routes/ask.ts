@@ -80,9 +80,9 @@ askRoute.post('/ask', async (c) => {
 
   // Forged, replayed and unanswered turns are dropped silently, and so are earlier attempts with the
   // replies after them, so an honest question after an attempt still reaches the model.
-  const messages = dropFlaggedTurns(await keepSignedTurns(signer, input.lang, input.messages, Date.now()));
-
   const now = Date.now();
+  const messages = dropFlaggedTurns(await keepSignedTurns(signer, input.lang, input.messages, now));
+
   const clientQuotaKey = await quotaKey(salt, utcMidnight(now), key);
   let reservation: Reservation;
   try {
