@@ -44,6 +44,12 @@
   overflow-wrap: break-word;
 }
 
+.bubble a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .user .bubble {
   background: var(--bg);
   color: var(--ink);

@@ -67,6 +67,23 @@ describe('ChatLog', () => {
     expect(container.textContent).toContain(`Sure: ${IMG} and ${LINK}`);
   });
 
+  it('links only contacts and known hosts in replies, never in questions', () => {
+    const messages: ChatMessage[] = [
+      { id: 1, role: 'user', text: 'Is hello@denisvarga.sk right?', failed: false },
+      {
+        id: 2,
+        role: 'assistant',
+        text: 'Yes: hello@denisvarga.dev or github.com/denisvarga. Not javascript:alert(1) or https://evil.example.com.',
+        failed: false,
+      },
+      { id: 3, role: 'assistant', text: 'Email Denis at hello@denisvarga.dev.', failed: true, retryable: true },
+    ];
+    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={noRetry} />));
+    const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['mailto:hello@denisvarga.dev', 'https://github.com/denisvarga', 'mailto:hello@denisvarga.dev']);
+    expect(container.querySelector('[data-message-id="1"] a')).toBeNull();
+  });
+
   it('reads a new reply from its top and stops following once the reader scrolls up', () => {
     let resize: (() => void) | undefined;
     vi.stubGlobal(

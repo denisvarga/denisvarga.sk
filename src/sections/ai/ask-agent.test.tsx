@@ -188,12 +188,13 @@ describe('AskAgent', () => {
     type('first');
     await press({});
     await act(() => vi.advanceTimersByTimeAsync(36));
-    const bubble = () => container.querySelector('[data-lenis-prevent] [aria-hidden="true"]')?.textContent;
-    expect(bubble()).toBe('A long');
+    const typed = () => container.querySelector('[data-lenis-prevent] [aria-hidden="true"]')?.textContent;
+    expect(typed()).toBe('A long');
     fetchMock.mockReturnValueOnce(new Promise(() => {}));
     type('second');
     await press({});
-    expect(bubble()).toBe('A long first answer that is still typing.');
+    expect(typed()).toBeUndefined();
+    expect(container.querySelector('[data-message-id="2"]')?.textContent).toContain('A long first answer that is still typing.');
     expect(container.querySelector('[data-pulse]')?.textContent).toBe(t.thinking);
   });
 });
