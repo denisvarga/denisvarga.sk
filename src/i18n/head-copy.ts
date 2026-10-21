@@ -22,9 +22,9 @@ export const headCopy: Localized<HeadCopy> = {
     origin: 'https://denisvarga.sk',
     path: '/',
     email: 'hello@denisvarga.sk',
-    title: 'Denis Varga | AI a full-stack developer, od nápadu po produkciu',
+    title: 'Denis Varga | AI a full-stack developer, Bratislava',
     description:
-      'Webové aplikácie, AI agenti, automatizácie a interné nástroje. Vyvíjam od roku 2017, dnes AI-first s Claude Code, Codexom a MCP. Otvorený projektom aj pozíciám.',
+      'AI a full-stack developer z Bratislavy. Webové aplikácie, AI agenti, automatizácie, WordPress a WooCommerce. Od roku 2017, otvorený projektom aj pozíciám.',
     jobTitle: 'AI a full-stack developer',
     ogLocale: 'sk_SK',
     consoleGreeting:
@@ -34,9 +34,9 @@ export const headCopy: Localized<HeadCopy> = {
     origin: 'https://denisvarga.dev',
     path: '/en/',
     email: 'hello@denisvarga.dev',
-    title: 'Denis Varga | AI & full-stack developer, from idea to production',
+    title: 'Denis Varga | AI & full-stack developer, Slovakia',
     description:
-      'Web apps, AI agents, automation and internal tools. Building software since 2017, now AI-first with Claude Code, Codex and MCP. Open to projects and roles.',
+      'AI & full-stack developer in Bratislava, Slovakia. Web apps, AI agents, automation, WordPress and WooCommerce. Since 2017, open to projects and roles.',
     jobTitle: 'AI & full-stack developer',
     ogLocale: 'en_US',
     consoleGreeting:
