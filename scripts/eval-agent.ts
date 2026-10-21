@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { z } from 'zod';
+import { easterEgg } from '../worker/agent/easter-eggs.ts';
 import { guardAnswer, isManipulation, manipulationReply } from '../worker/agent/guard.ts';
 import { buildInstructions, PROMPT_VERSION } from '../worker/agent/prompt.ts';
 import { callOpenAI, type ModelResult, REASONING_EFFORTS, TOTAL_BUDGET_MS } from '../worker/ask/openai.ts';
@@ -19,11 +20,26 @@ const caseSchema = z.object({
   history: z.array(z.object({ role: z.enum(['user', 'assistant']), content: z.string() })).optional(),
   expect: z.object({
     mustInclude: z.array(z.string()).optional(),
+    /** At least one of these must appear. */
+    mustIncludeAny: z.array(z.string()).min(1).optional(),
     mustNotInclude: z.array(z.string()).optional(),
+    maxChars: z.number().int().positive().optional(),
+    /** Language the reply must be in, whatever the site language. */
+    lang: z.enum(['sk', 'en']).optional(),
     note: z.string(),
   }),
 });
 type EvalCase = z.infer<typeof caseSchema>;
+type Lang = EvalCase['lang'];
+
+// Words common in one language and rare in the other; two distinct hits mark a reply as that language.
+const LANG_MARKERS: Readonly<Record<Lang, { readonly email: string; readonly words: readonly string[] }>> = {
+  sk: {
+    email: 'hello@denisvarga.sk',
+    words: ['je', 'sa', 'aj', 'na', 'pre', 'ako', 'alebo', 'áno', 'nie', 'jeho', 'má', 'robí', 'robil', 'ktoré', 'ktorý', 'môžete', 'napíšte', 'tiež'],
+  },
+  en: { email: 'hello@denisvarga.dev', words: ['the', 'and', 'is', 'he', 'his', 'has', 'does', 'with', 'you', 'of'] },
+};
 
 function fail(message: string): never {
   console.error(message);
@@ -55,11 +71,28 @@ function loadCases(only: string | undefined): EvalCase[] {
   return cases;
 }
 
+function languageChecks(lower: string, lang: Lang): string[] {
+  const other: Lang = lang === 'sk' ? 'en' : 'sk';
+  const { email, words } = LANG_MARKERS[other];
+  const present = new Set(lower.split(/[^\p{L}]+/u));
+  const hits = words.filter((word) => present.has(word));
+  return [
+    ...(lower.includes(email) ? [`contains the ${other} contact ${email}`] : []),
+    ...(hits.length >= 2 ? [`reads as ${other} (${hits.join(', ')})`] : []),
+  ];
+}
+
 function softChecks(answer: string, expect: EvalCase['expect']): string[] {
   const lower = answer.toLowerCase();
-  const misses = (expect.mustInclude ?? []).filter((s) => !lower.includes(s.toLowerCase())).map((s) => `missing "${s}"`);
-  const leaks = (expect.mustNotInclude ?? []).filter((s) => lower.includes(s.toLowerCase())).map((s) => `contains "${s}"`);
-  return [...misses, ...leaks];
+  const has = (s: string) => lower.includes(s.toLowerCase());
+  const any = expect.mustIncludeAny;
+  return [
+    ...(expect.mustInclude ?? []).filter((s) => !has(s)).map((s) => `missing "${s}"`),
+    ...(any && !any.some(has) ? [`missing any of ${any.map((s) => `"${s}"`).join(', ')}`] : []),
+    ...(expect.mustNotInclude ?? []).filter(has).map((s) => `contains "${s}"`),
+    ...(expect.maxChars !== undefined && answer.length > expect.maxChars ? [`${answer.length} chars, over ${expect.maxChars}`] : []),
+    ...(expect.lang ? languageChecks(lower, expect.lang) : []),
+  ];
 }
 
 const softLine = (checks: string[], note: string) => `  soft:   ${checks.length ? checks.join('; ') : 'pass'} (${note})`;
@@ -95,12 +128,15 @@ async function main(): Promise<void> {
       continue;
     }
 
-    if (isManipulation(lastUserMessage(request.data))) {
-      const reply = manipulationReply(testCase.lang);
-      const checks = softChecks(reply, testCase.expect);
+    // Same order as the route: exact commands first, then the input guard, then the model.
+    const question = lastUserMessage(request.data);
+    const egg = easterEgg(question, testCase.lang);
+    const canned = egg ?? (isManipulation(question) ? manipulationReply(testCase.lang) : null);
+    if (canned !== null) {
+      const checks = softChecks(canned, testCase.expect);
       if (checks.length > 0) softFailures++;
-      console.log(`  answer: ${reply}`);
-      console.log('  guard:  canned reply before the model, no API call');
+      console.log(`  answer: ${canned}`);
+      console.log(`  ${egg === null ? 'guard:  canned reply' : 'egg:    exact command'} before the model, no API call`);
       console.log(`${softLine(checks, testCase.expect.note)}\n`);
       continue;
     }
