@@ -111,15 +111,15 @@ export const copyEn: Copy = {
       },
       {
         title: 'How long',
-        text: 'Questions and answers are deleted automatically after 365 days.',
+        text: 'Questions and answers are deleted automatically after 365 days. Database backups (Cloudflare D1 Time Travel) can keep them restorable for up to 30 more days. CSV exports I download from my private overview of the questions stay with me for the same purposes.',
       },
       {
         title: 'OpenAI',
-        text: 'The answers come from OpenAI in the USA, acting as my processor. It receives your question and the earlier questions and answers of the same conversation. My settings tell it not to store the conversation, and it does not use it to train models. Under its terms it keeps abuse monitoring logs for up to 30 days.',
+        text: "The answers come from OpenAI, acting as my processor. Data from the EU is handled by OpenAI Ireland Limited, which also passes it to the USA under the EU standard contractual clauses in OpenAI's data processing addendum. OpenAI receives your question and the earlier questions and answers of the same conversation. My settings tell it not to store the conversation, and it does not use it to train models. It keeps abuse monitoring logs for up to 30 days, and longer only where the law requires it or to prevent harm.",
       },
       {
         title: 'Pseudonymous identifiers',
-        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address. One goes to OpenAI for abuse detection. The other changes every day, counts your questions (at most 20 a day) and is deleted within three days.',
+        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address without the secret key. One goes to OpenAI for abuse detection. The other changes every day, counts your questions (at most 20 a day) and is deleted within three days.',
       },
       {
         title: 'Cloudflare',

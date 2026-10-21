@@ -112,15 +112,15 @@ export const copySk: Copy = {
       },
       {
         title: 'Ako dlho',
-        text: 'Otázky a odpovede sa automaticky mažú po 365 dňoch.',
+        text: 'Otázky a odpovede sa automaticky mažú po 365 dňoch. V zálohách databázy (Cloudflare D1 Time Travel) sa dajú obnoviť ešte najviac 30 dní. CSV exporty, ktoré si stiahnem z môjho neverejného prehľadu otázok, uchovávam sám na rovnaký účel.',
       },
       {
         title: 'OpenAI',
-        text: 'Odpovede generuje OpenAI v USA ako môj sprostredkovateľ. Dostane vašu otázku a predchádzajúce otázky a odpovede z toho istého rozhovoru. Konverzáciu si podľa môjho nastavenia neukladá a na trénovanie modelov ju nepoužíva. Záznamy na odhaľovanie zneužitia si podľa svojich podmienok uchováva najviac 30 dní.',
+        text: 'Odpovede generuje OpenAI ako môj sprostredkovateľ. Údaje z EÚ spracúva spoločnosť OpenAI Ireland Limited, ktorá ich odovzdáva aj do USA na základe štandardných zmluvných doložiek EÚ v zmluve OpenAI o spracúvaní údajov. OpenAI dostane vašu otázku a predchádzajúce otázky a odpovede z toho istého rozhovoru. Konverzáciu si podľa môjho nastavenia neukladá a na trénovanie modelov ju nepoužíva. Záznamy na odhaľovanie zneužitia uchováva najviac 30 dní, dlhšie len vtedy, keď to vyžaduje zákon alebo ochrana pred škodou.',
       },
       {
         title: 'Pseudonymné identifikátory',
-        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Druhý sa mení každý deň, počíta vaše otázky (najviac 20 za deň) a do troch dní sa zmaže.',
+        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Druhý sa mení každý deň, počíta vaše otázky (najviac 20 za deň) a do troch dní sa zmaže.',
       },
       {
         title: 'Cloudflare',

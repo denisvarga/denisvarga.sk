@@ -52,7 +52,7 @@ describe('PrivacyNotice', () => {
     expect(html).toContain(`<details id="${IDS[lang]}"`);
     expect(html).not.toMatch(/<details[^>]* open/);
     const text = COPY[lang].privacy.sections.map((s) => s.text).join(' ');
-    for (const fact of [EMAILS[lang], '365', 'OpenAI', '30', '20', 'Cloudflare', 'D1', 'Turnstile', 'Google Analytics', 'GDPR']) {
+    for (const fact of [EMAILS[lang], '365', 'OpenAI', 'OpenAI Ireland Limited', 'USA', '30', '20', 'Cloudflare', 'D1', 'Time Travel', 'CSV', 'Turnstile', 'Google Analytics', 'GDPR']) {
       expect(text, fact).toContain(fact);
     }
     expect(text).not.toContain(EMAILS[lang === 'sk' ? 'en' : 'sk']);
