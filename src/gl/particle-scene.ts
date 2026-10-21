@@ -123,10 +123,16 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     if (!built.stage) throw new Error('gl_slice_order');
     return built.stage;
   };
+  const shape0 = () => {
+    if (!built.shapes[0]) throw new Error('gl_slice_order');
+    return built.shapes[0];
+  };
+  // The static frame shows only the hero shape, so the other six are never built.
+  const builders = mode === 'static' ? SHAPE_BUILDERS.slice(0, 1) : SHAPE_BUILDERS;
   const slices: InitSlice[] = [
     { name: 'renderer', run: () => void (built.stage = createStage(container, coarse)) },
-    ...SHAPE_BUILDERS.map((build, i) => ({ name: `shape-${i}`, run: () => void built.shapes.push(build(n, Math.random)) })),
-    { name: 'points', run: () => void (built.cloud = createCloud(stageOf(), built.shapes[0]!, n, owned)) },
+    ...builders.map((build, i) => ({ name: `shape-${i}`, run: () => void built.shapes.push(build(n, Math.random)) })),
+    { name: 'points', run: () => void (built.cloud = createCloud(stageOf(), shape0(), n, owned)) },
     { name: 'lines', run: () => void (built.net = createNet(stageOf(), n, nodeCount, owned)) },
     { name: 'compile', run: () => stageOf().renderer.compileAsync(stageOf().scene, stageOf().camera).then(() => {}) },
   ];
@@ -137,7 +143,8 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     throw error;
   }
   const { stage, cloud, net, shapes } = built;
-  if (!stage || !cloud || !net) {
+  const heroShape = shapes[0];
+  if (!stage || !cloud || !net || !heroShape || shapes.length !== builders.length) {
     dispose();
     throw new Error('gl_slice_order');
   }
@@ -148,7 +155,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   const renderStatic = () => {
     const vw = window.innerWidth, vh = window.innerHeight;
     const t = groupTargets(0, 0, 0, 0, { viewportWidth: vw, viewportHeight: vh, hero: getLayout().heroImage, mobile });
-    cloud.pos.set(shapes[0]!);
+    cloud.pos.set(heroShape);
     cloud.attr.needsUpdate = true;
     updateLines(net, cloud.pos, t.opacity);
     group.position.set(t.x, t.y, 0);
@@ -176,8 +183,9 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
       velocity: getScrollVelocity(), scrollY, mouseX: pointer.x, mouseY: pointer.y, coarse: isCoarsePointer(), mobile,
     });
     const r = stepFrame(state, input);
-    if (state.op < 0.001 && r.targetOpacity < 0.001) return;
-    writeMorphPositions(shapes[r.a]!, shapes[r.b]!, cloud.dir, cloud.ph, cloud.pos, r.m, r.burst, r.tt);
+    const from = shapes[r.a], to = shapes[r.b];
+    if (!from || !to || (state.op < 0.001 && r.targetOpacity < 0.001)) return;
+    writeMorphPositions(from, to, cloud.dir, cloud.ph, cloud.pos, r.m, r.burst, r.tt);
     cloud.attr.needsUpdate = true;
     updateLines(net, cloud.pos, r.lineOpacity);
     group.position.set(state.ox, state.oy, 0);
