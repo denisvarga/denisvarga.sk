@@ -210,11 +210,11 @@ describe('prerendered markup', () => {
       expect(html).toContain('href="tel:+421902074830"');
       expect(html).toContain(`2018 - ${BUILD_YEAR}`);
       expect(html).toContain('rel="noopener"');
-      const linkedin = new DOMParser().parseFromString(html, 'text/html').querySelector('a[href*="linkedin.com"]');
-      expect([linkedin?.textContent, linkedin?.getAttribute('target'), linkedin?.getAttribute('rel')]).toEqual([
-        'LinkedIn',
-        '_blank',
-        'noopener noreferrer',
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const profiles = [...doc.querySelectorAll('a[rel~="me"]')];
+      expect(profiles.map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('target'), a.getAttribute('rel')])).toEqual([
+        ['LinkedIn', 'https://www.linkedin.com/in/denisvarg/', '_blank', 'me noopener noreferrer'],
+        ['GitHub', 'https://github.com/denisvarga', '_blank', 'me noopener noreferrer'],
       ]);
       expect(html.match(/data-heroimg/g)).toHaveLength(2);
     }

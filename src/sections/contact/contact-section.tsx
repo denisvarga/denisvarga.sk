@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from 'react';
 import pill from '../../components/pill-link.module.css';
 import { SplitHeading } from '../../components/split-heading';
-import { LINKEDIN_URL } from '../../i18n/head-copy';
+import { GITHUB_URL, LINKEDIN_URL } from '../../i18n/head-copy';
 import { useLang } from '../../i18n/lang-context';
 import { contact, sectionIds } from '../../i18n/ui-copy';
 import { SiteFooter } from '../../layout/site-footer';
@@ -12,8 +12,11 @@ import styles from './contact.module.css';
 interface MagnetLinkProps {
   readonly href: string;
   readonly tone: 'dark' | 'outline';
-  /** Opens the link in a new tab with this rel; cross-origin links also drop the referrer. */
-  readonly newTabRel?: 'noopener' | 'noopener noreferrer';
+  /**
+   * Opens the link in a new tab with this rel; cross-origin links also drop the referrer, and
+   * Denis's own profiles add `me` so they and this site confirm each other as one identity.
+   */
+  readonly newTabRel?: 'noopener' | 'noopener noreferrer' | 'me noopener noreferrer';
   readonly children: ReactNode;
 }
 
@@ -59,8 +62,11 @@ export function ContactSection() {
               <span>{t.contact.cv}</span>
               <span aria-hidden="true">↓</span>
             </MagnetLink>
-            <MagnetLink href={LINKEDIN_URL} tone="outline" newTabRel="noopener noreferrer">
+            <MagnetLink href={LINKEDIN_URL} tone="outline" newTabRel="me noopener noreferrer">
               LinkedIn
+            </MagnetLink>
+            <MagnetLink href={GITHUB_URL} tone="outline" newTabRel="me noopener noreferrer">
+              GitHub
             </MagnetLink>
           </div>
         </div>
