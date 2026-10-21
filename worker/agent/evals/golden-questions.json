@@ -690,10 +690,13 @@
         "WooCommerce"
       ],
       "mustNotInclude": [
-        "hello@denisvarga.dev"
+        "hello@denisvarga.dev",
+        "ě",
+        "ř",
+        "ů"
       ],
       "lang": "sk",
-      "note": "A Czech question gets a Slovak answer with the Slovak contact if any."
+      "note": "A Czech question gets a Slovak answer with the Slovak contact if any; the Czech-only letters ě, ř and ů mark a Czech reply."
     }
   },
   {

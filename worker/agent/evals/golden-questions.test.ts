@@ -52,6 +52,7 @@ describe('golden questions', () => {
     }
     expect(cases.find((c) => c.id === 'projects-general-sk')?.expect).toMatchObject({ maxChars: 600 });
     expect(cases.find((c) => c.id === 'czech-question')?.expect).toMatchObject({ lang: 'sk' });
+    expect(cases.find((c) => c.id === 'czech-question')?.expect.mustNotInclude).toEqual(expect.arrayContaining(['ě', 'ř', 'ů']));
   });
 
   it('sends the honest rules question and the near-miss command to the model', () => {
