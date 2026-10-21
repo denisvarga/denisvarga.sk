@@ -1,4 +1,5 @@
 import type { Lang } from '../i18n/types';
+import { escapeHtml } from '../seo/head-tags';
 import { CV_TITLE } from './cv-copy';
 import blocksCss from './cv-blocks.css?raw';
 import printCss from './cv-print.css?raw';
@@ -39,7 +40,7 @@ export function cvHtmlDocument(lang: Lang, assets: CvAssets, body: string): stri
     `<html lang="${lang}">`,
     '<head>',
     '<meta charset="utf-8">',
-    `<title>${CV_TITLE}</title>`,
+    `<title>${escapeHtml(CV_TITLE[lang])}</title>`,
     '<style>',
     ...fontFaces(assets.fontDir),
     printCss,

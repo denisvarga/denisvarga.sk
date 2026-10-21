@@ -120,10 +120,18 @@ describe('cvHtmlDocument', () => {
   it('wraps the body in a titled print document with one @font-face per subset and weight', () => {
     const html = cvHtmlDocument('en', { fontDir: 'fonts', portrait: 'portrait.jpg' }, '<p>x</p>');
     expect(html.startsWith('<!doctype html>\n<html lang="en">')).toBe(true);
-    expect(html).toContain('<title>Denis Varga - CV</title>');
+    expect(html).toContain('<title>Denis Varga - CV, AI &amp; full-stack developer</title>');
     expect(html.match(/@font-face/g)).toHaveLength(8);
     expect(html).toContain("url('fonts/manrope-latin-ext-600.woff2')");
     expect(html).toContain('<body><p>x</p></body>');
+  });
+
+  it.each([
+    ['sk', 'Denis Varga - CV, AI a full-stack developer'],
+    ['en', 'Denis Varga - CV, AI & full-stack developer'],
+  ] as const)('%s: its own PDF title', (lang, title) => {
+    const html = cvHtmlDocument(lang, { fontDir: 'fonts', portrait: 'p.jpg' }, '');
+    expect(new DOMParser().parseFromString(html, 'text/html').title).toBe(title);
   });
 
   it('rejects a font directory that could break out of the CSS url()', () => {

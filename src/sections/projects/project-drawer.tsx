@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type KeyboardEvent } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { matchesMedia, REDUCED_MOTION_QUERY } from '../../motion/use-media-query';
@@ -47,6 +47,10 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const shownRef = useRef({ open, last });
   const titleId = useId();
+  // Content mounts on the first open, so the prerendered page gets no extra project heading or image
+  // copy from the closed drawer; it then stays mounted so the drawer can slide closed with it.
+  const [primed, setPrimed] = useState(open);
+  if (open && !primed) setPrimed(true);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -98,7 +102,7 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
         className={styles.aside}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={titleId}
+        aria-labelledby={primed ? titleId : undefined}
         data-lenis-prevent=""
         onKeyDown={trapTab}
       >
@@ -119,7 +123,7 @@ export function ProjectDrawer({ drawer }: { readonly drawer: DrawerApi }) {
           </div>
         </div>
         <div ref={bodyRef} className={styles.body}>
-          <ProjectDrawerContent project={project} titleId={titleId} />
+          {primed && <ProjectDrawerContent project={project} titleId={titleId} />}
         </div>
       </aside>
     </div>

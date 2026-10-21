@@ -27,3 +27,21 @@ export function goTo(target: ScrollTarget): void {
     behavior: matchesMedia(REDUCED_MOTION_QUERY) ? 'instant' : 'smooth',
   });
 }
+
+/** The parts of a DOM or React mouse event that decide whether a link click is plain. */
+export interface LinkClick {
+  readonly button: number;
+  readonly metaKey: boolean;
+  readonly ctrlKey: boolean;
+  readonly shiftKey: boolean;
+  readonly altKey: boolean;
+  preventDefault(): void;
+}
+
+// In-page links scroll with `go` (goTo or a wrapper of it) on a plain left click or Enter; a
+// modified or middle click keeps the browser's own behaviour, such as opening the anchor in a new tab.
+export function onScrollLinkClick(event: LinkClick, go: () => void): void {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  go();
+}

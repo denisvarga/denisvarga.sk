@@ -4,15 +4,21 @@ import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LangProvider } from '../i18n/lang-context';
 import { AboutSection } from '../sections/about/about-section';
+import { AiSection } from '../sections/ai/ai-section';
 import { ContactSection } from '../sections/contact/contact-section';
 import { ExperienceSection } from '../sections/experience/experience-section';
 import { HeroSection } from '../sections/hero/hero-section';
+import { ProjectsSection } from '../sections/projects/projects-section';
+import { StackSection } from '../sections/stack/stack-section';
 import { ProgressBar } from './progress-bar';
 import { SiteChrome } from './site-chrome';
 import { BUILD_YEAR } from '../lib/use-current-year';
 
 const goTo = vi.hoisted(() => vi.fn());
-vi.mock('../motion/scroll-to', () => ({ goTo }));
+vi.mock('../motion/scroll-to', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../motion/scroll-to')>()),
+  goTo,
+}));
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
@@ -51,6 +57,9 @@ const overlay = () => container.querySelector<HTMLElement>('#site-menu')!;
 const header = () => container.querySelector('header')!;
 const main = () => container.querySelector('main')!;
 const click = (el: HTMLElement) => act(() => el.click());
+const plainClick = () => new MouseEvent('click', { bubbles: true, cancelable: true });
+const navItems = () => [...overlay().querySelectorAll<HTMLAnchorElement>('nav a')];
+const contactPill = () => [...header().querySelectorAll<HTMLAnchorElement>('a')].find((a) => a.textContent === 'Kontakt')!;
 const langLinks = (scope: ParentNode) =>
   [...scope.querySelectorAll<HTMLAnchorElement>('a[hreflang]')].map((a) => [
     a.hreflang,
@@ -77,7 +86,7 @@ describe('menu overlay', () => {
 
   it('closes on Escape and returns focus to the toggle', () => {
     click(toggle());
-    overlay().querySelector('button')!.focus();
+    overlay().querySelector<HTMLAnchorElement>('nav a')!.focus();
     act(() => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     });
@@ -87,23 +96,50 @@ describe('menu overlay', () => {
     expect(document.documentElement.style.overflow).toBe('');
   });
 
-  it('nav item closes the menu first and scrolls 380 ms later', () => {
+  it('nav items are links to the section anchors', () => {
+    expect(navItems().map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['01O mne', '#o-mne'],
+      ['02AI', '#ai'],
+      ['03Projekty', '#projekty'],
+    ]);
+  });
+
+  it('nav item closes the menu first and scrolls 380 ms later instead of jumping', () => {
     click(toggle());
-    const items = overlay().querySelectorAll<HTMLButtonElement>('nav button');
-    expect(items).toHaveLength(3);
-    click(items[2]!);
+    const event = plainClick();
+    act(() => navItems()[2]!.dispatchEvent(event));
+    expect(event.defaultPrevented).toBe(true);
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(goTo).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(379));
     expect(goTo).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(1));
-    expect(goTo).toHaveBeenCalledWith(4);
+    expect(goTo).toHaveBeenCalledWith('#projekty');
   });
 
-  it('header contact pill scrolls to Kontakt (section 6) right away when the menu is closed', () => {
-    const contactPill = [...container.querySelectorAll('header button')].find((b) => b.textContent === 'Kontakt');
-    click(contactPill as HTMLButtonElement);
-    expect(goTo).toHaveBeenCalledWith(6);
+  it('leaves a modified click on a nav item to the browser, for a new tab', () => {
+    click(toggle());
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: true });
+    act(() => navItems()[0]!.dispatchEvent(event));
+    expect(event.defaultPrevented).toBe(false);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(goTo).not.toHaveBeenCalled();
+    expect(toggle().getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('header contact pill links to #kontakt and scrolls to section 6 right away when the menu is closed', () => {
+    expect(contactPill().getAttribute('href')).toBe('#kontakt');
+    const event = plainClick();
+    act(() => contactPill().dispatchEvent(event));
+    expect(event.defaultPrevented).toBe(true);
+    expect(goTo).toHaveBeenCalledWith('#kontakt');
+  });
+
+  it('header name links to #top and scrolls there', () => {
+    const name = header().querySelector<HTMLAnchorElement>('a[href="#top"]')!;
+    expect(name.textContent).toBe('Denis Varga');
+    click(name);
+    expect(goTo).toHaveBeenCalledWith('#top');
   });
 
   it('SK/EN are plain links to the language pages, the current one marked', () => {
@@ -125,8 +161,7 @@ describe('header language switch', () => {
       ['en', '/en/', null],
     ]);
     const en = header().querySelector('a[hreflang="en"]')!;
-    const contactPill = [...header().querySelectorAll('button')].find((b) => b.textContent === 'Kontakt')!;
-    expect(en.compareDocumentPosition(contactPill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(en.compareDocumentPosition(contactPill()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const navigate = new MouseEvent('click', { bubbles: true, cancelable: true });
     act(() => en.dispatchEvent(navigate));
     expect(navigate.defaultPrevented).toBe(false);
@@ -175,13 +210,38 @@ describe('prerendered markup', () => {
       expect(html).toContain('href="tel:+421902074830"');
       expect(html).toContain(`2018 - ${BUILD_YEAR}`);
       expect(html).toContain('rel="noopener"');
-      const linkedin = new DOMParser().parseFromString(html, 'text/html').querySelector('a[href*="linkedin.com"]');
-      expect([linkedin?.textContent, linkedin?.getAttribute('target'), linkedin?.getAttribute('rel')]).toEqual([
-        'LinkedIn',
-        '_blank',
-        'noopener noreferrer',
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const profiles = [...doc.querySelectorAll('a[rel~="me"]')];
+      expect(profiles.map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('target'), a.getAttribute('rel')])).toEqual([
+        ['LinkedIn', 'https://www.linkedin.com/in/denisvarg/', '_blank', 'me noopener noreferrer'],
+        ['GitHub', 'https://github.com/denisvarga', '_blank', 'me noopener noreferrer'],
       ]);
       expect(html.match(/data-heroimg/g)).toHaveLength(2);
     }
+  });
+
+  it.each([
+    ['sk', ['o-mne', 'skusenosti', 'ai', 'projekty', 'nastroje', 'kontakt'], 'Moja práca'],
+    ['en', ['about', 'experience', 'ai', 'work', 'stack', 'contact'], 'My work'],
+  ] as const)('%s: every section after the hero has its anchor, and every in-page link has a target', (lang, ids, workCta) => {
+    const html = renderToString(
+      <LangProvider lang={lang}>
+        <SiteChrome />
+        <main id="top">
+          <HeroSection />
+          <AboutSection />
+          <ExperienceSection />
+          <AiSection />
+          <ProjectsSection />
+          <StackSection />
+          <ContactSection />
+        </main>
+      </LangProvider>,
+    );
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    expect([...doc.querySelectorAll('section[data-sec]')].map((section) => section.id)).toEqual(['', ...ids]);
+    const inPage = [...doc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    expect(inPage.filter((a) => !doc.getElementById(a.getAttribute('href')!.slice(1)))).toEqual([]);
+    expect(inPage.find((a) => a.textContent?.includes(workCta))?.getAttribute('href')).toBe(`#${ids[3]}`);
   });
 });

@@ -37,6 +37,7 @@ const meta = (key: 'name' | 'property', name: string, content: string) =>
 function sharedTags(fontPreloads: readonly string[]): string[] {
   return [
     meta('name', 'theme-color', THEME_COLOR),
+    '<link rel="icon" href="/favicon.ico" sizes="48x48">',
     '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
     '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
     ...fontPreloads.map(
@@ -49,8 +50,9 @@ export function hreflangAlternates(): ReadonlyArray<readonly [hreflang: string, 
   return [...LANGS.map((lang) => [lang, canonicalUrl(lang)] as const), ['x-default', canonicalUrl('sk')]];
 }
 
-// charset and viewport live in index.html, so they are never emitted here.
-export function buildHeadTags(lang: Lang, assets: HeadAssets): string {
+// charset and viewport live in index.html, so they are never emitted here. `contentDate` is the
+// YYYY-MM-DD date of the last content change, the ProfilePage dateModified.
+export function buildHeadTags(lang: Lang, assets: HeadAssets, contentDate: string): string {
   const copy = headCopy[lang];
   const other = LANGS.find((l) => l !== lang) ?? 'sk';
   const image = { url: `${copy.origin}${OG_IMAGES[lang].path}?v=${OG_IMAGE_VERSION}`, alt: OG_IMAGES[lang].alt };
@@ -58,6 +60,7 @@ export function buildHeadTags(lang: Lang, assets: HeadAssets): string {
     HEAD_COMMENT,
     `<title>${escapeHtml(copy.title)}</title>`,
     meta('name', 'description', copy.description),
+    meta('name', 'robots', 'max-image-preview:large'),
     `<link rel="canonical" href="${canonicalUrl(lang)}">`,
     ...hreflangAlternates().map(([hreflang, href]) => `<link rel="alternate" hreflang="${hreflang}" href="${href}">`),
     meta('property', 'og:type', 'website'),
@@ -75,7 +78,7 @@ export function buildHeadTags(lang: Lang, assets: HeadAssets): string {
     meta('name', 'twitter:image', image.url),
     meta('name', 'twitter:image:alt', image.alt),
     ...sharedTags(assets.fonts),
-    `<script type="application/ld+json">${serializeJsonLd(profileJsonLd(lang, assets.portrait))}</script>`,
+    `<script type="application/ld+json">${serializeJsonLd(profileJsonLd(lang, assets.portrait, contentDate))}</script>`,
   ].join('\n    ');
 }
 

@@ -49,6 +49,7 @@ const FIXTURE: Record<string, string> = {
   'client/og-image.jpg': '',
   'client/og-image-en.jpg': '',
   'client/favicon.svg': '',
+  'client/favicon.ico': '',
   'client/apple-touch-icon.png': '',
   'client/cv/denis-varga-cv.pdf': '',
   'client/cv/denis-varga-cv-en.pdf': '',

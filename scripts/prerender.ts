@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -5,7 +6,7 @@ import sharp from 'sharp';
 import type { CvAssets } from '../src/cv/cv-html';
 import { LANGS, type Lang } from '../src/i18n/types';
 import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from '../src/seo/head-tags';
-import { buildSitemap } from '../src/seo/sitemap';
+import { buildSitemap, contentDateOr } from '../src/seo/sitemap';
 
 const CLIENT_DIR = 'dist/client';
 const SSR_DIR = 'dist-ssr';
@@ -21,6 +22,8 @@ const PORTRAIT_BG = '#ecece9';
 const HTML_LANG = /<html lang="[a-z]+">/;
 const MODULE_SCRIPT = /\s*<script type="module"[^>]*><\/script>/g;
 const MODULE_PRELOAD = /\s*<link rel="modulepreload"[^>]*>/g;
+// Whatever the pages, PDFs and llms.txt say comes from these paths.
+const CONTENT_PATHS = ['src/i18n', 'src/data', 'shared', 'public/cv', 'src/seo/json-ld.ts'];
 
 function replaceOnce(html: string, search: string | RegExp, value: string): string {
   const count = typeof search === 'string' ? html.split(search).length - 1 : (html.match(search) ?? []).length;
@@ -52,12 +55,30 @@ const template = await readFile(join(CLIENT_DIR, 'index.html'), 'utf8');
 const siteAsset = (pattern: RegExp) => `/assets/${assetName(pattern)}`;
 const assets: HeadAssets = { fonts: PRELOADED_FONTS.map(siteAsset), portrait: siteAsset(PROFILE_PORTRAIT) };
 
+function lastContentCommitDate(): string {
+  try {
+    return execFileSync('git', ['log', '-1', '--format=%cs', '--', ...CONTENT_PATHS], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+  } catch {
+    return '';
+  }
+}
+
+// lastmod and dateModified move only when the content does; a build date on every deploy would
+// teach Google to ignore them. sv-SE formats as YYYY-MM-DD in the site's timezone.
+const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Bratislava' }).format(new Date());
+const gitDate = lastContentCommitDate();
+const contentDate = contentDateOr(gitDate, today);
+if (contentDate !== gitDate.trim()) console.warn(`No content commit date from git, using the build date ${today}`);
+
 const pages: ReadonlyArray<{ lang: Lang; file: string }> = [
   { lang: 'sk', file: 'index.html' },
   { lang: 'en', file: 'en/index.html' },
 ];
 for (const { lang, file } of pages) {
-  const html = fillTemplate(template, lang, buildHeadTags(lang, assets), await renderApp(lang));
+  const html = fillTemplate(template, lang, buildHeadTags(lang, assets, contentDate), await renderApp(lang));
   await mkdir(join(CLIENT_DIR, file, '..'), { recursive: true });
   await writeFile(join(CLIENT_DIR, file), html);
   console.log(`prerendered: ${file}`);
@@ -73,10 +94,8 @@ await writeFile(
 );
 console.log('prerendered: 404.html');
 
-// sv-SE formats as YYYY-MM-DD; the site's timezone decides the date, not the build machine's.
-const buildDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Bratislava' }).format(new Date());
-await writeFile(join(CLIENT_DIR, 'sitemap.xml'), buildSitemap(buildDate));
-console.log(`sitemap.xml: lastmod ${buildDate}`);
+await writeFile(join(CLIENT_DIR, 'sitemap.xml'), buildSitemap(contentDate));
+console.log(`sitemap.xml: lastmod ${contentDate}`);
 
 await writeFile(join(CLIENT_DIR, 'llms.txt'), buildLlmsTxt());
 await writeFile(join(CLIENT_DIR, 'llms-full.txt'), buildLlmsFullTxt());

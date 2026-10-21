@@ -26,6 +26,21 @@ export const ui: Localized<UiCopy> = {
   },
 };
 
+export interface SectionIds {
+  readonly about: string;
+  readonly experience: string;
+  readonly ai: string;
+  readonly work: string;
+  readonly stack: string;
+  readonly contact: string;
+}
+
+// Anchors in the page language, for shareable deep links and "Jump to" links in search results.
+export const sectionIds: Localized<SectionIds> = {
+  sk: { about: 'o-mne', experience: 'skusenosti', ai: 'ai', work: 'projekty', stack: 'nastroje', contact: 'kontakt' },
+  en: { about: 'about', experience: 'experience', ai: 'ai', work: 'work', stack: 'stack', contact: 'contact' },
+};
+
 export interface ContactCopy {
   readonly email: string;
   readonly emailHref: `mailto:${string}`;

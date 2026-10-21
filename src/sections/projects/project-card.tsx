@@ -22,7 +22,7 @@ export function ProjectCard({ project, index, total, onOpen }: ProjectCardProps)
         <img
           className={styles.img}
           src={project.image}
-          alt={project.name}
+          alt={`${project.name}, ${project.kind[lang]}`}
           width={PROJECT_IMAGE_SIZE.width}
           height={PROJECT_IMAGE_SIZE.height}
           loading="lazy"

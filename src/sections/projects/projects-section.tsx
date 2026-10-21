@@ -3,6 +3,7 @@ import heading from '../../components/split-heading.module.css';
 import { SplitHeading } from '../../components/split-heading';
 import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
+import { sectionIds } from '../../i18n/ui-copy';
 import { useReveal } from '../../motion/use-reveal';
 import { ProjectDrawer } from './project-drawer';
 import { ProjectIndex } from './project-index';
@@ -11,7 +12,7 @@ import styles from './projects.module.css';
 import { useProjectDrawer } from './use-project-drawer';
 
 export function ProjectsSection() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const drawer = useProjectDrawer(PROJECTS.length);
   const labelRef = useRef<HTMLSpanElement>(null);
   const bodyRef = useRef<HTMLParagraphElement>(null);
@@ -19,7 +20,7 @@ export function ProjectsSection() {
   useReveal(bodyRef);
 
   return (
-    <section data-sec className={styles.section}>
+    <section data-sec id={sectionIds[lang].work} className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <div className={styles.headText}>

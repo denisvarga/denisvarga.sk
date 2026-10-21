@@ -4,6 +4,7 @@ import { SplitHeading } from '../../components/split-heading';
 import { demosEn } from '../../data/demos-en';
 import { demosSk } from '../../data/demos-sk';
 import { useLang } from '../../i18n/lang-context';
+import { sectionIds } from '../../i18n/ui-copy';
 import { useReveal } from '../../motion/use-reveal';
 import { AiToolList } from './ai-tool-list';
 import { AskAgent } from './ask-agent';
@@ -39,7 +40,7 @@ export function AiSection() {
   const advance = useCallback(() => setRun((s) => ({ tool: (s.tool + 1) % demos.length, run: s.run + 1 })), [demos.length]);
 
   return (
-    <section data-sec className={styles.section}>
+    <section data-sec id={sectionIds[lang].ai} className={styles.section}>
       <div className={styles.inner}>
         {SHOW_INTRO_AND_DEMO && (
           <>

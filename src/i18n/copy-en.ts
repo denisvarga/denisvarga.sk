@@ -4,7 +4,7 @@ export const copyEn: Copy = {
   nav: { items: ['About', 'AI', 'Work'], contact: 'Contact' },
   hero: {
     sub: 'AI & full-stack developer, from idea to production',
-    title: "Hi, I'm *Denis.*",
+    title: "Hi, I'm *Denis Varga.*",
     lead: "I don't see a problem as an obstacle but as a chance to make something better. First I make sure I understand it, then I design and build the right solution, whether that's a web app, an AI agent or an internal tool.",
     cta1: 'My work',
     cta2: 'Ask my AI agent',
@@ -13,11 +13,11 @@ export const copyEn: Copy = {
   about: {
     label: 'About',
     title: 'Building software since 2017. Now with AI at *every step.*',
-    body: "I started in 2015 with an agency internship, moved through graphic design and print, and since 2017 I've been building custom websites, online stores, apps and internal tools. Today I work AI-first: AI gives me speed, versatility and more control; I set the direction. I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. What I don't know yet, I learn fast. And sometimes the best solution is to simplify the process, not automate it.",
+    body: "I started in 2015 with an agency internship, moved through graphic design and print, and since 2017 I've been building custom websites, online stores, apps and internal tools. Today I work AI-first: AI gives me speed, versatility and more control; I set the direction. I write code with Claude Code and Codex, and on every project I first ask what it should bring to users and the business. What I don't know yet, I learn fast. I build AI agents on the Claude Agent SDK, OpenAI Agents SDK and LangGraph, and custom MCP servers that let AI work safely with WordPress, data and company tools. I automate processes with Make and n8n. And sometimes the best solution is to simplify the process, not automate it.",
     facts: [
       { label: 'AI', value: 'Agents, MCP, Claude Code, Codex' },
-      { label: 'I build', value: 'Websites, apps, automation' },
-      { label: 'Based in', value: 'Bratislava or remote' },
+      { label: 'I build', value: 'Websites, online stores (WordPress, WooCommerce), apps, automation' },
+      { label: 'Based in', value: 'Bratislava, Slovakia or remote' },
     ],
   },
   exp: { label: 'Experience', title: 'My *path*' },
