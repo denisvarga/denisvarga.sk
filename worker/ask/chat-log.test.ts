@@ -33,6 +33,18 @@ describe('chat log hygiene', () => {
     expect(db.rows[0]).toMatchObject({ answer: null, outcome: 'error' });
   });
 
+  it("redacts visitor emails and phone numbers in the question and the answer, keeping Denis's", async () => {
+    const db = new FakeD1();
+    const question = 'Som jana@firma.sk, tel. 0905 123 456. Kontakt na Denisa?';
+    const reservation = await reserveSlot(db.asBinding(), { now: Date.now(), lang: 'sk', question, cap: 10, clientCap: 10, quotaKey: 'k' });
+    if (reservation.status !== 'reserved') throw new Error('expected a reserved slot');
+    await finalizeRow(db.asBinding(), reservation.id, result('Jana (jana@firma.sk), Denis je na hello@denisvarga.sk a +421 902 074 830.'), 9, 'v-test');
+    expect(db.rows[0]).toMatchObject({
+      question: 'Som [email], tel. [telefón]. Kontakt na Denisa?',
+      answer: 'Jana ([email]), Denis je na hello@denisvarga.sk a +421 902 074 830.',
+    });
+  });
+
   it('records the prompt revision and the cache reads and writes with the answer', async () => {
     const db = new FakeD1();
     const reservation = await reserveSlot(db.asBinding(), { now: Date.now(), lang: 'sk', question: 'Kto je Denis?', cap: 10, clientCap: 10, quotaKey: 'k' });

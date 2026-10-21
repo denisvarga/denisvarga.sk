@@ -1,5 +1,6 @@
 import type { AskLang } from '../../shared/ask-contract';
 import { cleanContent } from './clean-text';
+import { redactContacts } from './redact';
 
 export const INSERT_PENDING_SQL =
   "INSERT INTO chat_log (created_at, lang, question, outcome) VALUES (?1, ?2, ?3, 'pending') RETURNING id";
@@ -45,12 +46,13 @@ export interface ReserveInput {
  * Inserts a pending row, counts the client's calls today and counts today's billable rows, all
  * including this one, in one batch (a single D1 transaction, so concurrent requests cannot
  * overshoot). Over either limit the row becomes `capped`. Throws on any D1 error so the caller can
- * fail closed. The question is stored without control characters whatever the caller validated.
+ * fail closed. The question is stored without control characters whatever the caller validated, and
+ * with visitor emails and phone numbers redacted.
  */
 export async function reserveSlot(db: D1Database, input: ReserveInput): Promise<Reservation> {
   const day = utcMidnight(input.now);
   const [inserted, quota, counted] = await db.batch<{ id?: number; n?: number }>([
-    db.prepare(INSERT_PENDING_SQL).bind(input.now, input.lang, cleanContent(input.question)),
+    db.prepare(INSERT_PENDING_SQL).bind(input.now, input.lang, redactContacts(cleanContent(input.question))),
     db.prepare(UPSERT_QUOTA_SQL).bind(day, input.quotaKey),
     db.prepare(COUNT_TODAY_SQL).bind(day, input.cap + 1),
   ]);
