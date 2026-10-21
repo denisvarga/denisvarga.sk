@@ -68,3 +68,35 @@ export async function reserveSlot(db: D1Database, input: ReserveInput): Promise<
   await db.prepare(MARK_CAPPED_SQL).bind(id).run();
   return { status: 'capped', scope };
 }
+
+/** Counter of all contact messages per UTC day. Client keys are hex HMACs, so it never collides with one. */
+export const CONTACT_TOTAL_KEY = 'contact:global';
+
+export interface ContactReserveInput {
+  readonly now: number;
+  readonly clientCap: number;
+  readonly cap: number;
+  /** `quotaKey` of "contact:" plus the client key, for the UTC day of `now`. */
+  readonly quotaKey: string;
+}
+
+export type ContactReservation = { readonly status: 'reserved' } | { readonly status: 'capped'; readonly scope: CapScope };
+
+/**
+ * Counts one contact message for the client and for the day, both including this one, in one
+ * batch. A message over either cap still counts, which only makes the limit stricter. Throws on
+ * any D1 error so the caller can fail closed.
+ */
+export async function reserveContactSlot(db: D1Database, input: ContactReserveInput): Promise<ContactReservation> {
+  const day = utcMidnight(input.now);
+  const [client, total] = await db.batch<{ n?: number }>([
+    db.prepare(UPSERT_QUOTA_SQL).bind(day, input.quotaKey),
+    db.prepare(UPSERT_QUOTA_SQL).bind(day, CONTACT_TOTAL_KEY),
+  ]);
+  const clientCount = client?.results[0]?.n;
+  const count = total?.results[0]?.n;
+  if (typeof clientCount !== 'number' || typeof count !== 'number') throw new Error('unexpected D1 result');
+  if (clientCount > input.clientCap) return { status: 'capped', scope: 'client' };
+  if (count > input.cap) return { status: 'capped', scope: 'global' };
+  return { status: 'reserved' };
+}

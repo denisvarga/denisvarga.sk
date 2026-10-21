@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contactEmail, oneLine, parseDraftArguments } from './schema';
+import { contactEmail, contactSchema, oneLine, parseDraftArguments } from './schema';
 
 const EM_DASH = String.fromCodePoint(0x2014);
 const args = (value: unknown) => JSON.stringify(value);
@@ -38,5 +38,32 @@ describe('parseDraftArguments', () => {
 
   it('keeps a 600-character message', () => {
     expect(parseDraftArguments(args({ message: 'x'.repeat(600), name: null, email: null }))?.message).toHaveLength(600);
+  });
+});
+
+const request = (extra: Record<string, unknown> = {}) => ({
+  lang: 'sk',
+  turnstileToken: 't',
+  name: 'Jana',
+  email: 'jana@firma.sk',
+  message: 'Správa',
+  messages: [],
+  ...extra,
+});
+
+describe('contactSchema', () => {
+  it('reduces the name to one line, trims the email and keeps line breaks in the message', () => {
+    const parsed = contactSchema.parse(request({ name: ' A\r\nBcc: x ', email: ' jana@firma.sk ', message: 'Riadok 1\r\nRiadok 2\u0007' }));
+    expect(parsed).toMatchObject({ name: 'A Bcc: x', email: 'jana@firma.sk', message: 'Riadok 1\nRiadok 2' });
+  });
+
+  it('accepts a conversation that ends with an assistant turn and drops a malformed signature only', () => {
+    const parsed = contactSchema.parse(request({ messages: [{ role: 'user', content: 'Áno.' }, { role: 'assistant', content: 'Návrh', sig: 'x'.repeat(200) }] }));
+    expect(parsed.messages).toEqual([{ role: 'user', content: 'Áno.' }, { role: 'assistant', content: 'Návrh', sig: undefined }]);
+  });
+
+  it('rejects a history over the total length', () => {
+    const messages = Array.from({ length: 8 }, () => ({ role: 'assistant', content: 'x'.repeat(1600) }));
+    expect(contactSchema.safeParse(request({ messages })).success).toBe(false);
   });
 });
