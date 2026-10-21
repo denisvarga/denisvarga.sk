@@ -1,8 +1,9 @@
 export const LINE_THRESHOLD = 0.52;
 export const MAX_SEGMENTS = 2600;
 
+// Phones use 160 nodes instead of the design's 240, which more than halves the pair tests per frame.
 export function lineNodeCount(viewportWidth: number): number {
-  return viewportWidth < 900 ? 240 : 420;
+  return viewportWidth < 900 ? 160 : 420;
 }
 
 export function makeLineNodes(n: number, nodeCount: number): Uint32Array {

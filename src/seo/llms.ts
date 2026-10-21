@@ -1,5 +1,6 @@
+import { PROJECTS_WITH_DETAILS } from '../../shared/project-details';
+import type { ProjectContext } from '../../shared/projects';
 import { formatPeriod, JOBS } from '../data/jobs';
-import { PROJECTS, type ProjectContext } from '../data/projects';
 import { SKILLS, skillLabel } from '../data/skills';
 import { copyEn } from '../i18n/copy-en';
 import { headCopy, LINKEDIN_URL, SOURCE_URL } from '../i18n/head-copy';
@@ -45,7 +46,7 @@ export function buildLlmsTxt(): string {
     ...contactLines(),
     '',
     '## Optional',
-    ...PROJECTS.map((p) => (p.url ? `- [${p.name}](${p.url}): ${p.desc.en}` : `- ${p.name} (private project): ${p.desc.en}`)),
+    ...PROJECTS_WITH_DETAILS.map((p) => (p.url ? `- [${p.name}](${p.url}): ${p.desc.en}` : `- ${p.name} (private project): ${p.desc.en}`)),
     '',
   ].join('\n');
 }
@@ -87,7 +88,7 @@ export function buildLlmsFullTxt(): string {
     ...SKILLS.map((group) => `- ${group.name.en}: ${group.items.map((item) => skillLabel(item, 'en')).join(', ')}`),
     '',
     '## Projects',
-    ...PROJECTS.map(
+    ...PROJECTS_WITH_DETAILS.map(
       (p) =>
         `- ${p.name} (${p.url ?? 'private project, no public site'}): ${p.kind.en}, ${PROJECT_CONTEXT[p.context]}. ${p.summary.en} Scope: ${p.scope.en.join('; ')}.`,
     ),

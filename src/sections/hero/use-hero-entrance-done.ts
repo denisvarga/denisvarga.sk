@@ -12,8 +12,9 @@ export interface EntranceStep {
 }
 
 // Mirrors the hero keyframes in src/styles/reveal.css: [data-enter] runs enter-fade 1s and
-// enter-rise 1.3s (rise ends last), [data-enter='fade'] runs enter-fade 1.6s, split words run
-// enter-word 1.25s with a 55 ms stagger.
+// enter-rise 1.3s (rise ends last), [data-enter='rise'] runs enter-rise 1.3s alone, so both are
+// the 'rise' kind; [data-enter='fade'] runs enter-fade 1.6s, split words run enter-word 1.25s
+// with a 55 ms stagger.
 const KEYFRAMES: Record<EntranceKind, { readonly name: string; readonly duration: number }> = {
   rise: { name: 'enter-rise', duration: 1300 },
   fade: { name: 'enter-fade', duration: 1600 },

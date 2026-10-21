@@ -89,7 +89,7 @@ describe('per-frame morph parity with the design renderGL', () => {
   });
 
   it('matches with the mobile point and node counts', () => {
-    runParity(7000, 240, 23, 120);
+    runParity(4000, 160, 23, 120);
   });
 });
 

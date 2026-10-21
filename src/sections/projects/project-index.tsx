@@ -1,7 +1,8 @@
-import { useId, useRef, useState } from 'react';
+import { memo, useId, useRef, useState } from 'react';
 import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { useReveal } from '../../motion/use-reveal';
+import { prefetchProjectDetails } from './project-drawer-content';
 import { ProjectGridCard } from './project-grid-card';
 import styles from './project-index.module.css';
 
@@ -13,8 +14,8 @@ interface ProjectIndexProps {
 // collapsed it is only squeezed to zero height and made inert. Until the first expand it also has
 // no box, because Chromium fetches lazy images inside a zero-height clip; afterwards it keeps one
 // so closing can animate (Firefox cannot transition display).
-export function ProjectIndex({ onOpen }: ProjectIndexProps) {
-  const { t } = useLang();
+export const ProjectIndex = memo(function ProjectIndex({ onOpen }: ProjectIndexProps) {
+  const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
   const [primed, setPrimed] = useState(false);
   const panelId = useId();
@@ -22,7 +23,13 @@ export function ProjectIndex({ onOpen }: ProjectIndexProps) {
   useReveal(ref);
 
   return (
-    <div ref={ref} data-reveal className={styles.index}>
+    <div
+      ref={ref}
+      data-reveal
+      className={styles.index}
+      onPointerOver={() => prefetchProjectDetails(lang)}
+      onFocus={() => prefetchProjectDetails(lang)}
+    >
       <button
         type="button"
         className={styles.toggle}
@@ -55,4 +62,4 @@ export function ProjectIndex({ onOpen }: ProjectIndexProps) {
       </div>
     </div>
   );
-}
+});

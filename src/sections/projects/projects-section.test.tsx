@@ -1,12 +1,14 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { PROJECT_DETAILS_SK } from '../../../shared/project-details-sk';
 import { PROJECT_IMAGE_SIZE, PROJECTS } from '../../data/projects';
 import { copySk } from '../../i18n/copy-sk';
 import { LangProvider } from '../../i18n/lang-context';
 import type { Lang } from '../../i18n/types';
 import { ui } from '../../i18n/ui-copy';
+import { loadProjectDetails } from './project-drawer-content';
 import { pad2 } from './project-format';
 import { ProjectsSection } from './projects-section';
 
@@ -14,6 +16,12 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
 }
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
+const enChunkLoaded = vi.hoisted(() => vi.fn());
+vi.mock('../../../shared/project-details-en', async (importOriginal) => {
+  enChunkLoaded();
+  return importOriginal();
+});
 
 const page = (lang: Lang) => (
   <LangProvider lang={lang}>
@@ -23,6 +31,10 @@ const page = (lang: Lang) => (
 
 let container: HTMLDivElement;
 let root: Root;
+
+// The drawer texts are a lazy chunk; with it loaded the drawer renders them on the first frame.
+// The loading state is covered in project-drawer-content.test.tsx.
+beforeAll(() => loadProjectDetails('sk'));
 
 beforeEach(() => {
   container = document.createElement('div');
@@ -186,8 +198,9 @@ describe('project drawer', () => {
     click(cards()[0]!);
     for (const project of PROJECTS) {
       expect(dialog().querySelector('h2')?.textContent).toBe(project.name);
-      expect([...dialog().querySelectorAll('p')].map((p) => p.textContent)).toContain(project.summary.sk);
-      expect(scopeRows()).toEqual(project.scope.sk.map((item, i) => [pad2(i + 1), item]));
+      const details = PROJECT_DETAILS_SK[project.slug]!;
+      expect([...dialog().querySelectorAll('p')].map((p) => p.textContent)).toContain(details.summary);
+      expect(scopeRows()).toEqual(details.scope.map((item, i) => [pad2(i + 1), item]));
       expect(dialog().querySelector('small')?.textContent).toBe(project.credit?.sk);
       press('ArrowRight');
     }
@@ -214,6 +227,15 @@ describe('project drawer', () => {
       press('ArrowRight');
     }
     expect(PROJECTS.some((p) => p.url === null)).toBe(true);
+  });
+});
+
+describe('drawer text prefetch', () => {
+  it('starts loading the page language\'s drawer texts when the pointer reaches the rail', async () => {
+    act(() => root.render(page('en')));
+    expect(enChunkLoaded).not.toHaveBeenCalled();
+    act(() => void container.querySelector('h3')!.dispatchEvent(new Event('pointerover', { bubbles: true })));
+    await vi.waitFor(() => expect(enChunkLoaded).toHaveBeenCalledTimes(1));
   });
 });
 

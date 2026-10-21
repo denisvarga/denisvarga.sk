@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROJECT_DETAILS_EN } from '../../shared/project-details-en';
 import { formatPeriod } from '../data/jobs';
 import { PROJECTS } from '../data/projects';
 import { BUILD_YEAR } from '../lib/use-current-year';
@@ -33,5 +34,14 @@ describe('llms.txt', () => {
     expect(text).toContain('- Languages: Slovak (native), English (professional working proficiency).');
     expect(text).toContain('- Education: Secondary School of Printing (Stredná odborná škola polygrafická), digital media graphic designer, 2012 - 2016.');
     expect(text).not.toContain('*');
+  });
+
+  it('carries every project\'s English drawer summary and scope', () => {
+    const text = buildLlmsFullTxt();
+    for (const project of PROJECTS) {
+      const details = PROJECT_DETAILS_EN[project.slug];
+      expect(details, project.slug).toBeDefined();
+      expect(text).toContain(`${details?.summary} Scope: ${details?.scope.join('; ')}.`);
+    }
   });
 });

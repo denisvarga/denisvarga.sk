@@ -6,14 +6,15 @@ const env = { innerWidth: 1440, innerHeight: 900, scrollY: 0, tops: [0, 900, 180
 const self = () => ({ Ts: 0, vel: 0, mouse: { x: 0, y: 0 }, coarse: false, mobile: false, spin: 0, lastSy2: 0 });
 
 describe('network lines', () => {
-  it('uses the design node counts and stride', () => {
-    expect(lineNodeCount(390)).toBe(240);
+  it('uses the design desktop node count, fewer nodes on phones and the design stride', () => {
+    expect(lineNodeCount(390)).toBe(160);
     expect(lineNodeCount(1440)).toBe(420);
     expect(Array.from(makeLineNodes(7000, 240).slice(0, 3))).toEqual([0, 29, 58]);
+    expect(Array.from(makeLineNodes(4000, 160).slice(0, 3))).toEqual([0, 25, 50]);
   });
 
   it('writes the same pairs in the same order as the design loop', () => {
-    for (const [n, NN] of [[7000, 240], [12000, 420]] as const) {
+    for (const [n, NN] of [[4000, 160], [12000, 420]] as const) {
       const R = seededRandom(n);
       const shapes = designMakeShapes(n, R);
       const G = designInitGL(n, NN, shapes, designPointAttributes(n, R), 0);

@@ -4,7 +4,9 @@ import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from './head-ta
 import { knowsAbout, profileJsonLd, serializeJsonLd } from './json-ld';
 import { buildSitemap, contentDateOr } from './sitemap';
 
-const FONTS = ['/assets/manrope-latin-wght-normal-abc.woff2', '/assets/manrope-latin-ext-wght-normal-def.woff2'];
+const LATIN = '/assets/manrope-latin-wght-normal-abc.woff2';
+const LATIN_EXT = '/assets/manrope-latin-ext-wght-normal-def.woff2';
+const FONTS: HeadAssets['fonts'] = { sk: [LATIN, LATIN_EXT], en: [LATIN] };
 const PORTRAIT = '/assets/denis-cutout-1024-Ab_1.webp';
 const ASSETS: HeadAssets = { fonts: FONTS, portrait: PORTRAIT };
 const CONTENT_DATE = '2026-10-19';
@@ -81,7 +83,7 @@ describe('buildHeadTags', () => {
     expect(attrs(doc, 'meta[name="robots"]', 'content')).toEqual(['max-image-preview:large']);
   });
 
-  it('emits icons and both font preloads, but no charset or viewport', () => {
+  it('emits icons and font preloads, but no charset or viewport', () => {
     const html = buildHeadTags('sk', ASSETS, CONTENT_DATE);
     const doc = parseHead(html);
     expect(attrs(doc, 'meta[name="twitter:card"]', 'content')).toEqual(['summary_large_image']);
@@ -89,12 +91,20 @@ describe('buildHeadTags', () => {
     expect(attrs(doc, 'link[rel="icon"]', 'href')).toEqual(['/favicon.ico', '/favicon.svg']);
     expect(attrs(doc, 'link[rel="icon"]', 'sizes')).toEqual(['48x48', null]);
     expect(attrs(doc, 'link[rel="apple-touch-icon"]', 'href')).toEqual(['/apple-touch-icon.png']);
-    expect(attrs(doc, 'link[rel="preload"][as="font"][crossorigin]', 'href')).toEqual(FONTS);
+    expect(attrs(doc, 'link[rel="preload"][as="font"][crossorigin]', 'href')).toEqual([LATIN, LATIN_EXT]);
     expect(html).toMatch(/^<!--/);
     expect(html).toContain('Ahoj, zvedavec. / Hi, curious one.');
     expect(html).toContain('sudo hire denis');
     expect(html).toContain('hello@denisvarga.sk / hello@denisvarga.dev');
     expect(html).not.toMatch(/charset|viewport/);
+  });
+
+  it.each([
+    ['sk', [LATIN, LATIN_EXT]],
+    ['en', [LATIN]],
+  ] as const)('%s: preloads only the fonts its first screen needs', (lang, fonts) => {
+    const doc = parseHead(buildHeadTags(lang, ASSETS, CONTENT_DATE));
+    expect(attrs(doc, 'link[rel="preload"][as="font"]', 'href')).toEqual(fonts);
   });
 
   it.each([
@@ -168,6 +178,11 @@ describe('buildHeadTags', () => {
     const doc = parseHead(buildNotFoundHeadTags(FONTS));
     expect(attrs(doc, 'meta[name="robots"]', 'content')).toEqual(['noindex']);
     expect(doc.querySelectorAll('link[rel="canonical"], link[hreflang], script')).toHaveLength(0);
+  });
+
+  it('404 head: preloads the fonts of both languages once each', () => {
+    const doc = parseHead(buildNotFoundHeadTags({ sk: [LATIN, LATIN_EXT], en: [LATIN] }));
+    expect(attrs(doc, 'link[rel="preload"][as="font"]', 'href')).toEqual([LATIN, LATIN_EXT]);
   });
 });
 

@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { matchesMedia, REDUCED_MOTION_QUERY } from '../../motion/use-media-query';
 import { useReveal } from '../../motion/use-reveal';
 import { ProjectCard } from './project-card';
+import { prefetchProjectDetails } from './project-drawer-content';
 import styles from './projects.module.css';
 
 const CARD_GAP_PX = 20;
@@ -15,8 +16,10 @@ interface ProjectRailProps {
   readonly onOpen: (index: number, opener: HTMLElement | null) => void;
 }
 
-export function ProjectRail({ onOpen }: ProjectRailProps) {
-  const { ui } = useLang();
+// Memoized with the index: the drawer state lives in the section, and opening or stepping it
+// would otherwise re-render every card; onOpen is stable.
+export const ProjectRail = memo(function ProjectRail({ onOpen }: ProjectRailProps) {
+  const { lang, ui } = useLang();
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLSpanElement>(null);
@@ -54,7 +57,12 @@ export function ProjectRail({ onOpen }: ProjectRailProps) {
 
   return (
     <div ref={wrapRef} data-reveal className={styles.rail}>
-      <div ref={trackRef} className={styles.track}>
+      <div
+        ref={trackRef}
+        className={styles.track}
+        onPointerOver={() => prefetchProjectDetails(lang)}
+        onFocus={() => prefetchProjectDetails(lang)}
+      >
         {FEATURED.map(({ project, index }) => (
           <ProjectCard key={project.slug} project={project} index={index} total={PROJECTS.length} onOpen={onOpen} />
         ))}
@@ -72,4 +80,4 @@ export function ProjectRail({ onOpen }: ProjectRailProps) {
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { PROJECT_DETAILS_EN } from '../shared/project-details-en';
+import { PROJECT_DETAILS_SK } from '../shared/project-details-sk';
 
 // Production origin -> the page dist/client serves at its root (the Worker maps "/" on
 // denisvarga.dev to the English page); every other path maps 1:1 on both domains.
@@ -48,6 +50,12 @@ const SECRET_PATTERNS: readonly (readonly [RegExp, string])[] = [
   // The public Turnstile site key ships in the bundle; only the longer secret key matches.
   [/0x4AAAAAAA[A-Za-z0-9_-]{25,}/, 'a Turnstile secret key'],
 ];
+// The drawer texts load as per-language chunks on demand; finding one in the entry means a static
+// import crept in. Only printable ASCII items without quotes, backslashes or "$" are matched, so
+// the minifier's choice of quotes or escapes cannot hide one.
+const DRAWER_TEXTS = [PROJECT_DETAILS_SK, PROJECT_DETAILS_EN]
+  .flatMap((details) => Object.values(details).flatMap((project) => project.scope))
+  .filter((item) => /^[\x20-\x7e]+$/.test(item) && !/["'`\\$]/.test(item));
 const TAG = /<([a-zA-Z][\w-]*)((?:\s+[^\s"'=/>]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*\/?>/g;
 const ATTR = /([^\s"'=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
@@ -153,6 +161,22 @@ export async function checkDist(distDir: string, { deploy = false } = {}): Promi
     }
     if (actualHreflangs.join() !== expectedHreflangs.join()) {
       failures.add(`client/${page.file}: hreflang ${JSON.stringify(actualHreflangs)}, expected ${expectedHreflangs}`);
+    }
+  }
+
+  const homePage = join(clientDir, 'index.html');
+  if (await exists(homePage)) {
+    const entries = parseTags(await readFile(homePage, 'utf8'))
+      .filter((t) => t.name === 'script' && t.attrs.get('type') === 'module')
+      .map((t) => localAssetPath(t.attrs.get('src') ?? ''))
+      .filter((path) => path !== null);
+    if (entries.length === 0) failures.add('client/index.html: no module entry script');
+    for (const path of entries) {
+      // A missing entry file is already reported by the asset check above.
+      const code = await readFile(join(clientDir, path), 'utf8').catch(() => '');
+      if (DRAWER_TEXTS.some((text) => code.includes(text))) {
+        failures.add(`client${path}: carries project drawer texts, which belong in their lazy chunks`);
+      }
     }
   }
 

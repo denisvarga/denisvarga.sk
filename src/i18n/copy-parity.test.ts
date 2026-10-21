@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { PROJECT_DETAILS_EN } from '../../shared/project-details-en';
+import { PROJECT_DETAILS_SK } from '../../shared/project-details-sk';
 import { demosEn } from '../data/demos-en';
 import { demosSk } from '../data/demos-sk';
 import { JOBS } from '../data/jobs';
@@ -25,7 +27,7 @@ function strings(value: unknown): string[] {
   return [];
 }
 
-const everything = { copySk, copyEn, ui, contact, headCopy, JOBS, PROJECTS, SKILLS, demosSk, demosEn };
+const everything = { copySk, copyEn, ui, contact, headCopy, JOBS, PROJECTS, PROJECT_DETAILS_SK, PROJECT_DETAILS_EN, SKILLS, demosSk, demosEn };
 
 describe('copy parity', () => {
   it('SK and EN page copy have identical shape', () => {
@@ -54,8 +56,9 @@ describe('copy parity', () => {
 
   it('every project lists the same number of scope items in SK and EN', () => {
     for (const project of PROJECTS) {
-      expect(project.scope.sk.length, project.slug).toBeGreaterThan(0);
-      expect(project.scope.en, project.slug).toHaveLength(project.scope.sk.length);
+      const sk = PROJECT_DETAILS_SK[project.slug]?.scope ?? [];
+      expect(sk.length, project.slug).toBeGreaterThan(0);
+      expect(PROJECT_DETAILS_EN[project.slug]?.scope, project.slug).toHaveLength(sk.length);
     }
   });
 
