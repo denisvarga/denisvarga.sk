@@ -1,3 +1,5 @@
+import { COARSE_POINTER_QUERY, matchesMedia } from './use-media-query';
+
 export interface DocumentRect {
   readonly top: number;
   readonly left: number;
@@ -32,6 +34,24 @@ export function getLayout(): LayoutSnapshot {
   return snapshot;
 }
 
+export interface ViewportSize {
+  readonly width: number;
+  readonly height: number;
+}
+
+const URL_BAR_SLACK_PX = 150;
+
+/**
+ * The viewport height to size against after a resize from `prev` to `next`. On touch devices the
+ * URL bar changes innerHeight by well under 150 px while scrolling; such a change never shrinks
+ * the height, so it stays at the largest one seen (like 100lvh) and nothing is re-laid out each
+ * time the bar shows. A width change (rotation) or a larger height change takes the new height.
+ */
+export function settledViewportHeight(prev: ViewportSize, next: ViewportSize, coarse: boolean): number {
+  const urlBar = coarse && next.width === prev.width && Math.abs(next.height - prev.height) < URL_BAR_SLACK_PX;
+  return urlBar ? Math.max(prev.height, next.height) : next.height;
+}
+
 function visibleHeroImage(scrollX: number, scrollY: number): DocumentRect | null {
   // The hero image exists twice (mobile in-flow, desktop overlay); only one is displayed.
   for (const img of document.querySelectorAll('[data-heroimg]')) {
@@ -64,17 +84,25 @@ export function measureLayout(): void {
 
 function start(): () => void {
   let alive = true;
+  const coarse = matchesMedia(COARSE_POINTER_QUERY);
   const onChange = () => {
     if (alive) measureLayout();
   };
+  // Section tops do not move with the URL bar; a real layout change still reaches the observer.
+  const onResize = () => {
+    const prev = { width: snapshot.viewportWidth, height: snapshot.viewportHeight };
+    const next = { width: window.innerWidth, height: window.innerHeight };
+    if (next.width === prev.width && settledViewportHeight(prev, next, coarse) === prev.height) return;
+    onChange();
+  };
   measureLayout();
-  window.addEventListener('resize', onChange, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
   const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onChange);
   observer?.observe(document.body);
   document.fonts?.ready.then(onChange, () => {});
   return () => {
     alive = false;
-    window.removeEventListener('resize', onChange);
+    window.removeEventListener('resize', onResize);
     observer?.disconnect();
   };
 }

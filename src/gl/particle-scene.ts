@@ -13,7 +13,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { FRAME_PRIORITY, subscribeFrame } from '../motion/frame-loop';
-import { getLayout } from '../motion/layout-cache';
+import { getLayout, settledViewportHeight, type ViewportSize } from '../motion/layout-cache';
 import { getPointer, isCoarsePointer, retainPointer } from '../motion/pointer';
 import { COARSE_POINTER_QUERY, matchesMedia } from '../motion/use-media-query';
 import { isScrollLocked, subscribeScrollLock } from '../motion/use-scroll-lock';
@@ -39,20 +39,20 @@ interface Net { nodes: Uint32Array; buffers: LineBuffers; geo: BufferGeometry; p
 
 // Touch devices skip MSAA and cap the pixel ratio at 1.5: the points have soft edges anyway, and
 // a full-screen 2x MSAA buffer costs the most on the weakest GPUs.
-function createStage(container: HTMLElement, coarse: boolean): Stage {
+function createStage(container: HTMLElement, coarse: boolean, size: ViewportSize): Stage {
   const renderer = new WebGLRenderer({ antialias: !coarse, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, coarse ? 1.5 : 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(size.width, size.height);
   renderer.setClearColor(0x000000, 0);
   container.appendChild(renderer.domElement);
-  const camera = new PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+  const camera = new PerspectiveCamera(42, size.width / size.height, 0.1, 100);
   camera.position.z = 8.2;
   const scene = new Scene(), group = new Group();
   scene.add(group);
   return { renderer, scene, camera, group };
 }
 
-function createCloud({ renderer, group }: Stage, shape0: Float32Array, n: number, owned: { dispose(): void }[]): Cloud {
+function createCloud({ renderer, group }: Stage, shape0: Float32Array, n: number, aspect: number, owned: { dispose(): void }[]): Cloud {
   const attrs = makePointAttributes(n), pos = new Float32Array(shape0), geo = new BufferGeometry(), attr = new BufferAttribute(pos, 3);
   geo.setAttribute('position', attr);
   geo.setAttribute('aColor', new BufferAttribute(attrs.col, 3));
@@ -63,7 +63,7 @@ function createCloud({ renderer, group }: Stage, shape0: Float32Array, n: number
     uOpacity: { value: 0 },
     uTime: { value: 0 },
     uMouse: { value: new Vector2(5, 5) },
-    uAspect: { value: window.innerWidth / window.innerHeight },
+    uAspect: { value: aspect },
   };
   const material = new ShaderMaterial({ uniforms, vertexShader: POINT_VERTEX_SHADER, fragmentShader: POINT_FRAGMENT_SHADER, transparent: true, depthWrite: false });
   owned.push(geo, material);
@@ -105,6 +105,8 @@ function updateLines(net: Net, pos: Float32Array, opacity: number): void {
 export async function createParticleScene(container: HTMLElement, mode: SceneMode, signal: AbortSignal): Promise<ParticleScene> {
   const width = window.innerWidth, n = pointCount(width), nodeCount = lineNodeCount(width);
   const coarse = matchesMedia(COARSE_POINTER_QUERY);
+  // The canvas size, which the scene math uses as the viewport; see onResize.
+  let viewport: ViewportSize = { width, height: window.innerHeight };
   const built: { stage?: Stage; cloud?: Cloud; net?: Net; shapes: Float32Array[] } = { shapes: [] };
   const owned: { dispose(): void }[] = [];
   const cleanups: (() => void)[] = [];
@@ -131,9 +133,15 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
   // The static frame shows only the hero shape, so the other six are never built.
   const builders = mode === 'static' ? SHAPE_BUILDERS.slice(0, 1) : SHAPE_BUILDERS;
   const slices: InitSlice[] = [
-    { name: 'renderer', run: () => void (built.stage = createStage(container, coarse)) },
+    {
+      name: 'renderer',
+      run: () => {
+        viewport = { width: window.innerWidth, height: window.innerHeight };
+        built.stage = createStage(container, coarse, viewport);
+      },
+    },
     ...builders.map((build, i) => ({ name: `shape-${i}`, run: () => void built.shapes.push(build(n, Math.random)) })),
-    { name: 'points', run: () => void (built.cloud = createCloud(stageOf(), shape0(), n, owned)) },
+    { name: 'points', run: () => void (built.cloud = createCloud(stageOf(), shape0(), n, viewport.width / viewport.height, owned)) },
     { name: 'lines', run: () => void (built.net = createNet(stageOf(), n, nodeCount, owned)) },
     { name: 'compile', run: () => stageOf().renderer.compileAsync(stageOf().scene, stageOf().camera).then(() => {}) },
   ];
@@ -154,7 +162,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
 
   // Reduced motion: shape 0 at its hero anchor for the top of the page; no time, mouse or burst.
   const renderStatic = () => {
-    const vw = window.innerWidth, vh = window.innerHeight;
+    const { width: vw, height: vh } = viewport;
     const t = groupTargets(0, 0, 0, 0, { viewportWidth: vw, viewportHeight: vh, hero: getLayout().heroImage, mobile });
     cloud.pos.set(heroShape);
     cloud.attr.needsUpdate = true;
@@ -180,7 +188,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     for (let i = 0; i < tops.length; i++) tops[i] = layout.sectionTops[i]! - scrollY;
     if (hero) Object.assign(heroRect, { left: hero.left - window.scrollX, top: hero.top - scrollY, width: hero.width, height: hero.height });
     Object.assign(input, {
-      time, viewportWidth: window.innerWidth, viewportHeight: window.innerHeight, hero: hero ? heroRect : null,
+      time, viewportWidth: viewport.width, viewportHeight: viewport.height, hero: hero ? heroRect : null,
       velocity: getScrollVelocity(), scrollY, mouseX: pointer.x, mouseY: pointer.y, coarse: isCoarsePointer(), mobile,
     });
     const r = stepFrame(state, input);
@@ -212,11 +220,17 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     stopLoop?.();
     stopLoop = null;
   };
+  // On touch devices a URL-bar height change never shrinks the canvas, so scrolling does not
+  // reallocate the drawing buffer; it stays at the largest height seen and runs under the bar.
   const onResize = () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const next = { width: window.innerWidth, height: window.innerHeight };
+    const height = settledViewportHeight(viewport, next, coarse);
+    if (next.width === viewport.width && height === viewport.height) return;
+    viewport = { width: next.width, height };
+    renderer.setSize(viewport.width, viewport.height);
+    camera.aspect = viewport.width / viewport.height;
     camera.updateProjectionMatrix();
-    mobile = isMobileWidth(window.innerWidth);
+    mobile = isMobileWidth(viewport.width);
     if (mode === 'static') renderStatic();
   };
   const onContextLost = (event: Event) => {
@@ -244,6 +258,8 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   });
   if (mode === 'animated') cleanups.push(retainScrollVelocity(), retainPointer());
+  // Catches a resize that landed while the scene was being built; a no-op otherwise.
+  onResize();
 
   try {
     // First render uploads the buffers; in static mode it is the only frame.
