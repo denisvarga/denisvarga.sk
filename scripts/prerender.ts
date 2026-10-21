@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import sharp from 'sharp';
 import type { CvAssets } from '../src/cv/cv-html';
-import { LANGS, type Lang } from '../src/i18n/types';
+import { LANGS, type Lang, type Localized } from '../src/i18n/types';
 import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from '../src/seo/head-tags';
 import { buildSitemap, contentDateOr } from '../src/seo/sitemap';
 
@@ -12,7 +12,10 @@ const CLIENT_DIR = 'dist/client';
 const SSR_DIR = 'dist-ssr';
 // Outside dist/client, so the CV print sources never deploy; scripts/build-cv-pdf.ts reads them.
 const CV_DIR = 'dist/cv-src';
-const PRELOADED_FONTS = [/^manrope-latin-wght-normal-[\w-]+\.woff2$/, /^manrope-latin-ext-wght-normal-[\w-]+\.woff2$/];
+const MANROPE_LATIN = /^manrope-latin-wght-normal-[\w-]+\.woff2$/;
+const MANROPE_LATIN_EXT = /^manrope-latin-ext-wght-normal-[\w-]+\.woff2$/;
+// The Slovak hero lead needs Latin Extended at first paint; English needs it only further down.
+const PRELOADED_FONTS: Localized<readonly RegExp[]> = { sk: [MANROPE_LATIN, MANROPE_LATIN_EXT], en: [MANROPE_LATIN] };
 const PROFILE_PORTRAIT = /^denis-cutout-1024-[\w-]+\.webp$/;
 const CV_PORTRAIT = /^denis-cutout-640-[\w-]+\.webp$/;
 // 25 mm at about 360 dpi. Chromium passes a JPEG into the PDF as is, but re-encodes a WebP with
@@ -53,7 +56,10 @@ const { renderApp, renderNotFound, renderCvHtml, buildLlmsTxt, buildLlmsFullTxt 
 
 const template = await readFile(join(CLIENT_DIR, 'index.html'), 'utf8');
 const siteAsset = (pattern: RegExp) => `/assets/${assetName(pattern)}`;
-const assets: HeadAssets = { fonts: PRELOADED_FONTS.map(siteAsset), portrait: siteAsset(PROFILE_PORTRAIT) };
+const assets: HeadAssets = {
+  fonts: { sk: PRELOADED_FONTS.sk.map(siteAsset), en: PRELOADED_FONTS.en.map(siteAsset) },
+  portrait: siteAsset(PROFILE_PORTRAIT),
+};
 
 function lastContentCommitDate(): string {
   try {

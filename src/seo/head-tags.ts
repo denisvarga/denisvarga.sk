@@ -22,7 +22,8 @@ const SITE_NAME = 'Denis Varga';
 
 /** Hashed build outputs the head points at, as /assets/ paths found in dist/client. */
 export interface HeadAssets {
-  readonly fonts: readonly string[];
+  /** Font preloads per page language. */
+  readonly fonts: Localized<readonly string[]>;
   /** The 1024 px hero portrait, the profile image in the JSON-LD. */
   readonly portrait: string;
 }
@@ -77,16 +78,17 @@ export function buildHeadTags(lang: Lang, assets: HeadAssets, contentDate: strin
     meta('name', 'twitter:card', 'summary_large_image'),
     meta('name', 'twitter:image', image.url),
     meta('name', 'twitter:image:alt', image.alt),
-    ...sharedTags(assets.fonts),
+    ...sharedTags(assets.fonts[lang]),
     `<script type="application/ld+json">${serializeJsonLd(profileJsonLd(lang, assets.portrait, contentDate))}</script>`,
   ].join('\n    ');
 }
 
-export function buildNotFoundHeadTags(fontPreloads: readonly string[]): string {
+// The 404 page is bilingual, so it preloads what either language needs.
+export function buildNotFoundHeadTags(fonts: HeadAssets['fonts']): string {
   return [
     HEAD_COMMENT,
     `<title>${escapeHtml(notFoundCopy.title)}</title>`,
     meta('name', 'robots', 'noindex'),
-    ...sharedTags(fontPreloads),
+    ...sharedTags([...new Set(LANGS.flatMap((lang) => fonts[lang]))]),
   ].join('\n    ');
 }
