@@ -7,10 +7,10 @@ const MAX_RADIUS = [2.06, 2.2, 2.5, 3.0, 4.0, 2.3, 2.61];
 
 describe('makeShapes', () => {
   it('builds seven shapes with three finite coordinates per point', () => {
-    const shapes = makeShapes(7000, seededRandom(1));
+    const shapes = makeShapes(4000, seededRandom(1));
     expect(shapes).toHaveLength(7);
     for (const shape of shapes) {
-      expect(shape).toHaveLength(21000);
+      expect(shape).toHaveLength(12000);
       expect(shape.every(Number.isFinite)).toBe(true);
     }
   });
@@ -25,7 +25,7 @@ describe('makeShapes', () => {
   });
 
   it('reproduces the design buffers exactly for the same random sequence', () => {
-    for (const n of [7000, 12000]) {
+    for (const n of [4000, 12000]) {
       const port = makeShapes(n, seededRandom(42));
       const design = designMakeShapes(n, seededRandom(42));
       port.forEach((shape, s) => expect(shape).toEqual(design[s]));
@@ -34,11 +34,11 @@ describe('makeShapes', () => {
 
   it('consumes random numbers in the design order when built one slice at a time', () => {
     const R = seededRandom(7);
-    const sliced = SHAPE_BUILDERS.map((build) => build(7000, R));
-    const attrs = makePointAttributes(7000, R);
+    const sliced = SHAPE_BUILDERS.map((build) => build(4000, R));
+    const attrs = makePointAttributes(4000, R);
     const D = seededRandom(7);
-    const design = designMakeShapes(7000, D);
-    const designAttrs = designPointAttributes(7000, D);
+    const design = designMakeShapes(4000, D);
+    const designAttrs = designPointAttributes(4000, D);
     sliced.forEach((shape, s) => expect(shape).toEqual(design[s]));
     expect(attrs.dir).toEqual(designAttrs.dir);
     expect(attrs.ph).toEqual(designAttrs.ph);
@@ -47,8 +47,8 @@ describe('makeShapes', () => {
   });
 
   it('picks the point count from the init width', () => {
-    expect(pointCount(390)).toBe(7000);
-    expect(pointCount(899)).toBe(7000);
+    expect(pointCount(390)).toBe(4000);
+    expect(pointCount(899)).toBe(4000);
     expect(pointCount(900)).toBe(12000);
   });
 });

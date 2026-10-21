@@ -15,6 +15,7 @@ import {
 import { FRAME_PRIORITY, subscribeFrame } from '../motion/frame-loop';
 import { getLayout } from '../motion/layout-cache';
 import { getPointer, isCoarsePointer, retainPointer } from '../motion/pointer';
+import { COARSE_POINTER_QUERY, matchesMedia } from '../motion/use-media-query';
 import { getScrollVelocity, retainScrollVelocity } from '../motion/scroll-velocity';
 import { runIdleSlices, type InitSlice } from './init-slices';
 import { isMobileWidth, makePointAttributes, pointCount, SHAPE_BUILDERS } from './make-shapes';
@@ -35,9 +36,11 @@ interface Cloud {
 }
 interface Net { nodes: Uint32Array; buffers: LineBuffers; geo: BufferGeometry; posAttr: BufferAttribute; colAttr: BufferAttribute }
 
-function createStage(container: HTMLElement): Stage {
-  const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// Touch devices skip MSAA and cap the pixel ratio at 1.5: the points have soft edges anyway, and
+// a full-screen 2x MSAA buffer costs the most on the weakest GPUs.
+function createStage(container: HTMLElement, coarse: boolean): Stage {
+  const renderer = new WebGLRenderer({ antialias: !coarse, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, coarse ? 1.5 : 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x000000, 0);
   container.appendChild(renderer.domElement);
@@ -100,6 +103,7 @@ function updateLines(net: Net, pos: Float32Array, opacity: number): void {
 // keeps one still frame in static (reduced-motion) mode.
 export async function createParticleScene(container: HTMLElement, mode: SceneMode, signal: AbortSignal): Promise<ParticleScene> {
   const width = window.innerWidth, n = pointCount(width), nodeCount = lineNodeCount(width);
+  const coarse = matchesMedia(COARSE_POINTER_QUERY);
   const built: { stage?: Stage; cloud?: Cloud; net?: Net; shapes: Float32Array[] } = { shapes: [] };
   const owned: { dispose(): void }[] = [];
   const cleanups: (() => void)[] = [];
@@ -120,7 +124,7 @@ export async function createParticleScene(container: HTMLElement, mode: SceneMod
     return built.stage;
   };
   const slices: InitSlice[] = [
-    { name: 'renderer', run: () => void (built.stage = createStage(container)) },
+    { name: 'renderer', run: () => void (built.stage = createStage(container, coarse)) },
     ...SHAPE_BUILDERS.map((build, i) => ({ name: `shape-${i}`, run: () => void built.shapes.push(build(n, Math.random)) })),
     { name: 'points', run: () => void (built.cloud = createCloud(stageOf(), built.shapes[0]!, n, owned)) },
     { name: 'lines', run: () => void (built.net = createNet(stageOf(), n, nodeCount, owned)) },

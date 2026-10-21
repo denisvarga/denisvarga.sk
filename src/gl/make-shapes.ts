@@ -16,9 +16,10 @@ const MOBILE_WIDTH = 900;
 const ACCENT_HEX = 0xf2541b;
 const ACCENT_RGB = [(ACCENT_HEX >> 16) & 255, (ACCENT_HEX >> 8) & 255, ACCENT_HEX & 255].map((v) => v / 255);
 
-// Chosen once at init from the viewport width, like the design; never re-read on resize.
+// Chosen once at init from the viewport width, like the design; never re-read on resize. Phones
+// get 4000 instead of the design's 7000: the cloud is faint there and the morph runs per point.
 export function pointCount(viewportWidth: number): number {
-  return viewportWidth < MOBILE_WIDTH ? 7000 : 12000;
+  return viewportWidth < MOBILE_WIDTH ? 4000 : 12000;
 }
 
 export function isMobileWidth(viewportWidth: number): boolean {
