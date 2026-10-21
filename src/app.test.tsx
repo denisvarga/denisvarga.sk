@@ -10,11 +10,11 @@ describe('App', () => {
     const html = renderToString(<App lang="sk" />);
     expect(html).toContain('<main id="top">');
     expect(html.match(/<section data-sec/g)).toHaveLength(7);
-    expect(h1Text(html)).toBe('Ahoj, som Denis.');
+    expect(h1Text(html)).toBe('Ahoj, som Denis Varga.');
   });
 
   it('renders the English copy for lang="en"', () => {
-    expect(h1Text(renderToString(<App lang="en" />))).toBe("Hi, I'm Denis.");
+    expect(h1Text(renderToString(<App lang="en" />))).toBe("Hi, I'm Denis Varga.");
   });
 
   it.runIf(!SHOW_INTRO_AND_DEMO)('keeps the chat but leaves out the AI heading, tools and terminal demo above it', () => {

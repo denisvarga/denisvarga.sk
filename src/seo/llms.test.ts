@@ -13,6 +13,12 @@ describe('llms.txt', () => {
     expect(text).toContain('hello@denisvarga.sk');
   });
 
+  it('summarises with the page description: role, place and WordPress', () => {
+    const summary = buildLlmsTxt().split('\n')[2];
+    expect(summary).toContain('AI & full-stack developer in Bratislava, Slovakia.');
+    expect(summary).toContain('WordPress and WooCommerce');
+  });
+
   it('carries the whole CV without markup', () => {
     const text = buildLlmsFullTxt();
     for (const project of PROJECTS) expect(text).toContain(project.url ?? `${project.name} (private project, no public site)`);
@@ -20,6 +26,9 @@ describe('llms.txt', () => {
     expect(text).toContain('- Brixx (https://brixx.cz): Residential development website, built as an employee of GrandPano. ');
     expect(text).toContain(`### Denva, AI engineer & full-stack developer (2018 - ${BUILD_YEAR})`);
     expect(text).toContain('- Location: Bratislava, Slovakia; remote preferred.');
+    expect(text).toContain('- Based in: Bratislava, Slovakia or remote');
+    expect(text).toContain('- I build: Websites, online stores (WordPress, WooCommerce), apps, automation');
+    expect(text).toContain('Make and n8n');
     expect(text).toContain('- Languages: Slovak (native), English (professional working proficiency).');
     expect(text).toContain('- Education: Secondary School of Printing (Stredná odborná škola polygrafická), digital media graphic designer, 2012 - 2016.');
     expect(text).not.toContain('*');

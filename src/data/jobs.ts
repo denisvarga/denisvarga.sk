@@ -21,7 +21,7 @@ export const JOBS: readonly Job[] = [
   {
     period: { start: 2018, end: null },
     company: 'Denva',
-    role: { sk: 'AI engineer a fullstack developer', en: 'AI engineer & full-stack developer' },
+    role: { sk: 'AI engineer a full-stack developer', en: 'AI engineer & full-stack developer' },
     text: {
       sk: 'Pod značkou Denva pracujem priamo pre klientov. Staviam AI agentov, automatizácie a vlastné MCP servery a k tomu weby, e-shopy a aplikácie od prvého náčrtu po produkciu.',
       en: 'Under the Denva name I work directly with clients. I build AI agents, automations and custom MCP servers, plus websites, online stores and apps from first sketch to production.',
