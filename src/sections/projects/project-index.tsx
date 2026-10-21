@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { memo, useId, useRef, useState } from 'react';
 import { PROJECTS } from '../../data/projects';
 import { useLang } from '../../i18n/lang-context';
 import { useReveal } from '../../motion/use-reveal';
@@ -13,7 +13,7 @@ interface ProjectIndexProps {
 // collapsed it is only squeezed to zero height and made inert. Until the first expand it also has
 // no box, because Chromium fetches lazy images inside a zero-height clip; afterwards it keeps one
 // so closing can animate (Firefox cannot transition display).
-export function ProjectIndex({ onOpen }: ProjectIndexProps) {
+export const ProjectIndex = memo(function ProjectIndex({ onOpen }: ProjectIndexProps) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [primed, setPrimed] = useState(false);
@@ -55,4 +55,4 @@ export function ProjectIndex({ onOpen }: ProjectIndexProps) {
       </div>
     </div>
   );
-}
+});
