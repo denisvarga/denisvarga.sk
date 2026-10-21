@@ -52,6 +52,7 @@ async function press(init: KeyboardEventInit) {
 }
 
 const sentBodies = () => fetchMock.mock.calls.map(([, init]) => JSON.parse(String(init?.body)));
+const retryButton = () => [...container.querySelectorAll('button')].find((b) => b.textContent === t.retry);
 
 beforeEach(() => {
   vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '1x00000000000000000000AA');
@@ -131,12 +132,34 @@ describe('AskAgent', () => {
     expect(container.querySelector('[data-lenis-prevent]')?.textContent).toContain('Is he available?');
   });
 
-  it('asks a suggestion chip directly and shows the error copy on failure', async () => {
-    fetchMock.mockResolvedValueOnce(Response.json({ error: 'daily_cap' }, { status: 503 }));
+  it('asks a suggestion chip directly and shows the daily cap copy without a retry', async () => {
+    fetchMock.mockResolvedValueOnce(Response.json({ error: 'daily_cap' }, { status: 429 }));
     const chip = [...container.querySelectorAll('button')].find((b) => b.textContent === t.suggestions[0]);
     await act(async () => chip?.click());
     expect(sentBodies()[0]?.messages).toEqual([{ role: 'user', content: t.suggestions[0] }]);
-    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(t.error);
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(t.errors.dailyCap);
+    expect(retryButton()).toBeUndefined();
+  });
+
+  it('explains a rate limit and asks the same question once more on retry', async () => {
+    fetchMock.mockResolvedValueOnce(Response.json({ error: 'rate_limited' }, { status: 429 }));
+    type('Is he available?');
+    await press({});
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(t.errors.rateLimited);
+    await act(async () => retryButton()?.click());
+    expect(sentBodies()).toHaveLength(2);
+    expect(sentBodies()[1]?.messages).toEqual([{ role: 'user', content: 'Is he available?' }]);
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('An answer.');
+    expect(container.querySelector('[data-lenis-prevent]')?.textContent).not.toContain(t.errors.rateLimited);
+    expect(retryButton()).toBeUndefined();
+  });
+
+  it('uses the fallback copy with a retry for any other failure', async () => {
+    fetchMock.mockResolvedValueOnce(Response.json({ error: 'verification_failed' }, { status: 403 }));
+    type('Hi');
+    await press({});
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(t.errors.fallback);
+    expect(retryButton()).toBeDefined();
   });
 
   it('a new question completes the previous typewriter instantly', async () => {

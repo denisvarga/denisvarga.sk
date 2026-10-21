@@ -57,8 +57,13 @@ export const copySk: Copy = {
     note: 'Agent pozná moje CV. Keď si nie je istý, povie to a dá vám na mňa kontakt.',
     privacyNote: 'Otázky a odpovede uchovávam 365 dní bez vašej IP adresy či iného identifikátora, odpovedá na ne OpenAI.',
     privacyLink: 'Viac o súkromí',
-    error:
-      'Teraz sa mi nepodarilo odpovedať. Napíšte Denisovi priamo na hello@denisvarga.sk alebo zavolajte na +421 902 074 830.',
+    errors: {
+      rateLimited: 'Veľa otázok naraz, skúste to o minútu.',
+      dailyCap: 'Agent má na dnes dosť. Napíšte Denisovi na hello@denisvarga.sk.',
+      fallback:
+        'Teraz sa mi nepodarilo odpovedať. Napíšte Denisovi priamo na hello@denisvarga.sk alebo zavolajte na +421 902 074 830.',
+    },
+    retry: 'Skúsiť znova',
     suggestions: [
       'S akými AI nástrojmi pracuje?',
       'Ako vznikol tento web?',

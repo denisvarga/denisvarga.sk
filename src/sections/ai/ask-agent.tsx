@@ -21,7 +21,7 @@ export function AskAgent() {
   useReveal(cardRef);
 
   const tokens = useTurnstileToken(widgetRef);
-  const { state, setInput, ask } = useAgentChat({ lang, errorText: t.ask.error, tokens });
+  const { state, setInput, ask, retry } = useAgentChat({ lang, errors: t.ask.errors, tokens });
   const submit = (question: string) => void ask(question);
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -69,7 +69,8 @@ export function AskAgent() {
         messages={state.messages}
         loading={state.loading}
         typingId={state.typingId}
-        labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking }}
+        labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking, retry: t.ask.retry }}
+        onRetry={(id) => void retry(id)}
       />
       <span className={styles.note}>
         {t.ask.note} {t.ask.privacyNote}{' '}

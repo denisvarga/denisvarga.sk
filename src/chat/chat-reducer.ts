@@ -13,6 +13,8 @@ export interface ChatMessage {
   readonly text: string;
   /** Error copy shown in place of a reply; never sent back to the model. */
   readonly failed: boolean;
+  /** Set on a failed reply whose question may be asked again from the log. */
+  readonly retryable?: true;
   /** Server signature of an assistant reply, returned with it so the server trusts the turn. */
   readonly sig?: string;
 }
@@ -30,7 +32,9 @@ export type ChatAction =
   | { readonly type: 'input'; readonly value: string }
   | { readonly type: 'ask'; readonly text: string }
   | { readonly type: 'reply'; readonly text: string; readonly sig?: string }
-  | { readonly type: 'fail'; readonly text: string };
+  | { readonly type: 'fail'; readonly text: string; readonly retryable: boolean }
+  /** Removes the failed reply `id` and its question, then asks that question again. */
+  | { readonly type: 'retry'; readonly id: number };
 
 export const initialChatState: ChatState = {
   messages: [],
@@ -40,16 +44,21 @@ export const initialChatState: ChatState = {
   nextId: 1,
 };
 
-function appendAssistant(state: ChatState, text: string, failed: boolean, sig?: string): ChatState {
+function appendAssistant(state: ChatState, reply: Omit<ChatMessage, 'id' | 'role'>): ChatState {
   if (!state.loading) return state;
   const id = state.nextId;
   return {
     ...state,
-    messages: [...state.messages, { id, role: 'assistant', text, failed, ...(sig ? { sig } : {}) }],
+    messages: [...state.messages, { id, role: 'assistant', ...reply }],
     loading: false,
     typingId: id,
     nextId: id + 1,
   };
+}
+
+function startQuestion(state: ChatState, messages: readonly ChatMessage[], text: string): ChatState {
+  const id = state.nextId;
+  return { ...state, messages: [...messages, { id, role: 'user', text, failed: false }], loading: true, typingId: null, nextId: id + 1 };
 }
 
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -59,19 +68,23 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'ask': {
       const text = action.text.trim();
       if (!text || state.loading) return state;
-      const id = state.nextId;
-      return {
-        messages: [...state.messages, { id, role: 'user', text, failed: false }],
-        input: '',
-        loading: true,
-        typingId: null,
-        nextId: id + 1,
-      };
+      return { ...startQuestion(state, state.messages, text), input: '' };
+    }
+    case 'retry': {
+      const index = state.messages.findIndex((m) => m.id === action.id);
+      const question = state.messages[index - 1];
+      if (state.loading || !state.messages[index]?.retryable || question?.role !== 'user') return state;
+      // The input is left alone: the visitor may be typing the next question.
+      return startQuestion(
+        state,
+        state.messages.filter((_, i) => i !== index && i !== index - 1),
+        question.text,
+      );
     }
     case 'reply':
-      return appendAssistant(state, action.text, false, action.sig);
+      return appendAssistant(state, { text: action.text, failed: false, ...(action.sig ? { sig: action.sig } : {}) });
     case 'fail':
-      return appendAssistant(state, action.text, true);
+      return appendAssistant(state, { text: action.text, failed: true, ...(action.retryable ? { retryable: true } : {}) });
   }
 }
 

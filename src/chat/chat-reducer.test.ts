@@ -39,9 +39,27 @@ describe('chatReducer', () => {
     expect(replied.loading).toBe(false);
     expect(replied.typingId).toBe(2);
     expect(replied.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'a', failed: false });
-    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error copy' }]);
-    expect(failed.messages[1]).toMatchObject({ text: 'error copy', failed: true });
+    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error copy', retryable: true }]);
+    expect(failed.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'error copy', failed: true, retryable: true });
     expect(failed.typingId).toBe(2);
+    const final = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'done for today', retryable: false }]);
+    expect(final.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'done for today', failed: true });
+  });
+
+  it('retries a failed reply: drops it with its question, asks the question again and keeps the draft', () => {
+    const failed = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy', retryable: true }, { type: 'input', value: 'draft' }]);
+    const retried = chatReducer(failed, { type: 'retry', id: 4 });
+    expect(retried.messages.map((m) => m.text)).toEqual(['q1', 'a1', 'q2']);
+    expect(retried.messages.at(-1)).toEqual({ id: 5, role: 'user', text: 'q2', failed: false });
+    expect(retried).toMatchObject({ loading: true, typingId: null, nextId: 6, input: 'draft' });
+  });
+
+  it('ignores a retry while loading, of a reply that offers none, and of an unknown id', () => {
+    const final = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'done', retryable: false }]);
+    expect(chatReducer(final, { type: 'retry', id: 2 })).toBe(final);
+    expect(chatReducer(final, { type: 'retry', id: 99 })).toBe(final);
+    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error', retryable: true }, { type: 'ask', text: 'next' }]);
+    expect(chatReducer(failed, { type: 'retry', id: 2 })).toBe(failed);
   });
 
   it('stores the reply signature, and none when the server sent none', () => {
@@ -84,7 +102,7 @@ describe('requestMessages', () => {
   });
 
   it('excludes failed replies together with their questions', () => {
-    const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy' }]).messages;
+    const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy', retryable: true }]).messages;
     expect(requestMessages(history, 'q2').map((m) => m.content)).toEqual(['q1', 'a1', 'q2']);
   });
 

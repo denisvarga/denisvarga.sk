@@ -77,11 +77,12 @@ describe('copy parity', () => {
     expect(headCopy.en.email).toBe('hello@denisvarga.dev');
     for (const [lang, copy] of [['sk', copySk], ['en', copyEn]] as const) {
       const other = headCopy[lang === 'sk' ? 'en' : 'sk'].email;
-      expect(copy.ask.error).toContain(headCopy[lang].email);
-      expect(copy.ask.error).toContain('+421 902 074 830');
+      expect(copy.ask.errors.fallback).toContain(headCopy[lang].email);
+      expect(copy.ask.errors.fallback).toContain('+421 902 074 830');
+      expect(copy.ask.errors.dailyCap).toContain(headCopy[lang].email);
       expect(headCopy[lang].consoleGreeting).toContain(headCopy[lang].email);
       expect(contact[lang]).toMatchObject({ email: headCopy[lang].email, emailHref: `mailto:${headCopy[lang].email}` });
-      expect([copy.ask.error, headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
+      expect([...Object.values(copy.ask.errors), headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
     }
   });
 });

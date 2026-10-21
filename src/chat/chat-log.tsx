@@ -7,7 +7,8 @@ interface ChatLogProps {
   readonly messages: readonly ChatMessage[];
   readonly loading: boolean;
   readonly typingId: number | null;
-  readonly labels: { readonly you: string; readonly agent: string; readonly thinking: string };
+  readonly labels: { readonly you: string; readonly agent: string; readonly thinking: string; readonly retry: string };
+  readonly onRetry: (id: number) => void;
 }
 
 function liveText(messages: readonly ChatMessage[], loading: boolean, thinking: string): string {
@@ -35,7 +36,7 @@ function useStickToBottom(logRef: RefObject<HTMLDivElement | null>, visible: boo
  * The visible log is not a live region; the hidden polite region below announces the thinking
  * line and then each reply once, in full, while the bubble types it out.
  */
-export function ChatLog({ messages, loading, typingId, labels }: ChatLogProps) {
+export function ChatLog({ messages, loading, typingId, labels, onRetry }: ChatLogProps) {
   const visible = messages.length > 0 || loading;
   const logRef = useRef<HTMLDivElement>(null);
   const stackRef = useStickToBottom(logRef, visible);
@@ -56,7 +57,16 @@ export function ChatLog({ messages, loading, typingId, labels }: ChatLogProps) {
                   {user ? (
                     <span className={styles.bubble}>{m.text}</span>
                   ) : (
-                    <TypingBubble className={styles.bubble} text={m.text} animate={m.id === typingId} />
+                    <TypingBubble
+                      className={m.failed ? `${styles.bubble} ${styles.failed}` : styles.bubble}
+                      text={m.text}
+                      animate={m.id === typingId}
+                    />
+                  )}
+                  {m.retryable && (
+                    <button type="button" className={styles.retry} onClick={() => onRetry(m.id)}>
+                      {labels.retry}
+                    </button>
                   )}
                 </div>
               );
