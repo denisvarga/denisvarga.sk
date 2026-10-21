@@ -132,6 +132,47 @@ describe('checkDist', () => {
     await put('client/.dev.vars.production', 'SECRET=1');
     expect(await checkDist(dist)).toEqual(['client/.dev.vars.production: .dev.vars must not ship']);
   });
+
+  it('rule 7: source maps, .env files and wrangler configs under client', async () => {
+    await put('client/assets/index-A1.js.map', '{}');
+    await put('client/.env.production', 'X=1');
+    await put('client/wrangler.json', '{}');
+    await put('client/nested/wrangler.jsonc', '{}');
+    expect((await checkDist(dist)).toSorted()).toEqual([
+      'client/.env.production: .env file must not ship',
+      'client/assets/index-A1.js.map: source map must not ship',
+      'client/nested/wrangler.jsonc: wrangler config must not ship',
+      'client/wrangler.json: wrangler config must not ship',
+    ]);
+  });
+
+  it('rule 7: the Worker source map and config outside client stay allowed', async () => {
+    await put('denisvarga_sk/index.js.map', '{}');
+    await put('denisvarga_sk/wrangler.json', '{}');
+    expect(await checkDist(dist, { deploy: true })).toEqual([]);
+  });
+
+  it('rule 8: secrets in shipped text files, reported without the matched value', async () => {
+    const openAi = `sk-proj-${'a1_B-'.repeat(6)}`;
+    const turnstile = `0x4AAAAAAA${'b2_C-'.repeat(6)}`;
+    await put('client/assets/index-A1.js', `use("${openAi}")`);
+    await put('client/humans.txt', '-----BEGIN PRIVATE KEY-----');
+    await put('client/sitemap.xml', `<x>${turnstile}</x>`);
+    await put('client/og-image.jpg', openAi);
+    expect((await checkDist(dist)).toSorted()).toEqual([
+      'client/assets/index-A1.js: looks like an OpenAI API key',
+      'client/humans.txt: looks like a private key',
+      'client/sitemap.xml: looks like a Turnstile secret key',
+    ]);
+  });
+
+  it('rule 8: the public Turnstile site key and "sk-" inside CSS names pass', async () => {
+    await put(
+      'client/assets/index-A1.js',
+      `render({sitekey:"0x4AAAAAAA${'x'.repeat(14)}"});el.style.setProperty("--tw-mask-linear-from-position","0")`,
+    );
+    expect(await checkDist(dist)).toEqual([]);
+  });
 });
 
 describe('localAssetPath', () => {
