@@ -3,11 +3,10 @@ import { LangSwitch } from '../components/lang-switch';
 import { useLang } from '../i18n/lang-context';
 import { contact } from '../i18n/ui-copy';
 import type { ScrollTarget } from '../motion/scroll-to';
-import { sectionIndex, SECTIONS, type SectionKey } from '../sections/section-order';
 import styles from './menu-overlay.module.css';
 
-// Sections of the menu items in t.nav.items order (O mne, AI, Projekty).
-const NAV_SECTIONS: readonly SectionKey[] = ['about', 'ai', 'projects'];
+// Section indices of the three menu items (O mne, AI, Projekty).
+const NAV_SECTIONS = [1, 3, 4] as const;
 
 interface MenuOverlayProps {
   readonly id: string;
@@ -19,7 +18,6 @@ interface MenuOverlayProps {
 export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
   const { lang, t, ui } = useLang();
   const links = contact[lang];
-  const items = NAV_SECTIONS.flatMap((key, i) => (SECTIONS.includes(key) ? [{ key, name: t.nav.items[i] }] : []));
 
   return (
     <div
@@ -33,9 +31,9 @@ export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
       inert={!open}
     >
       <nav className={styles.nav}>
-        {items.map(({ key, name }, i) => (
-          <div key={key} className={styles.row}>
-            <button type="button" className={styles.item} onClick={() => onGo(sectionIndex(key))}>
+        {t.nav.items.map((name, i) => (
+          <div key={NAV_SECTIONS[i]} className={styles.row}>
+            <button type="button" className={styles.item} onClick={() => onGo(NAV_SECTIONS[i] ?? 0)}>
               <span className={styles.index} aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>

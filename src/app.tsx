@@ -12,10 +12,9 @@ import { ContactSection } from './sections/contact/contact-section';
 import { ExperienceSection } from './sections/experience/experience-section';
 import { HeroSection } from './sections/hero/hero-section';
 import { ProjectsSection } from './sections/projects/projects-section';
-import { SHOW_AI } from './sections/section-order';
 import { StackSection } from './sections/stack/stack-section';
 
-// The rendered order must match SECTIONS in sections/section-order.ts.
+// Section order defines the [data-sec] indices used by navigation, goTo and the GL morph.
 export function App({ lang }: { lang: Lang }) {
   useEffect(() => retainLayoutCache(), []);
 
@@ -28,7 +27,7 @@ export function App({ lang }: { lang: Lang }) {
         <HeroSection />
         <AboutSection />
         <ExperienceSection />
-        {SHOW_AI && <AiSection />}
+        <AiSection />
         <ProjectsSection />
         <StackSection />
         <ContactSection />

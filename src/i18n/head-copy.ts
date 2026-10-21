@@ -15,7 +15,6 @@ export interface HeadCopy {
   readonly jobTitle: string;
   readonly ogLocale: 'sk_SK' | 'en_US';
   readonly consoleGreeting: string;
-  readonly consoleChatHint: string;
 }
 
 export const headCopy: Localized<HeadCopy> = {
@@ -29,8 +28,7 @@ export const headCopy: Localized<HeadCopy> = {
     jobTitle: 'AI a full-stack developer',
     ogLocale: 'sk_SK',
     consoleGreeting:
-      'Ahoj, vidím, že sa pozeráte pod kapotu. Tento web beží na React 19, TypeScripte a Vite, servíruje ho jeden Cloudflare Worker s Hono a AI chat odpovedá cez OpenAI. Zdrojový kód: https://github.com/denisvarga/denisvarga.sk. Napíšte na hello@denisvarga.sk.',
-    consoleChatHint: 'Alebo skúste v chate: sudo hire denis',
+      'Ahoj, vidím, že sa pozeráte pod kapotu. Tento web beží na React 19, TypeScripte a Vite, servíruje ho jeden Cloudflare Worker s Hono a AI chat odpovedá cez OpenAI. Zdrojový kód: https://github.com/denisvarga/denisvarga.sk. Napíšte na hello@denisvarga.sk alebo skúste v chate: sudo hire denis',
   },
   en: {
     origin: 'https://denisvarga.dev',
@@ -42,8 +40,7 @@ export const headCopy: Localized<HeadCopy> = {
     jobTitle: 'AI & full-stack developer',
     ogLocale: 'en_US',
     consoleGreeting:
-      'Hi, I see you are looking under the hood. This site runs on React 19, TypeScript and Vite, is served by a single Cloudflare Worker with Hono, and the AI chat answers through OpenAI. Source: https://github.com/denisvarga/denisvarga.sk. Write to hello@denisvarga.dev.',
-    consoleChatHint: 'Or try in the chat: sudo hire denis',
+      'Hi, I see you are looking under the hood. This site runs on React 19, TypeScript and Vite, is served by a single Cloudflare Worker with Hono, and the AI chat answers through OpenAI. Source: https://github.com/denisvarga/denisvarga.sk. Write to hello@denisvarga.dev or try in the chat: sudo hire denis',
   },
 };
 
