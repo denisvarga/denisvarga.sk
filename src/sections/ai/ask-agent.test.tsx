@@ -3,6 +3,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { copyEn } from '../../i18n/copy-en';
 import { LangProvider } from '../../i18n/lang-context';
+import { PrivacyNotice } from '../../layout/privacy-notice';
 import type { TurnstileRenderOptions } from '../../types/turnstile';
 import { AskAgent } from './ask-agent';
 
@@ -88,6 +89,27 @@ describe('AskAgent', () => {
     expect(container.querySelector('button[aria-label]')?.getAttribute('aria-label')).toBe(t.send);
     expect(container.querySelector('[data-lenis-prevent]')).toBeNull();
     expect(window.turnstile?.render).not.toHaveBeenCalled();
+  });
+
+  it('says what the chat stores and opens the privacy disclosure from the note', () => {
+    const footer = document.createElement('div');
+    document.body.append(footer);
+    const footerRoot = createRoot(footer);
+    act(() =>
+      footerRoot.render(
+        <LangProvider lang="en">
+          <PrivacyNotice />
+        </LangProvider>,
+      ),
+    );
+    vi.stubGlobal('scrollTo', vi.fn());
+    const link = [...container.querySelectorAll('button')].find((b) => b.textContent === t.privacyLink);
+    expect(link?.parentElement?.textContent).toContain(t.privacyNote);
+    act(() => link?.click());
+    expect(footer.querySelector('details')?.open).toBe(true);
+    expect(fetchMock).not.toHaveBeenCalled();
+    act(() => footerRoot.unmount());
+    footer.remove();
   });
 
   it('does not submit on Enter while an IME composition is active', async () => {

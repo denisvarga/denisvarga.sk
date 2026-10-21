@@ -21,6 +21,11 @@ export interface CookieInfo {
   readonly desc: string;
 }
 
+export interface PrivacySection {
+  readonly title: string;
+  readonly text: string;
+}
+
 type Four<T> = readonly [T, T, T, T];
 type Three<T> = readonly [T, T, T];
 
@@ -58,6 +63,8 @@ export interface Copy {
     readonly you: string;
     readonly agent: string;
     readonly note: string;
+    readonly privacyNote: string;
+    readonly privacyLink: string;
     readonly error: string;
     readonly suggestions: Three<string>;
   };
@@ -86,6 +93,10 @@ export interface Copy {
     readonly details: string;
     readonly cookies: Three<CookieInfo>;
     readonly settings: string;
+  };
+  readonly privacy: {
+    readonly title: string;
+    readonly sections: readonly PrivacySection[];
   };
 }
 

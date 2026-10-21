@@ -2,6 +2,7 @@ import { openConsentSettings } from '../consent/consent-store';
 import { useLang } from '../i18n/lang-context';
 import { useCurrentYear } from '../lib/use-current-year';
 import { goTo } from '../motion/scroll-to';
+import { PrivacyNotice } from './privacy-notice';
 import styles from './site-footer.module.css';
 
 export function SiteFooter() {
@@ -19,6 +20,7 @@ export function SiteFooter() {
           {t.contact.top} <span aria-hidden="true">↑</span>
         </button>
       </div>
+      <PrivacyNotice />
     </footer>
   );
 }

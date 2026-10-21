@@ -1,0 +1,32 @@
+.notice {
+  flex: 1 0 100%;
+}
+
+.summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .summary:hover {
+    color: var(--ink);
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  margin: 16px 0 0;
+  line-height: 1.6;
+}
+
+.term {
+  font-weight: 600;
+  color: var(--grey-800);
+}
+
+.text {
+  margin: 0;
+}

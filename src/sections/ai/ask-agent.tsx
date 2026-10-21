@@ -4,6 +4,7 @@ import { ChatLog } from '../../chat/chat-log';
 import { useAgentChat } from '../../chat/use-agent-chat';
 import { useTurnstileToken } from '../../chat/use-turnstile-token';
 import { useLang } from '../../i18n/lang-context';
+import { openPrivacyNotice } from '../../layout/privacy-notice';
 import { useReveal } from '../../motion/use-reveal';
 import styles from './ask-agent.module.css';
 
@@ -70,7 +71,12 @@ export function AskAgent() {
         typingId={state.typingId}
         labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking }}
       />
-      <span className={styles.note}>{t.ask.note}</span>
+      <span className={styles.note}>
+        {t.ask.note} {t.ask.privacyNote}{' '}
+        <button type="button" className={styles.noteLink} onClick={() => openPrivacyNotice(lang)}>
+          {t.ask.privacyLink}
+        </button>
+      </span>
     </div>
   );
 }

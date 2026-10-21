@@ -55,6 +55,8 @@ export const copyEn: Copy = {
     you: 'You',
     agent: 'Agent',
     note: "The agent knows my CV. When it isn't sure, it says so and gives you my contact details.",
+    privacyNote: 'Questions and answers are kept for 365 days without your IP address or any other identifier, and the answers come from OpenAI.',
+    privacyLink: 'More on privacy',
     error: "I couldn't answer right now. Email Denis at hello@denisvarga.dev or call +421 902 074 830.",
     suggestions: [
       'Which AI tools does he use?',
@@ -91,5 +93,46 @@ export const copyEn: Copy = {
       { name: '_ga_XMK9J72476', desc: 'Google Analytics, session state, 2 years' },
     ],
     settings: 'Cookie settings',
+  },
+  privacy: {
+    title: 'Privacy',
+    sections: [
+      {
+        title: 'Who',
+        text: 'The controller is Denis Varga. Send privacy questions to hello@denisvarga.dev.',
+      },
+      {
+        title: 'What the AI chat stores',
+        text: 'For each question to the agent I store the time, the language, the question and the answer, the model used, the response time, the token counts and the outcome, such as whether an answer came back. No IP address, browser details or other identifier is stored with the questions. Please do not type personal data into the chat.',
+      },
+      {
+        title: 'Why',
+        text: 'To answer your questions, protect the chat from abuse and improve the answers. The legal basis is my legitimate interest under Art. 6(1)(f) GDPR.',
+      },
+      {
+        title: 'How long',
+        text: 'Questions and answers are deleted automatically after 365 days.',
+      },
+      {
+        title: 'OpenAI',
+        text: 'The answers come from OpenAI in the USA, acting as my processor. It receives your question and the earlier questions and answers of the same conversation. My settings tell it not to store the conversation, and it does not use it to train models. Under its terms it keeps abuse monitoring logs for up to 30 days.',
+      },
+      {
+        title: 'Pseudonymous identifiers',
+        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address. One goes to OpenAI for abuse detection. The other changes every day, counts your questions (at most 20 a day) and is deleted within three days.',
+      },
+      {
+        title: 'Cloudflare',
+        text: 'The site runs on Cloudflare, and the question log sits in a Cloudflare D1 database in the EU jurisdiction. Before a question is sent, Cloudflare Turnstile checks browser signals and your IP address to tell people from bots. Your IP address also drives the limit of 5 questions a minute, and I do not store it.',
+      },
+      {
+        title: 'Analytics',
+        text: 'Google Analytics loads only after you accept it in the cookie bar. You can change your choice any time under Cookie settings in the footer.',
+      },
+      {
+        title: 'Your rights',
+        text: 'You can ask for access, correction, erasure or restriction, and you can object. Email hello@denisvarga.dev. Since no identifier is stored with the questions, tell me roughly when you asked and what. You can also complain to a data protection authority, in Slovakia the Úrad na ochranu osobných údajov SR.',
+      },
+    ],
   },
 };
