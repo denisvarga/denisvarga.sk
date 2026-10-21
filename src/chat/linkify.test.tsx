@@ -51,6 +51,21 @@ describe('linkify', () => {
     }
   });
 
+  it('keeps a profile link inside the profile once dot segments are resolved', () => {
+    for (const text of [
+      'github.com/denisvarga/../attacker',
+      'github.com/denisvarga/%2e%2e/attacker',
+      'https://github.com/denisvarga/./../../attacker/repo',
+      'linkedin.com/in/denisvarg/../../company/evil',
+    ]) {
+      expect(anchors(text), text).toEqual([]);
+    }
+    expect(anchors('github.com/denisvarga/./denisvarga.sk')).toEqual([
+      { href: 'https://github.com/denisvarga/denisvarga.sk', text: 'github.com/denisvarga/./denisvarga.sk', target: '_blank' },
+    ]);
+    expect(anchors('linkedin.com/in/denisvarg/')[0]?.href).toBe('https://linkedin.com/in/denisvarg/');
+  });
+
   it('never turns markup in the text into elements', () => {
     const host = document.createElement('div');
     host.innerHTML = html('<img src=x onerror="alert(1)"> hello@denisvarga.sk');

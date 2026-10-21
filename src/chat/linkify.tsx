@@ -13,15 +13,28 @@ const TOKEN = new RegExp(`(${EMAIL})|(${PHONE})|(${KNOWN_LINK})`, 'g');
 // A match glued to the end of another word ("evil.com/denisvarga.sk", "sub.denisvarga.sk") stays text.
 const GLUED = /[\w@./+-]/;
 const TRAILING_PUNCTUATION = /[.,;:!?]+$/;
-const KNOWN_HOSTS = new Set(['denisvarga.sk', 'denisvarga.dev', 'github.com', 'linkedin.com']);
+// Host to the path prefix a link must stay under; null allows any path on Denis's own sites.
+const KNOWN_HOSTS: ReadonlyMap<string, string | null> = new Map([
+  ['denisvarga.sk', null],
+  ['denisvarga.dev', null],
+  ['github.com', '/denisvarga'],
+  ['linkedin.com', '/in/denisvarg'],
+]);
 
+// Checked on the parsed URL, after ".." and "%2e%2e" segments are resolved, so
+// "github.com/denisvarga/../attacker" cannot leave Denis's profile.
 function linkHref(raw: string): string | null {
+  let url: URL;
   try {
-    const url = new URL(`https://${raw.replace(/^https?:\/\//, '')}`);
-    return url.protocol === 'https:' && KNOWN_HOSTS.has(url.hostname.replace(/^www\./, '')) ? url.href : null;
+    url = new URL(`https://${raw.replace(/^https?:\/\//, '')}`);
   } catch {
     return null;
   }
+  const host = url.hostname.replace(/^www\./, '');
+  if (url.protocol !== 'https:' || !KNOWN_HOSTS.has(host)) return null;
+  const prefix = KNOWN_HOSTS.get(host);
+  if (prefix && url.pathname !== prefix && !url.pathname.startsWith(`${prefix}/`)) return null;
+  return url.href;
 }
 
 /** Text nodes and anchors for a reply; never parses markup and only builds mailto:, tel: or https: hrefs. */
