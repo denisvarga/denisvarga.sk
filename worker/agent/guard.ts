@@ -1,4 +1,4 @@
-import type { AskLang } from '../../shared/ask-contract';
+import type { AskLang, AskRole } from '../../shared/ask-contract';
 import type { ModelResult } from '../ask/openai';
 import { CONTACT_EMAIL_EN, CONTACT_EMAIL_SK } from './facts';
 import { INTRO, RULES } from './rules';
@@ -77,6 +77,20 @@ export function isManipulation(text: string): boolean {
   const plain = normalize(text);
   const words = toWords(text);
   return MARKERS.some((re) => re.test(plain)) || PHRASES.some((re) => re.test(words));
+}
+
+/**
+ * Drops earlier user turns that look like manipulation together with the assistant turns after
+ * them. The last message stays: the caller answers an attempt there with a canned reply.
+ */
+export function dropFlaggedTurns<T extends { readonly role: AskRole; readonly content: string }>(messages: readonly T[]): T[] {
+  const last = messages.length - 1;
+  let flagged = false;
+  return messages.filter((m, i) => {
+    if (i === last) return true;
+    if (m.role === 'user') flagged = isManipulation(m.content);
+    return !flagged;
+  });
 }
 
 const SHINGLE_WORDS = 8;

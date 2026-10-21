@@ -10,7 +10,8 @@ export interface AskMessage {
   readonly content: string;
   /**
    * The `sig` the Worker returned with an assistant reply, echoed back with the reply text
-   * unchanged. The Worker drops assistant turns whose signature is missing or does not match.
+   * unchanged and right after the question it answered. The Worker drops assistant turns whose
+   * signature is missing or does not match, and earlier questions left without a kept answer.
    */
   readonly sig?: string;
 }
@@ -26,8 +27,12 @@ export type AskReplyKind = 'answer' | 'easter_egg';
 export interface AskSuccess {
   readonly reply: string;
   readonly kind: AskReplyKind;
-  /** HMAC over the reply and the request `lang`; valid only for that language. */
-  readonly sig: string;
+  /**
+   * HMAC over the reply, the request `lang`, the UTC day and the question it answers; it verifies
+   * only after that question, in that language, on the same or the next UTC day. Missing on the
+   * canned reply to a manipulation attempt.
+   */
+  readonly sig?: string;
 }
 
 export const ASK_ERROR_CODES = [

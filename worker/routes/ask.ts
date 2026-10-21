@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { easterEgg } from '../agent/easter-eggs';
-import { guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
+import { dropFlaggedTurns, guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
 import { buildInstructions } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
@@ -34,7 +34,7 @@ askRoute.post('/ask', async (c) => {
   const key = clientKey(ip);
   if (env.ASK_LIMITER && !(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
 
-  // Every reply is signed, easter eggs included, so the salt is required before any of them.
+  // Easter eggs are signed like answers, so the salt is required before any reply.
   const salt = env.SAFETY_SALT?.trim();
   if (!salt) {
     logEvent('config_error', 503);
@@ -42,10 +42,14 @@ askRoute.post('/ask', async (c) => {
   }
   const signer = await createReplySigner(salt);
 
-  // Only the last message is checked, so an honest question after an attempt still reaches the model.
-  const canned = easterEgg(question, input.lang) ?? (isManipulation(question) ? manipulationReply(input.lang) : null);
-  if (canned !== null) {
-    return c.json({ reply: canned, kind: 'easter_egg', sig: await signer.sign(input.lang, canned) } satisfies AskSuccess);
+  const egg = easterEgg(question, input.lang);
+  if (egg !== null) {
+    const sig = await signer.sign({ lang: input.lang, anchor: question, reply: egg }, Date.now());
+    return c.json({ reply: egg, kind: 'easter_egg', sig } satisfies AskSuccess);
+  }
+  // Left unsigned, so a later request can never carry the attempt as an answered question.
+  if (isManipulation(question)) {
+    return c.json({ reply: manipulationReply(input.lang), kind: 'easter_egg' } satisfies AskSuccess);
   }
 
   const turnstile = { secret: env.TURNSTILE_SECRET_KEY, hostname: env.TURNSTILE_HOSTNAME, action: env.TURNSTILE_ACTION };
@@ -72,8 +76,9 @@ askRoute.post('/ask', async (c) => {
     return askError(c, 'verification_failed');
   }
 
-  // Forged or foreign-language assistant turns are dropped silently; the request still goes through.
-  const messages = await keepSignedTurns(signer, input.lang, input.messages);
+  // Forged, replayed and unanswered turns are dropped silently, and so are earlier attempts with the
+  // replies after them, so an honest question after an attempt still reaches the model.
+  const messages = dropFlaggedTurns(await keepSignedTurns(signer, input.lang, input.messages, Date.now()));
 
   const now = Date.now();
   const clientQuotaKey = await quotaKey(salt, utcMidnight(now), key);
@@ -107,5 +112,6 @@ askRoute.post('/ask', async (c) => {
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);
   if (result.outcome === 'error') logEvent('openai_error', result.httpStatus);
   if (result.text === null) return askError(c, 'upstream_unavailable');
-  return c.json({ reply: result.text, kind: 'answer', sig: await signer.sign(input.lang, result.text) } satisfies AskSuccess);
+  const sig = await signer.sign({ lang: input.lang, anchor: question, reply: result.text }, Date.now());
+  return c.json({ reply: result.text, kind: 'answer', sig } satisfies AskSuccess);
 });
