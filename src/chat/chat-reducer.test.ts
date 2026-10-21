@@ -60,13 +60,16 @@ describe('chatReducer', () => {
   });
 });
 
+const long = (id: number, role: ChatMessage['role']): ChatMessage => ({ id, role, text: 'x'.repeat(MAX_ASSISTANT_CONTENT), failed: false });
+
 describe('requestMessages', () => {
-  it('sends at most the last eight turns, ending with the question', () => {
+  it('sends at most the last eight turns, starting at a question and ending with the new one', () => {
     const history = run(Array.from({ length: 6 }, (_, i) => exchange(`q${i}`, `a${i}`)).flat()).messages;
     const payload = requestMessages(history, ' next ');
-    expect(payload).toHaveLength(MAX_MESSAGES);
+    // The last eight would start with the answer a2, whose question q2 no longer fits.
+    expect(payload).toHaveLength(MAX_MESSAGES - 1);
     expect(payload.at(-1)).toEqual({ role: 'user', content: 'next' });
-    expect(payload[0]).toEqual({ role: 'assistant', content: 'a2' });
+    expect(payload[0]).toEqual({ role: 'user', content: 'q3' });
   });
 
   it('sends assistant turns back with their signature, unsigned ones without', () => {
@@ -95,18 +98,19 @@ describe('requestMessages', () => {
     expect(requestMessages(exact, 'next')[1]).toHaveProperty('sig', 'sig-max');
   });
 
-  it('drops the oldest turns while the total exceeds the limit', () => {
+  it('drops the oldest turns while the total exceeds the limit, never leaving a reply first', () => {
     // Alternating turns cannot exceed MAX_TOTAL within eight messages; consecutive long replies can.
-    const history: ChatMessage[] = Array.from({ length: 7 }, (_, i) => ({
-      id: i + 1,
-      role: 'assistant',
-      text: 'a'.repeat(MAX_ASSISTANT_CONTENT),
-      failed: false,
-    }));
+    const history = [long(1, 'assistant'), long(2, 'assistant'), long(3, 'assistant'), long(4, 'user'), long(5, 'assistant'), long(6, 'assistant'), long(7, 'assistant')];
     const payload = requestMessages(history, 'q');
     const total = payload.reduce((sum, m) => sum + m.content.length, 0);
     expect(total).toBeLessThanOrEqual(MAX_TOTAL);
-    expect(payload).toHaveLength(Math.floor((MAX_TOTAL - 1) / MAX_ASSISTANT_CONTENT) + 1);
+    // The total drops the first reply, then the two replies left before the question go as well.
+    expect(payload.map((m) => m.role)).toEqual(['user', 'assistant', 'assistant', 'assistant', 'user']);
     expect(payload.at(-1)?.content).toBe('q');
+  });
+
+  it('keeps the question alone when the history holds only replies', () => {
+    const history: ChatMessage[] = [{ id: 1, role: 'assistant', text: 'orphan', failed: false }];
+    expect(requestMessages(history, 'q')).toEqual([{ role: 'user', content: 'q' }]);
   });
 });

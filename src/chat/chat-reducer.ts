@@ -87,7 +87,8 @@ function clamp(message: ChatMessage): AskMessage {
 /**
  * Payload history for a new question: failed replies dropped, the last MAX_MESSAGES kept, each
  * turn clamped to its role limit (assistant turns keep their signature), and oldest turns dropped
- * while the total exceeds MAX_TOTAL. The question itself is always the last entry.
+ * while the total exceeds MAX_TOTAL. The window then starts at a question, because the server
+ * drops a reply whose question was cut off. The question itself is always the last entry.
  */
 export function requestMessages(history: readonly ChatMessage[], question: string): AskMessage[] {
   // A failed reply takes its question with it, so retries are not sent twice.
@@ -98,5 +99,6 @@ export function requestMessages(history: readonly ChatMessage[], question: strin
   while (total > MAX_TOTAL && recent.length > 1) {
     total -= recent.shift()?.content.length ?? 0;
   }
+  while (recent.length > 1 && recent[0]?.role === 'assistant') recent.shift();
   return recent;
 }
