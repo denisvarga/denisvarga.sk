@@ -48,8 +48,15 @@ afterEach(() => {
 
 const toggle = () => container.querySelector<HTMLButtonElement>('[aria-controls="site-menu"]')!;
 const overlay = () => container.querySelector<HTMLElement>('#site-menu')!;
+const header = () => container.querySelector('header')!;
 const main = () => container.querySelector('main')!;
 const click = (el: HTMLElement) => act(() => el.click());
+const langLinks = (scope: ParentNode) =>
+  [...scope.querySelectorAll<HTMLAnchorElement>('a[hreflang]')].map((a) => [
+    a.hreflang,
+    a.getAttribute('href'),
+    a.getAttribute('aria-current'),
+  ]);
 
 describe('menu overlay', () => {
   it('starts closed and inert, with the toggle collapsed', () => {
@@ -101,14 +108,49 @@ describe('menu overlay', () => {
 
   it('SK/EN are plain links to the language pages, the current one marked', () => {
     // jsdom runs on localhost, a single-host preview, so the links stay relative there.
-    const links = [...overlay().querySelectorAll<HTMLAnchorElement>('a[hreflang]')];
-    expect(links.map((a) => [a.hreflang, a.getAttribute('href'), a.getAttribute('aria-current')])).toEqual([
+    expect(langLinks(overlay())).toEqual([
       ['sk', '/', 'page'],
       ['en', '/en/', null],
     ]);
     const navigate = new MouseEvent('click', { bubbles: true, cancelable: true });
-    act(() => links[1]!.dispatchEvent(navigate));
+    act(() => overlay().querySelector('a[hreflang="en"]')!.dispatchEvent(navigate));
     expect(navigate.defaultPrevented).toBe(false);
+  });
+});
+
+describe('header language switch', () => {
+  it('has the same SK/EN links as the overlay, before the contact pill', () => {
+    expect(langLinks(header())).toEqual([
+      ['sk', '/', 'page'],
+      ['en', '/en/', null],
+    ]);
+    const en = header().querySelector('a[hreflang="en"]')!;
+    const contactPill = [...header().querySelectorAll('button')].find((b) => b.textContent === 'Kontakt')!;
+    expect(en.compareDocumentPosition(contactPill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const navigate = new MouseEvent('click', { bubbles: true, cancelable: true });
+    act(() => en.dispatchEvent(navigate));
+    expect(navigate.defaultPrevented).toBe(false);
+  });
+
+  it('stays reachable while the menu is open and adds no duplicate ids', () => {
+    click(toggle());
+    expect(header().closest('[inert]')).toBeNull();
+    expect(langLinks(header())).toHaveLength(2);
+    const ids = [...container.querySelectorAll('[id]')].map((el) => el.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it.each(['sk', 'en'] as const)('%s prerender: production URLs, the current language marked', (lang) => {
+    const html = renderToString(
+      <LangProvider lang={lang}>
+        <SiteChrome />
+      </LangProvider>,
+    );
+    const prerendered = new DOMParser().parseFromString(html, 'text/html').querySelector('header')!;
+    expect(langLinks(prerendered)).toEqual([
+      ['sk', 'https://denisvarga.sk/', lang === 'sk' ? 'page' : null],
+      ['en', 'https://denisvarga.dev/', lang === 'en' ? 'page' : null],
+    ]);
   });
 });
 

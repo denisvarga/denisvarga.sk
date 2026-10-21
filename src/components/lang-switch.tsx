@@ -20,7 +20,7 @@ export function LangSwitch({ className }: { readonly className?: string }) {
     <div className={className ? `${styles.switch} ${className}` : styles.switch}>
       {LANGS.map((code, i) => (
         <Fragment key={code}>
-          {i > 0 && <span aria-hidden="true">/</span>}
+          {i > 0 && <span className={styles.sep} aria-hidden="true">/</span>}
           <a
             href={langHref(code, singleHost)}
             hrefLang={code}
