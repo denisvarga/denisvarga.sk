@@ -75,8 +75,13 @@
     color 0.3s;
 }
 
+.retry[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: progress;
+}
+
 @media (hover: hover) {
-  .retry:hover {
+  .retry:not([aria-disabled='true']):hover {
     border-color: var(--bg);
     color: #fff;
   }

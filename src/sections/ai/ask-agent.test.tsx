@@ -113,6 +113,26 @@ describe('AskAgent', () => {
     footer.remove();
   });
 
+  it('offers a send key on mobile keyboards and describes the input by the note', () => {
+    expect(input().getAttribute('enterkeyhint')).toBe('send');
+    const note = document.getElementById(input().getAttribute('aria-describedby') ?? '');
+    expect(note?.textContent).toContain(t.note);
+  });
+
+  it('marks send, the chips and the log busy while a question is pending', async () => {
+    let answer: ((response: Response) => void) | undefined;
+    fetchMock.mockReturnValueOnce(new Promise<Response>((resolve) => (answer = resolve)));
+    const busyButtons = () => [...container.querySelectorAll('button[aria-disabled="true"]')].map((b) => b.getAttribute('aria-label') ?? b.textContent);
+    expect(busyButtons()).toEqual([]);
+    type('Is he available?');
+    await press({});
+    expect(busyButtons()).toEqual([t.send, ...t.suggestions]);
+    expect(container.querySelector('[data-lenis-prevent]')?.getAttribute('aria-busy')).toBe('true');
+    await act(async () => answer?.(Response.json({ reply: 'An answer.', kind: 'answer' })));
+    expect(busyButtons()).toEqual([]);
+    expect(container.querySelector('[data-lenis-prevent]')?.getAttribute('aria-busy')).toBe('false');
+  });
+
   it('does not submit on Enter while an IME composition is active', async () => {
     type('konnichiwa');
     await press({ isComposing: true });

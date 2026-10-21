@@ -88,6 +88,16 @@
   background: var(--acc);
 }
 
+.send[aria-disabled='true'],
+.chip[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+.send[aria-disabled='true']:hover {
+  background: var(--ink);
+}
+
 .widget[data-interactive] {
   margin-top: 16px;
 }
@@ -114,7 +124,7 @@
     color 0.3s;
 }
 
-.chip:hover {
+.chip:not([aria-disabled='true']):hover {
   border-color: var(--bg);
   color: #fff;
 }
