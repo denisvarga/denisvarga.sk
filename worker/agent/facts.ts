@@ -22,7 +22,7 @@ const credit = (p: ProjectInfo): string => (p.credit && !p.credit.sk.startsWith(
 
 // Generated from the same data as the site, so the chat never drifts from the project list.
 const PROJECT_FACTS: readonly string[] = [
-  `Portfólio: spolu ${PROJECT_INFO.length} projektov: ${names(PROJECT_INFO)}. Na úvodnej stránke je výber (${names(PROJECT_INFO.filter((p) => p.featured))}), celý zoznam je v sekcii "Všetky projekty". Keď sa niekto pýta na všetky projekty, vymenuj všetkých ${PROJECT_INFO.length}.`,
+  `Portfólio: spolu ${PROJECT_INFO.length} projektov: ${names(PROJECT_INFO)}. Na úvodnej stránke je výber (${names(PROJECT_INFO.filter((p) => p.featured))}), celý zoznam je v sekcii "Všetky projekty" (na anglickej verzii "All projects").`,
   ...PROJECT_INFO.map(
     (p) =>
       `Projekt ${p.name} (${where(p)}, ${lowerFirst(p.kind.sk)}): ${RELATIONSHIP[p.context]}.${credit(p)} ${p.summary.sk} Rozsah: ${p.scope.sk.join('; ')}.`,
@@ -46,12 +46,14 @@ export const FACTS: readonly string[] = [
   'Vývoj robí AI-first. Robí aj MCP integrácie do WordPressu. Všetky AI nástroje, modely a postupy aj nástroje na automatizáciu sú v bode Stack.',
   'Weby a aplikácie: WordPress a WooCommerce na mieru (vlastné témy, bez pagebuilderov a kúpených šablón), aplikácie v Reacte, Next.js a Vue.js, backendy v PHP, Pythone a Node.js.',
   'Web má dve jazykové verzie: slovenskú na denisvarga.sk a anglickú na denisvarga.dev.',
-  'Tento web (denisvarga.sk a denisvarga.dev) postavil Denis s pomocou AI agentov, ktorí pracovali pod jeho kontrolou: on určil zadanie a plán, rozdelil prácu medzi agentov a každý výsledok skontroloval, od dizajnu po produkciu za jedno poobedie. Beží na React 19, TypeScripte a Three.js, servíruje ho Cloudflare Worker s D1 a Turnstile a tento chat odpovedá cez OpenAI (GPT-6 Luna). Zdrojový kód je verejný na github.com/denisvarga/denisvarga.sk.',
+  'Tento web (denisvarga.sk a denisvarga.dev) postavil Denis s pomocou AI agentov, ktorí pracovali pod jeho kontrolou: on určil zadanie a plán, rozdelil prácu medzi agentov a každý výsledok skontroloval. Prvý commit vo verejnom repozitári je z 2. októbra 2026, v ten deň išla do produkcie prvá verzia a odvtedy ju s agentmi priebežne dolaďuje. Beží na React 19, TypeScripte a Three.js, servíruje ho Cloudflare Worker s D1 a Turnstile a tento chat odpovedá cez OpenAI (GPT-6 Luna). Zdrojový kód je verejný na github.com/denisvarga/denisvarga.sk.',
   ...JOB_FACTS,
   'Lokalita: Bratislava, Slovensko. Najradšej pracuje remote, hybrid alebo práca na mieste je tiež možná.',
   'Jazyky: slovenčina (materinský jazyk) a angličtina na pracovnej úrovni: písanej angličtine rozumie úplne, dohovorí sa aj ústne.',
   'Vzdelanie: Stredná odborná škola polygrafická (anglicky Secondary School of Printing), odbor grafik digitálnych médií (2012-2016).',
   STACK_FACT,
+  'CV na stiahnutie: slovenské na denisvarga.sk/cv/denis-varga-cv.pdf, anglické na denisvarga.dev/cv/denis-varga-cv-en.pdf. Profily: linkedin.com/in/denisvarg a github.com/denisvarga.',
+  'Chat pozná aj príkazy help, whoami a sudo hire denis; keď sa niekto pýta na príkazy alebo skryté funkcie, spomeň ich.',
   ...PROJECT_FACTS,
   'Dostupnosť: otvorený projektom, dlhodobej spolupráci aj pozíciám v tíme. Najviac ho zaujímajú AI roly: interný vývoj s AI, automatizácia a optimalizácia firemných procesov aj procesov klientov, napríklad v startupe alebo produktovej firme.',
   `Kontakt: e-mail ${CONTACT_EMAIL_SK} (v slovenských odpovediach) alebo ${CONTACT_EMAIL_EN} (v anglických odpovediach), telefón ${CONTACT_PHONE}.`,

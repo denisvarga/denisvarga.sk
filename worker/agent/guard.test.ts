@@ -136,6 +136,19 @@ describe('leaksInstructions', () => {
     expect(leaksInstructions(RULES[3] ?? '')).toBe(false);
   });
 
+  it('lets answers that follow the greeting, salary and unknown-technology rules through', () => {
+    expect(
+      leaksInstructions(
+        'Ahoj, som AI agent na Denisovom CV. Môžem vám povedať o AI a agentoch, o jeho projektoch alebo o tom, ako vznikol tento web.',
+      ),
+    ).toBe(false);
+    expect(
+      leaksInstructions(
+        'Mzdové očakávania ani termín nástupu nie sú vo faktoch, Denis ich rád prebere osobne na hello@denisvarga.sk. Shopify v profile neuvádza.',
+      ),
+    ).toBe(false);
+  });
+
   it('lets ordinary answers and the canned replies through', () => {
     expect(leaksInstructions('Denis robí WordPress na mieru a AI agentov. Pravidlá pre čistý kód nie sú vo faktoch.')).toBe(false);
     expect(leaksInstructions('Yes, Denis builds AI agents and hardens them against prompt injection.')).toBe(false);
