@@ -114,6 +114,9 @@ askRoute.post('/ask', async (c) => {
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);
   if (result.outcome === 'error') logEvent('openai_error', result.httpStatus);
   if (result.text === null) return askError(c, 'upstream_unavailable');
+  // A refused answer here is the canned reply that replaced a leak. Like the input guard's reply it
+  // stays unsigned, so the question that drew the leak never returns as answered history.
+  if (result.outcome === 'refused') return c.json({ reply: result.text, kind: 'answer' } satisfies AskSuccess);
   const sig = await signer.sign({ lang: input.lang, anchor: question, reply: result.text }, Date.now());
   return c.json({ reply: result.text, kind: 'answer', sig } satisfies AskSuccess);
 });

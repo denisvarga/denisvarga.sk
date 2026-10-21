@@ -30,7 +30,7 @@ export interface AskSuccess {
   /**
    * HMAC over the reply, the request `lang`, the UTC day and the question it answers; it verifies
    * only after that question, in that language, on the same or the next UTC day. Missing on the
-   * canned reply to a manipulation attempt.
+   * canned replies to a manipulation attempt and to an answer that leaked the instructions.
    */
   readonly sig?: string;
 }
