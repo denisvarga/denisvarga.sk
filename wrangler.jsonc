@@ -15,7 +15,7 @@
     // Pages stay free static assets: the denisvarga.dev "/" -> "/en/" rewrite and the "/en*"
     // redirects are zone rules in Cloudflare, so only the chat API and the private question
     // overview (behind Cloudflare Access) invoke the Worker.
-    "run_worker_first": ["/api/*", "/prehlad*"]
+    "run_worker_first": ["/api/*", "/prehlad", "/prehlad/*"]
   },
   // Daily cleanup of the question log and the per-client counters (worker/scheduled.ts).
   "triggers": { "crons": ["17 3 * * *"] },

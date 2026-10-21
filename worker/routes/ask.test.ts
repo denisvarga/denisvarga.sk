@@ -42,9 +42,20 @@ describe('POST /api/ask rejections', () => {
     expect((await send({ env, body: askBody('help'), headers: { 'CF-Connecting-IP': '198.51.100.1' } })).status).toBe(200);
   });
 
-  it('works without the limiter binding', async () => {
+  it('keys the limit on CF-Connecting-IP only, whatever X-Forwarded-For or True-Client-IP say', async () => {
+    const { env } = makeEnv();
+    for (let i = 0; i < 5; i++) {
+      const spoofed = { 'X-Forwarded-For': `198.51.100.${i}`, 'True-Client-IP': `192.0.2.${i}` };
+      expect((await send({ env, body: askBody('help'), headers: spoofed })).status).toBe(200);
+    }
+    const res = await send({ env, body: askBody('help'), headers: { 'X-Forwarded-For': '198.51.100.99', 'True-Client-IP': '192.0.2.99' } });
+    await expectError(res, 429, 'rate_limited');
+  });
+
+  it('logs config_error but still answers when the limiter binding is missing', async () => {
     const { env } = makeEnv({ ASK_LIMITER: undefined });
     for (let i = 0; i < 7; i++) expect((await send({ env, body: askBody('whoami') })).status).toBe(200);
+    expect(logs).toHaveBeenCalledWith({ event: 'config_error', status: 503 });
   });
 });
 

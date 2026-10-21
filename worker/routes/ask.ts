@@ -32,7 +32,9 @@ askRoute.post('/ask', async (c) => {
 
   const ip = c.req.header('CF-Connecting-IP') ?? null;
   const key = clientKey(ip);
-  if (env.ASK_LIMITER && !(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
+  // Without the binding the request still goes on: the client budget and the daily cap bound the cost.
+  if (!env.ASK_LIMITER) logEvent('config_error', 503);
+  else if (!(await env.ASK_LIMITER.limit({ key })).success) return askError(c, 'rate_limited');
 
   // Easter eggs are signed like answers, so the salt is required before any reply.
   const salt = env.SAFETY_SALT?.trim();
