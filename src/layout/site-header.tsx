@@ -1,10 +1,9 @@
 import type { RefObject } from 'react';
 import { useLang } from '../i18n/lang-context';
 import type { ScrollTarget } from '../motion/scroll-to';
-import { sectionIndex } from '../sections/section-order';
 import styles from './site-header.module.css';
 
-const CONTACT_SECTION = sectionIndex('contact');
+const CONTACT_SECTION = 6;
 
 interface SiteHeaderProps {
   readonly open: boolean;

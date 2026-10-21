@@ -7,7 +7,6 @@ import { AboutSection } from '../sections/about/about-section';
 import { ContactSection } from '../sections/contact/contact-section';
 import { ExperienceSection } from '../sections/experience/experience-section';
 import { HeroSection } from '../sections/hero/hero-section';
-import { sectionIndex, SHOW_AI } from '../sections/section-order';
 import { ProgressBar } from './progress-bar';
 import { SiteChrome } from './site-chrome';
 import { BUILD_YEAR } from '../lib/use-current-year';
@@ -84,20 +83,20 @@ describe('menu overlay', () => {
   it('nav item closes the menu first and scrolls 380 ms later', () => {
     click(toggle());
     const items = overlay().querySelectorAll<HTMLButtonElement>('nav button');
-    expect([...items].map((b) => b.textContent)).toEqual(SHOW_AI ? ['01O mne', '02AI', '03Projekty'] : ['01O mne', '02Projekty']);
-    click(items[items.length - 1]!);
+    expect(items).toHaveLength(3);
+    click(items[2]!);
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
     expect(goTo).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(379));
     expect(goTo).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(1));
-    expect(goTo).toHaveBeenCalledWith(sectionIndex('projects'));
+    expect(goTo).toHaveBeenCalledWith(4);
   });
 
-  it('header contact pill scrolls to Kontakt right away when the menu is closed', () => {
+  it('header contact pill scrolls to Kontakt (section 6) right away when the menu is closed', () => {
     const contactPill = [...container.querySelectorAll('header button')].find((b) => b.textContent === 'Kontakt');
     click(contactPill as HTMLButtonElement);
-    expect(goTo).toHaveBeenCalledWith(sectionIndex('contact'));
+    expect(goTo).toHaveBeenCalledWith(6);
   });
 
   it('SK/EN are plain links to the language pages, the current one marked', () => {

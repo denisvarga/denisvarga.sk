@@ -1,7 +1,7 @@
 import { helixShape, knotShape, neuralShape, sphereShape, type Rand, type ShapeBuilder } from './shapes-primary';
 import { atomShape, gridShape, ringsShape } from './shapes-secondary';
 
-// Index = DESIGN_SECTIONS index: hero, about, experience, AI, projects, stack, contact.
+// Index = section index: hero, about, experience, AI, projects, stack, contact.
 export const SHAPE_BUILDERS: readonly ShapeBuilder[] = [
   sphereShape,
   knotShape,
