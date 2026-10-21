@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import heading from '../../components/split-heading.module.css';
 import { SplitHeading } from '../../components/split-heading';
-import { skillLabel, SKILLS } from '../../data/skills';
+import { skillLabel, SKILLS } from '../../../shared/skills';
 import { useLang } from '../../i18n/lang-context';
 import { sectionIds } from '../../i18n/ui-copy';
 import { FRAME_PRIORITY, subscribeFrame } from '../../motion/frame-loop';

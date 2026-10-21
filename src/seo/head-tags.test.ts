@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SKILLS, skillLabel } from '../data/skills';
+import { SKILLS, skillLabel } from '../../shared/skills';
 import { buildHeadTags, buildNotFoundHeadTags, type HeadAssets } from './head-tags';
 import { knowsAbout, profileJsonLd, serializeJsonLd } from './json-ld';
 import { buildSitemap, contentDateOr } from './sitemap';

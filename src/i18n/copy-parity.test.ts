@@ -3,9 +3,9 @@ import { PROJECT_DETAILS_EN } from '../../shared/project-details-en';
 import { PROJECT_DETAILS_SK } from '../../shared/project-details-sk';
 import { demosEn } from '../data/demos-en';
 import { demosSk } from '../data/demos-sk';
-import { JOBS } from '../data/jobs';
+import { JOBS } from '../../shared/jobs';
 import { PROJECTS } from '../data/projects';
-import { SKILLS } from '../data/skills';
+import { SKILLS } from '../../shared/skills';
 import { copyEn } from './copy-en';
 import { copySk } from './copy-sk';
 import { headCopy } from './head-copy';
@@ -77,11 +77,12 @@ describe('copy parity', () => {
     expect(headCopy.en.email).toBe('hello@denisvarga.dev');
     for (const [lang, copy] of [['sk', copySk], ['en', copyEn]] as const) {
       const other = headCopy[lang === 'sk' ? 'en' : 'sk'].email;
-      expect(copy.ask.error).toContain(headCopy[lang].email);
-      expect(copy.ask.error).toContain('+421 902 074 830');
+      expect(copy.ask.errors.fallback).toContain(headCopy[lang].email);
+      expect(copy.ask.errors.fallback).toContain('+421 902 074 830');
+      expect(copy.ask.errors.dailyCap).toContain(headCopy[lang].email);
       expect(headCopy[lang].consoleGreeting).toContain(headCopy[lang].email);
       expect(contact[lang]).toMatchObject({ email: headCopy[lang].email, emailHref: `mailto:${headCopy[lang].email}` });
-      expect([copy.ask.error, headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
+      expect([...Object.values(copy.ask.errors), headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
     }
   });
 });

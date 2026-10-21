@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { SplitHeading } from '../../components/split-heading';
 import heading from '../../components/split-heading.module.css';
-import { formatPeriod, JOBS } from '../../data/jobs';
+import { formatPeriod, JOBS } from '../../../shared/jobs';
 import { useLang } from '../../i18n/lang-context';
 import { sectionIds } from '../../i18n/ui-copy';
 import { useCurrentYear } from '../../lib/use-current-year';

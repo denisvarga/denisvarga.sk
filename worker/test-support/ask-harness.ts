@@ -53,7 +53,7 @@ export const openaiCompleted = (text = 'Denis robí WordPress na mieru.'): Respo
     status: 'completed',
     model: 'gpt-6-luna-2026-05-18',
     output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text }] }],
-    usage: { input_tokens: 1200, output_tokens: 40 },
+    usage: { input_tokens: 1200, output_tokens: 40, input_tokens_details: { cached_tokens: 1024, cache_write_tokens: 0 } },
   });
 
 interface Upstream {

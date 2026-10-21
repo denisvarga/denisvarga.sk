@@ -65,7 +65,8 @@ export interface Copy {
     readonly note: string;
     readonly privacyNote: string;
     readonly privacyLink: string;
-    readonly error: string;
+    readonly errors: { readonly rateLimited: string; readonly dailyCap: string; readonly fallback: string };
+    readonly retry: string;
     readonly suggestions: Three<string>;
   };
   readonly work: {

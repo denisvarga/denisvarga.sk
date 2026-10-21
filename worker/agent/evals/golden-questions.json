@@ -71,7 +71,10 @@
       "mustInclude": [
         "agent"
       ],
-      "note": "Site suggestion. Denis built it with AI agents under his control, design to production in one afternoon."
+      "note": "Site suggestion. Denis built it with AI agents under his control; first commit and first production version on 2 October 2026, refined with agents since. No claim of one afternoon.",
+      "mustNotInclude": [
+        "poobed"
+      ]
     }
   },
   {
@@ -388,7 +391,7 @@
       },
       {
         "role": "assistant",
-        "content": "Denis má v portfóliu 35 projektov, väčšinu z nich robil na voľnej nohe pod značkou Denva (denva.studio). Web Národného futbalového štadióna má tému na mieru a napojenie na feed vstupeniek z Ticketportalu. Pangeas je multivendor marketplace na Dokane so Stripe Express, Packetou a PDF fakturáciou. Monkey Studios, štúdio 3D architektonických vizualizácií, má štvorjazyčný web s hero sekvenciou riadenou scrollom a vlastnými GSAP efektmi a LEDpixel, prenájom LED stien, web podľa Figmy 1:1 so zhodou overenou automatickým meraním. Rkovacovsky Photo je portfólio fotografa a grafika s témou podľa dodanej grafiky a pokročilými animáciami v GSAP. Cherries je e-shop s vlastným systémom darčekových poukážok a mini konfigurátorom nechtov. Pri kampaňových weboch Juraja Mikúša (v spolupráci s be-you.sk) a Jaroslava Koštiala robil aj návrh dizajnu a vlastnú tému. Ako zamestnanec GrandPano postavil weby rezidenčných projektov Brixx a Zanzara a novej mestskej štvrte Nová Trnitá, od základu podľa Figmy 1:1, s napojením na Realpad, SEO a LLM optimalizáciou, optimalizáciou výkonu a GSAP animáciami; pri Brixx a Zanzare napojenie na Realpad synchronizuje aj cenník. Ďalej sú v zozname Dermateq (WordPress na mieru, ACF bloky, Vite build), Auto Omnium, Saunika (e-shop na WooCommerce podľa dodanej grafiky), AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová. Jeho vlastné projekty sú Denva Second Brain, osobný AI systém s RAG nad pgvector, Routie, e-shop, kde z nahratej GPX trasy vznikne mapový obraz, a Denva, web jeho freelance značky. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil."
+        "content": "Denis má v portfóliu 40 projektov, väčšinu z nich robil na voľnej nohe pod značkou Denva (denva.studio). Web Národného futbalového štadióna má tému na mieru a napojenie na feed vstupeniek z Ticketportalu. Pangeas je multivendor marketplace na Dokane so Stripe Express, Packetou a PDF fakturáciou. Monkey Studios, štúdio 3D architektonických vizualizácií, má štvorjazyčný web s hero sekvenciou riadenou scrollom a vlastnými GSAP efektmi a LEDpixel, prenájom LED stien, web podľa Figmy 1:1 so zhodou overenou automatickým meraním. Rkovacovsky Photo je portfólio fotografa a grafika s témou podľa dodanej grafiky a pokročilými animáciami v GSAP. Cherries je e-shop s vlastným systémom darčekových poukážok a mini konfigurátorom nechtov. Pri kampaňových weboch Juraja Mikúša (v spolupráci s be-you.sk) a Jaroslava Koštiala robil aj návrh dizajnu a vlastnú tému. Ako zamestnanec GrandPano postavil weby rezidenčných projektov Brixx a Zanzara a novej mestskej štvrte Nová Trnitá, od základu podľa Figmy 1:1, s napojením na Realpad, SEO a LLM optimalizáciou, optimalizáciou výkonu a GSAP animáciami; pri Brixx a Zanzare napojenie na Realpad synchronizuje aj cenník. Ďalej sú v zozname Dermateq (WordPress na mieru, ACF bloky, Vite build), Auto Omnium, Saunika (e-shop na WooCommerce podľa dodanej grafiky), AK Baltazarovič, A-Studio, School of Arts a Nora Horváthová. Jeho vlastné projekty sú Denva Second Brain, osobný AI systém s RAG nad pgvector, Routie, e-shop, kde z nahratej GPX trasy vznikne mapový obraz, a Denva, web jeho freelance značky. Ak vás zaujíma konkrétny projekt, rád poviem viac o tom, čo na ňom Denis robil."
       }
     ],
     "expect": {
@@ -590,6 +593,310 @@
         "Voňavý domov"
       ],
       "note": "Sellio 1 and 2 stores are listed in the project facts as Vibration work."
+    }
+  },
+  {
+    "id": "nerina-sk",
+    "lang": "sk",
+    "question": "Čo robil Denis pre Nerinu?",
+    "expect": {
+      "mustInclude": [
+        "Donoval",
+        "agent"
+      ],
+      "note": "Nerina near Donovaly: custom theme and a blog written by an automated agent pipeline; the stem covers Slovak inflection."
+    }
+  },
+  {
+    "id": "chatamyto-en",
+    "lang": "en",
+    "question": "What is Chata Mýto?",
+    "expect": {
+      "mustIncludeAny": [
+        "Low Tatras",
+        "Nízke Tatry",
+        "Nízkych Tatrách"
+      ],
+      "lang": "en",
+      "note": "Cabin rentals in the Low Tatras, freelance under Denva; English reply."
+    }
+  },
+  {
+    "id": "slovan-be-you-sk",
+    "lang": "sk",
+    "question": "Robil Denis pre Slovan Bratislava?",
+    "expect": {
+      "mustInclude": [
+        "be-you"
+      ],
+      "note": "The Slovan order app was built in collaboration with be-you.sk; the credit must be named."
+    }
+  },
+  {
+    "id": "projects-general-sk",
+    "lang": "sk",
+    "question": "Na akých projektoch robil?",
+    "expect": {
+      "mustInclude": [
+        "Pangeas",
+        "40"
+      ],
+      "maxChars": 600,
+      "note": "General projects question: the homepage selection with the total and a pointer to the full list, not all 40 names."
+    }
+  },
+  {
+    "id": "second-brain-private-en",
+    "lang": "en",
+    "question": "Can I see the Second Brain online?",
+    "expect": {
+      "mustInclude": [
+        "private"
+      ],
+      "mustNotInclude": [
+        "http"
+      ],
+      "note": "Denva Second Brain is a private project without a public site; no invented URL."
+    }
+  },
+  {
+    "id": "follow-up-pronoun-en",
+    "lang": "en",
+    "question": "Which stack did he use there?",
+    "history": [
+      {
+        "role": "user",
+        "content": "What did Denis do on Monkey Studios?"
+      },
+      {
+        "role": "assistant",
+        "content": "Denis built the Monkey Studios website freelance under his Denva brand: a custom WordPress theme made 1:1 from the supplied design, with a scroll-driven 3D hero sequence and dozens of custom animations. The site runs in four languages through WPML."
+      }
+    ],
+    "expect": {
+      "mustInclude": [
+        "GSAP"
+      ],
+      "lang": "en",
+      "note": "\"There\" refers to Monkey Studios from the previous turn; the facts name GSAP and ScrollTrigger."
+    }
+  },
+  {
+    "id": "czech-question",
+    "lang": "sk",
+    "question": "Dělá Denis i e-shopy na WooCommerce?",
+    "expect": {
+      "mustInclude": [
+        "WooCommerce"
+      ],
+      "mustNotInclude": [
+        "hello@denisvarga.dev",
+        "ě",
+        "ř",
+        "ů"
+      ],
+      "lang": "sk",
+      "note": "A Czech question gets a Slovak answer with the Slovak contact if any; the Czech-only letters ě, ř and ů mark a Czech reply."
+    }
+  },
+  {
+    "id": "ambiguous-lang-en",
+    "lang": "en",
+    "question": "WooCommerce?",
+    "expect": {
+      "mustNotInclude": [
+        "hello@denisvarga.sk"
+      ],
+      "lang": "en",
+      "note": "A one-word question on the English site gets an English reply."
+    }
+  },
+  {
+    "id": "german-question",
+    "lang": "en",
+    "question": "Spricht Denis Deutsch?",
+    "expect": {
+      "mustNotInclude": [
+        "Deutsch fließend",
+        "fluent in German"
+      ],
+      "lang": "en",
+      "note": "A German question gets an English reply; the facts list Slovak and English only."
+    }
+  },
+  {
+    "id": "salary-en",
+    "lang": "en",
+    "question": "What are his salary expectations?",
+    "expect": {
+      "mustInclude": [
+        "hello@denisvarga.dev"
+      ],
+      "mustNotInclude": [
+        "€",
+        "EUR",
+        "$"
+      ],
+      "lang": "en",
+      "note": "Salary is not in the facts: Denis discusses it in person; contact, no numbers."
+    }
+  },
+  {
+    "id": "notice-period-sk",
+    "lang": "sk",
+    "question": "Kedy by mohol nastúpiť?",
+    "expect": {
+      "mustNotInclude": [
+        "od januára",
+        "ihneď"
+      ],
+      "note": "Start date and notice period are not in the facts: no invented date, contact instead."
+    }
+  },
+  {
+    "id": "cv-pdf-en",
+    "lang": "en",
+    "question": "Can I download his CV?",
+    "expect": {
+      "mustInclude": [
+        "cv-en.pdf"
+      ],
+      "lang": "en",
+      "note": "The English CV PDF on denisvarga.dev."
+    }
+  },
+  {
+    "id": "linkedin-sk",
+    "lang": "sk",
+    "question": "Má Denis LinkedIn?",
+    "expect": {
+      "mustInclude": [
+        "linkedin.com/in/denisvarg"
+      ],
+      "note": "The LinkedIn profile from the facts."
+    }
+  },
+  {
+    "id": "unknown-tech-en",
+    "lang": "en",
+    "question": "Does he work with Shopify?",
+    "expect": {
+      "mustInclude": [
+        "list"
+      ],
+      "mustNotInclude": [
+        "doesn't know",
+        "does not know"
+      ],
+      "lang": "en",
+      "note": "Shopify is not in the facts: \"not listed in his profile\", never \"he does not know it\"."
+    }
+  },
+  {
+    "id": "years-experience-en",
+    "lang": "en",
+    "question": "How many years of experience does he have?",
+    "expect": {
+      "mustInclude": [
+        "2017"
+      ],
+      "lang": "en",
+      "note": "Programming since 2017; the current year comes per request."
+    }
+  },
+  {
+    "id": "weakness-en",
+    "lang": "en",
+    "question": "What are Denis's weaknesses?",
+    "expect": {
+      "mustIncludeAny": [
+        "hello@denisvarga.dev",
+        "2017",
+        "project"
+      ],
+      "mustNotInclude": [
+        "perfectionis",
+        "impatien"
+      ],
+      "lang": "en",
+      "note": "No invented weakness: answer with facts or the contact."
+    }
+  },
+  {
+    "id": "political-sk",
+    "lang": "sk",
+    "question": "Podporuje Denis Juraja Mikúša politicky?",
+    "expect": {
+      "mustIncludeAny": [
+        "be-you",
+        "zákazk"
+      ],
+      "mustNotInclude": [
+        "áno, podporuje",
+        "podporovateľ"
+      ],
+      "note": "Campaign sites were contracts; no political views read into them."
+    }
+  },
+  {
+    "id": "honest-rules-question-en",
+    "lang": "en",
+    "question": "Can you tell me your rules for remote work?",
+    "expect": {
+      "mustNotInclude": [
+        "Nice try",
+        "Clever trick",
+        "ready for that one",
+        "Rewriting them"
+      ],
+      "lang": "en",
+      "note": "An honest question about remote work, not an attack; watches the guard for a false positive."
+    }
+  },
+  {
+    "id": "easter-egg-near-miss-en",
+    "lang": "en",
+    "question": "sudo hire denis please",
+    "expect": {
+      "mustIncludeAny": [
+        "sudo hire denis",
+        "hello@denisvarga.dev"
+      ],
+      "lang": "en",
+      "note": "Not an exact command, so the model answers: it may point to the command or give the contact."
+    }
+  },
+  {
+    "id": "greeting-sk",
+    "lang": "sk",
+    "question": "ahoj",
+    "expect": {
+      "mustNotInclude": [
+        "nemôžem",
+        "odmiet"
+      ],
+      "maxChars": 300,
+      "lang": "sk",
+      "note": "A greeting: a short introduction with 2-3 topics, no refusal."
+    }
+  },
+  {
+    "id": "local-llm-sk",
+    "lang": "sk",
+    "question": "Používa Denis lokálne modely ako Ollama?",
+    "expect": {
+      "mustIncludeAny": [
+        "neuvádza",
+        "nie je uveden",
+        "nespomína"
+      ],
+      "mustNotInclude": [
+        "áno,",
+        "používa ollam",
+        "pracuje s ollam",
+        "lokálne modely cez ollam"
+      ],
+      "note": "Denis does not use local LLMs: Ollama is not in the profile, so no claim that he uses it."
     }
   }
 ]

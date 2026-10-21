@@ -1,4 +1,6 @@
-import type { Localized } from '../i18n/types';
+// Work history shared by the site, the PDF CVs, llms.txt and the chat agent's facts.
+
+type Localized<T> = Readonly<Record<'sk' | 'en', T>>;
 
 export interface Job {
   /** `end: null` means the job is ongoing; it renders up to the current year. */

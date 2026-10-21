@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { formatPeriod, JOBS } from '../data/jobs';
-import { SKILLS, skillLabel } from '../data/skills';
+import { formatPeriod, JOBS } from '../../shared/jobs';
+import { SKILLS, skillLabel } from '../../shared/skills';
 import { GITHUB_URL, headCopy, LINKEDIN_URL } from '../i18n/head-copy';
 import type { Lang } from '../i18n/types';
 import { contact } from '../i18n/ui-copy';

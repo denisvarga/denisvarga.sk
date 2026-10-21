@@ -15,7 +15,7 @@ function request(fetchImpl: typeof fetch, overrides: Partial<OpenAIRequest> = {}
     apiKey: 'sk-test',
     model: 'gpt-6-luna',
     effort: 'none',
-    instructions: 'INSTRUCTIONS',
+    instructions: { shared: 'SHARED', perRequest: 'PER-REQUEST' },
     messages: [{ role: 'user', content: 'Ahoj' }],
     safetyIdentifier: 'a'.repeat(64),
     deadline: Date.now() + 20_000,
@@ -27,20 +27,42 @@ function request(fetchImpl: typeof fetch, overrides: Partial<OpenAIRequest> = {}
 
 afterEach(() => vi.restoreAllMocks());
 
+const usage = (details: unknown) =>
+  parseResponse(
+    { status: 'completed', output: message({ type: 'output_text', text: 'Ahoj.' }), usage: { input_tokens: 12_000, output_tokens: 9, input_tokens_details: details } },
+    'm',
+  );
+
 describe('buildRequestBody', () => {
-  it('sends the hardened request shape', () => {
+  it('sends the hardened request shape with the shared prefix as the only cache breakpoint', () => {
     const body = buildRequestBody(request(fetch, { effort: 'bogus' }));
     expect(body).toEqual({
       model: 'gpt-6-luna',
-      instructions: 'INSTRUCTIONS',
-      input: [{ role: 'user', content: 'Ahoj' }],
+      input: [
+        { role: 'developer', content: [{ type: 'input_text', text: 'SHARED', prompt_cache_breakpoint: { mode: 'explicit' } }] },
+        { role: 'developer', content: [{ type: 'input_text', text: 'PER-REQUEST' }] },
+        { role: 'user', content: 'Ahoj' },
+      ],
       store: false,
       max_output_tokens: 400,
       reasoning: { effort: 'none' },
-      prompt_cache_key: 'cv-chat-v1',
+      prompt_cache_key: 'cv-chat-v2',
+      prompt_cache_options: { mode: 'explicit', ttl: '30m' },
       safety_identifier: 'a'.repeat(64),
     });
+    expect(body).not.toHaveProperty('instructions');
     expect(buildRequestBody(request(fetch, { effort: 'low' }))).toMatchObject({ reasoning: { effort: 'low' } });
+  });
+
+  it('keeps the turns after both developer messages, in order', () => {
+    const messages = [
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1' },
+      { role: 'user', content: 'q2' },
+    ] as const;
+    const { input } = buildRequestBody(request(fetch, { messages })) as { input: { role: string }[] };
+    expect(input.map((m) => m.role)).toEqual(['developer', 'developer', 'user', 'assistant', 'user']);
+    expect(input.slice(2)).toEqual(messages);
   });
 });
 
@@ -51,6 +73,17 @@ describe('parseResponse', () => {
       'gpt-6-luna',
     );
     expect(r).toMatchObject({ outcome: 'ok', text: 'Ahoj. Ako?', model: 'gpt-6-luna', inputTokens: 5, outputTokens: 2 });
+  });
+
+  it('reads cache reads and writes from the usage details, and null when they are missing or malformed', () => {
+    expect(usage({ cached_tokens: 11_000, cache_write_tokens: 0, cache_write_tokens_details: { ttl_30m_tokens: 0, ttl_12h_tokens: 0 } })).toMatchObject({
+      outcome: 'ok',
+      inputTokens: 12_000,
+      cachedTokens: 11_000,
+      cacheWriteTokens: 0,
+    });
+    expect(usage(undefined)).toMatchObject({ outcome: 'ok', cachedTokens: null, cacheWriteTokens: null });
+    expect(usage({ cached_tokens: 'lots' })).toMatchObject({ outcome: 'ok', text: 'Ahoj.', cachedTokens: null, cacheWriteTokens: null });
   });
 
   it('strips control characters from the answer, keeping newlines and tabs', () => {

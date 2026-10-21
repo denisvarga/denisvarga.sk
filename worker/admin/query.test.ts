@@ -9,9 +9,9 @@ const filter = (raw: Record<string, string> = {}) => filterSchema.parse(raw);
 
 function seeded(): FakeD1 {
   const db = new FakeD1();
-  db.seed({ created_at: NOW - HOUR_MS, lang: 'sk', outcome: 'ok', latency_ms: 800, input_tokens: 1000, output_tokens: 100 });
+  db.seed({ created_at: NOW - HOUR_MS, lang: 'sk', outcome: 'ok', latency_ms: 800, input_tokens: 1000, output_tokens: 100, cached_tokens: 600, cache_write_tokens: 0 });
   // 00:30 local on 5 Oct, still 4 Oct in UTC.
-  db.seed({ created_at: Date.UTC(2026, 9, 4, 22, 30), lang: 'en', outcome: 'truncated', latency_ms: 1200, input_tokens: 2000, output_tokens: 400 });
+  db.seed({ created_at: Date.UTC(2026, 9, 4, 22, 30), lang: 'en', outcome: 'truncated', latency_ms: 1200, input_tokens: 2000, output_tokens: 400, cached_tokens: 0, cache_write_tokens: 1500 });
   db.seed({ created_at: Date.UTC(2026, 9, 4, 21, 30), lang: 'sk', outcome: 'error' });
   db.seed({ created_at: NOW - 10 * DAY_MS, lang: 'sk', outcome: 'capped' });
   db.seed({ created_at: NOW - 40 * DAY_MS, lang: 'en', outcome: 'refused', latency_ms: 400, input_tokens: 500, output_tokens: 0 });
@@ -22,8 +22,9 @@ function seeded(): FakeD1 {
 describe('loadOverview summary', () => {
   it('computes totals, languages, outcomes, latency, tokens and cost on seeded rows', async () => {
     const { summary } = await loadOverview(seeded().asBinding(), filter(), NOW);
-    expect(summary).toMatchObject({ total: 6, last7: 4, last30: 5, sk: 4, en: 2, avgLatencyMs: 800, inputTokens: 3500, outputTokens: 500 });
-    expect(summary.costUsd).toBeCloseTo(3500 * 0.1e-6 + 500 * 0.5e-6, 12);
+    expect(summary).toMatchObject({ total: 6, last7: 4, last30: 5, sk: 4, en: 2, avgLatencyMs: 800, inputTokens: 3500, outputTokens: 500, cachedTokens: 600, cacheWriteTokens: 1500 });
+    // Rows logged before cache tracking have no cache counts and are priced as plain input.
+    expect(summary.costUsd).toBeCloseTo(1400 * 0.1e-6 + 600 * 0.01e-6 + 1500 * 0.125e-6 + 500 * 0.5e-6, 12);
     expect(summary.outcomes).toEqual([
       { outcome: 'ok', count: 1 },
       { outcome: 'truncated', count: 1 },

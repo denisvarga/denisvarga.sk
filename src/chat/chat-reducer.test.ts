@@ -39,9 +39,27 @@ describe('chatReducer', () => {
     expect(replied.loading).toBe(false);
     expect(replied.typingId).toBe(2);
     expect(replied.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'a', failed: false });
-    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error copy' }]);
-    expect(failed.messages[1]).toMatchObject({ text: 'error copy', failed: true });
+    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error copy', retryable: true }]);
+    expect(failed.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'error copy', failed: true, retryable: true });
     expect(failed.typingId).toBe(2);
+    const final = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'done for today', retryable: false }]);
+    expect(final.messages[1]).toEqual({ id: 2, role: 'assistant', text: 'done for today', failed: true });
+  });
+
+  it('retries a failed reply: drops it with its question, asks the question again and keeps the draft', () => {
+    const failed = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy', retryable: true }, { type: 'input', value: 'draft' }]);
+    const retried = chatReducer(failed, { type: 'retry', id: 4 });
+    expect(retried.messages.map((m) => m.text)).toEqual(['q1', 'a1', 'q2']);
+    expect(retried.messages.at(-1)).toEqual({ id: 5, role: 'user', text: 'q2', failed: false });
+    expect(retried).toMatchObject({ loading: true, typingId: null, nextId: 6, input: 'draft' });
+  });
+
+  it('ignores a retry while loading, of a reply that offers none, and of an unknown id', () => {
+    const final = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'done', retryable: false }]);
+    expect(chatReducer(final, { type: 'retry', id: 2 })).toBe(final);
+    expect(chatReducer(final, { type: 'retry', id: 99 })).toBe(final);
+    const failed = run([{ type: 'ask', text: 'q' }, { type: 'fail', text: 'error', retryable: true }, { type: 'ask', text: 'next' }]);
+    expect(chatReducer(failed, { type: 'retry', id: 2 })).toBe(failed);
   });
 
   it('stores the reply signature, and none when the server sent none', () => {
@@ -60,13 +78,16 @@ describe('chatReducer', () => {
   });
 });
 
+const long = (id: number, role: ChatMessage['role']): ChatMessage => ({ id, role, text: 'x'.repeat(MAX_ASSISTANT_CONTENT), failed: false });
+
 describe('requestMessages', () => {
-  it('sends at most the last eight turns, ending with the question', () => {
+  it('sends at most the last eight turns, starting at a question and ending with the new one', () => {
     const history = run(Array.from({ length: 6 }, (_, i) => exchange(`q${i}`, `a${i}`)).flat()).messages;
     const payload = requestMessages(history, ' next ');
-    expect(payload).toHaveLength(MAX_MESSAGES);
+    // The last eight would start with the answer a2, whose question q2 no longer fits.
+    expect(payload).toHaveLength(MAX_MESSAGES - 1);
     expect(payload.at(-1)).toEqual({ role: 'user', content: 'next' });
-    expect(payload[0]).toEqual({ role: 'assistant', content: 'a2' });
+    expect(payload[0]).toEqual({ role: 'user', content: 'q3' });
   });
 
   it('sends assistant turns back with their signature, unsigned ones without', () => {
@@ -81,7 +102,7 @@ describe('requestMessages', () => {
   });
 
   it('excludes failed replies together with their questions', () => {
-    const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy' }]).messages;
+    const history = run([...exchange('q1', 'a1'), { type: 'ask', text: 'q2' }, { type: 'fail', text: 'error copy', retryable: true }]).messages;
     expect(requestMessages(history, 'q2').map((m) => m.content)).toEqual(['q1', 'a1', 'q2']);
   });
 
@@ -95,18 +116,19 @@ describe('requestMessages', () => {
     expect(requestMessages(exact, 'next')[1]).toHaveProperty('sig', 'sig-max');
   });
 
-  it('drops the oldest turns while the total exceeds the limit', () => {
+  it('drops the oldest turns while the total exceeds the limit, never leaving a reply first', () => {
     // Alternating turns cannot exceed MAX_TOTAL within eight messages; consecutive long replies can.
-    const history: ChatMessage[] = Array.from({ length: 7 }, (_, i) => ({
-      id: i + 1,
-      role: 'assistant',
-      text: 'a'.repeat(MAX_ASSISTANT_CONTENT),
-      failed: false,
-    }));
+    const history = [long(1, 'assistant'), long(2, 'assistant'), long(3, 'assistant'), long(4, 'user'), long(5, 'assistant'), long(6, 'assistant'), long(7, 'assistant')];
     const payload = requestMessages(history, 'q');
     const total = payload.reduce((sum, m) => sum + m.content.length, 0);
     expect(total).toBeLessThanOrEqual(MAX_TOTAL);
-    expect(payload).toHaveLength(Math.floor((MAX_TOTAL - 1) / MAX_ASSISTANT_CONTENT) + 1);
+    // The total drops the first reply, then the two replies left before the question go as well.
+    expect(payload.map((m) => m.role)).toEqual(['user', 'assistant', 'assistant', 'assistant', 'user']);
     expect(payload.at(-1)?.content).toBe('q');
+  });
+
+  it('keeps the question alone when the history holds only replies', () => {
+    const history: ChatMessage[] = [{ id: 1, role: 'assistant', text: 'orphan', failed: false }];
+    expect(requestMessages(history, 'q')).toEqual([{ role: 'user', content: 'q' }]);
   });
 });

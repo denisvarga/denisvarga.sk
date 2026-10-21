@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { matchesMedia, REDUCED_MOTION_QUERY } from '../motion/use-media-query';
+import { linkify } from './linkify';
 
 export const TYPE_TICK_MS = 18;
 export const TYPE_STEP = 3;
@@ -28,10 +29,12 @@ export function TypingBubble({ text, animate, className }: TypingBubbleProps) {
     return () => clearInterval(timer);
   }, [instant, text]);
 
+  // Links appear once the text is complete, so a half-typed address is never a link.
+  if (instant || typed >= text.length) return <span className={className}>{linkify(text)}</span>;
   return (
     <span className={className}>
       <span className="visually-hidden">{text}</span>
-      <span aria-hidden="true">{instant ? text : text.slice(0, typed)}</span>
+      <span aria-hidden="true">{text.slice(0, typed)}</span>
     </span>
   );
 }

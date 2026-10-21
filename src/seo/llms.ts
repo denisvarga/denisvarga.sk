@@ -1,7 +1,7 @@
+import { formatPeriod, JOBS } from '../../shared/jobs';
 import { PROJECTS_WITH_DETAILS } from '../../shared/project-details';
 import type { ProjectContext } from '../../shared/projects';
-import { formatPeriod, JOBS } from '../data/jobs';
-import { SKILLS, skillLabel } from '../data/skills';
+import { SKILLS, skillLabel } from '../../shared/skills';
 import { copyEn } from '../i18n/copy-en';
 import { headCopy, LINKEDIN_URL, SOURCE_URL } from '../i18n/head-copy';
 import { contact } from '../i18n/ui-copy';

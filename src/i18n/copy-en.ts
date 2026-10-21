@@ -57,7 +57,12 @@ export const copyEn: Copy = {
     note: "The agent knows my CV. When it isn't sure, it says so and gives you my contact details.",
     privacyNote: 'Questions and answers are kept for 365 days without your IP address or any other identifier, and the answers come from OpenAI.',
     privacyLink: 'More on privacy',
-    error: "I couldn't answer right now. Email Denis at hello@denisvarga.dev or call +421 902 074 830.",
+    errors: {
+      rateLimited: 'Too many questions at once, try again in a minute.',
+      dailyCap: 'The agent is done for today. Email Denis at hello@denisvarga.dev.',
+      fallback: "I couldn't answer right now. Email Denis at hello@denisvarga.dev or call +421 902 074 830.",
+    },
+    retry: 'Try again',
     suggestions: [
       'Which AI tools does he use?',
       'How was this site built?',

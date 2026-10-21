@@ -5,13 +5,13 @@ import type { ProjectDetailsBySlug } from './projects';
 // Every scope item is backed by the project's source code; keep it that way when editing.
 export const PROJECT_DETAILS_SK: ProjectDetailsBySlug = {
   'second-brain': {
-    summary: 'Osobný systém, ktorý zbiera poznámky, e-maily, články, hlasové správy aj fotky, triedi ich cez Claude a robí z nich prehľadávateľnú znalostnú bázu. Beží na dvoch miestach: riadiaca vrstva na Hetzner VPS, lokálne modely a agenti na stále zapnutom Macu, prepojené cez Tailscale.',
+    summary: 'Osobný systém, ktorý zbiera poznámky, e-maily, články, hlasové správy aj fotky, triedi ich cez Claude a robí z nich prehľadávateľnú znalostnú bázu. Beží na dvoch miestach: riadiaca vrstva na Hetzner VPS, prepis reči, OCR a agenti na stále zapnutom Macu, prepojené cez Tailscale.',
     scope: [
       'RAG nad PostgreSQL 17 a pgvector: embeddingy bge-m3 v HNSW indexe, hybridné vyhľadávanie (vektory, fulltext a trigramy) spojené cez reciprocal rank fusion a reranker bge-reranker-v2-m3',
       'Odpovede s citovanými zdrojmi a vlastný MCP server s nástrojmi na vyhľadávanie, otázky, zachytávanie poznámok a úlohy',
       'Telegram bot na zachytávanie obsahu, rozhovor s asistentom a schvaľovanie krokov agentov',
       'Coding agent nad Claude Agent SDK v oddelených git worktrees, v sandboxe bez prístupových údajov, s plánom na schválenie v Telegrame a pull requestom cez GitHub App',
-      'Lokálne modely na Apple Silicon: prepis reči cez mlx-whisper (aj v slovenčine), OCR cez Apple Vision a generovanie cez mlx-lm',
+      'Na Apple Silicon: prepis reči cez mlx-whisper (aj v slovenčine) a OCR cez Apple Vision',
       'Plánované joby vo fronte pg-boss: denné súhrny, kompilácia stránok znalostnej bázy, údržba a samoopravné úlohy',
       'Docker Compose, Caddy a Cloudflare Access, deploy so zálohou databázy, health checkom a automatickým rollbackom, nočné zálohy s týždenným testom obnovy',
     ],

@@ -18,11 +18,14 @@ export function AskAgent() {
   const cardRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
   const inputId = useId();
+  const noteId = useId();
   useReveal(cardRef);
 
   const tokens = useTurnstileToken(widgetRef);
-  const { state, setInput, ask } = useAgentChat({ lang, errorText: t.ask.error, tokens });
+  const { state, setInput, ask, retry } = useAgentChat({ lang, errors: t.ask.errors, tokens });
   const submit = (question: string) => void ask(question);
+  // Stays focusable while a question is pending; the chat ignores clicks until the reply lands.
+  const busy = state.loading || undefined;
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter' || isComposing(event)) return;
@@ -48,11 +51,19 @@ export function AskAgent() {
             maxLength={MAX_USER_CONTENT}
             placeholder={t.ask.placeholder}
             autoComplete="off"
+            enterKeyHint="send"
+            aria-describedby={noteId}
             onChange={(event) => setInput(event.target.value)}
             onFocus={tokens.warmUp}
             onKeyDown={onKeyDown}
           />
-          <button type="button" className={styles.send} aria-label={t.ask.send} onClick={() => submit(state.input)}>
+          <button
+            type="button"
+            className={styles.send}
+            aria-label={t.ask.send}
+            aria-disabled={busy}
+            onClick={() => submit(state.input)}
+          >
             ↑
           </button>
         </div>
@@ -60,7 +71,7 @@ export function AskAgent() {
       </div>
       <div className={styles.chips}>
         {t.ask.suggestions.map((question) => (
-          <button key={question} type="button" className={styles.chip} onClick={() => submit(question)}>
+          <button key={question} type="button" className={styles.chip} aria-disabled={busy} onClick={() => submit(question)}>
             {question}
           </button>
         ))}
@@ -69,9 +80,10 @@ export function AskAgent() {
         messages={state.messages}
         loading={state.loading}
         typingId={state.typingId}
-        labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking }}
+        labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking, retry: t.ask.retry }}
+        onRetry={(id) => void retry(id)}
       />
-      <span className={styles.note}>
+      <span id={noteId} className={styles.note}>
         {t.ask.note} {t.ask.privacyNote}{' '}
         <button type="button" className={styles.noteLink} onClick={() => openPrivacyNotice(lang)}>
           {t.ask.privacyLink}

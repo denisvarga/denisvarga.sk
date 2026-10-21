@@ -238,7 +238,7 @@ describe('chat wiring', () => {
     const post = vi.fn();
     const chat: { current: AgentChat | null } = { current: null };
     function Probe() {
-      chat.current = useAgentChat({ lang: 'en', errorText: 'ERROR COPY', tokens, post });
+      chat.current = useAgentChat({ lang: 'en', errors: { rateLimited: 'SLOW DOWN', dailyCap: 'DONE TODAY', fallback: 'ERROR COPY' }, tokens, post });
       return null;
     }
     act(() => root.render(createElement(Probe)));

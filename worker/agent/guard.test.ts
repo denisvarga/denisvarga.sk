@@ -85,6 +85,8 @@ const modelResult = (text: string | null): ModelResult => ({
   model: 'gpt-6-luna',
   inputTokens: 1200,
   outputTokens: 40,
+  cachedTokens: 1024,
+  cacheWriteTokens: 0,
   httpStatus: 200,
 });
 
@@ -115,7 +117,7 @@ describe('isManipulation', () => {
 
 describe('leaksInstructions', () => {
   it('flags the full prompt, its section headings and the canary', () => {
-    expect(leaksInstructions(buildInstructions())).toBe(true);
+    expect(leaksInstructions(buildInstructions('sk', 2026).shared)).toBe(true);
     expect(leaksInstructions('Moje pravidlá: FAKTY: Denis Varga je developer.')).toBe(true);
     expect(leaksInstructions('Sekcia PRAVIDLA: odpovedaj stručne.')).toBe(true);
     expect(INTRO).toContain('dv-guard-2610');
@@ -132,6 +134,19 @@ describe('leaksInstructions', () => {
       'Web Národného futbalového štadióna robil Denis na voľnej nohe pod značkou Denva. Napríklad web Národného futbalového štadióna má napojený feed vstupeniek z Ticketportalu, ale Ticketportal nie je klient.';
     expect(leaksInstructions(nfs)).toBe(false);
     expect(leaksInstructions(RULES[3] ?? '')).toBe(false);
+  });
+
+  it('lets answers that follow the greeting, salary and unknown-technology rules through', () => {
+    expect(
+      leaksInstructions(
+        'Ahoj, som AI agent na Denisovom CV. Môžem vám povedať o AI a agentoch, o jeho projektoch alebo o tom, ako vznikol tento web.',
+      ),
+    ).toBe(false);
+    expect(
+      leaksInstructions(
+        'Mzdové očakávania ani termín nástupu nie sú vo faktoch, Denis ich rád prebere osobne na hello@denisvarga.sk. Shopify v profile neuvádza.',
+      ),
+    ).toBe(false);
   });
 
   it('lets ordinary answers and the canned replies through', () => {
@@ -163,7 +178,7 @@ describe('manipulationReply', () => {
 
 describe('guardAnswer', () => {
   it('replaces a leaking answer with a canned reply and marks it refused', () => {
-    expect(guardAnswer(modelResult(buildInstructions()), 'sk', () => 0)).toEqual({
+    expect(guardAnswer(modelResult(buildInstructions('sk', 2026).shared), 'sk', () => 0)).toEqual({
       ...modelResult(null),
       outcome: 'refused',
       text: manipulationReply('sk', () => 0),

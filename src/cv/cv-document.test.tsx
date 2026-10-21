@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { formatPeriod, JOBS } from '../data/jobs';
+import { formatPeriod, JOBS } from '../../shared/jobs';
 import { PROJECTS } from '../data/projects';
 import { headCopy } from '../i18n/head-copy';
 import { LANGS, type Lang } from '../i18n/types';

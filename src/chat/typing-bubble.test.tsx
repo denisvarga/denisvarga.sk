@@ -2,7 +2,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { startDesignTypewriter } from '../../scripts/oracles/design-typewriter';
-import { TypingBubble } from './typing-bubble';
+import { TYPE_TICK_MS, TypingBubble } from './typing-bubble';
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
@@ -26,7 +26,8 @@ function mockReducedMotion(reduce: boolean) {
   );
 }
 
-const visible = () => container.querySelector('[aria-hidden="true"]')?.textContent;
+/** The typed part while typing, the whole bubble once complete. */
+const visible = () => (container.querySelector('[aria-hidden="true"]') ?? container).textContent;
 const hidden = () => container.querySelector('.visually-hidden')?.textContent;
 
 beforeEach(() => {
@@ -74,6 +75,18 @@ describe('TypingBubble', () => {
     act(() => root.render(<TypingBubble text={TEXT} animate={false} />));
     expect(visible()).toBe(TEXT);
     expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('links contacts only once the text is complete, without a hidden duplicate', () => {
+    mockReducedMotion(false);
+    const reply = 'Email hello@denisvarga.dev.';
+    act(() => root.render(<TypingBubble text={reply} animate />));
+    act(() => vi.advanceTimersByTime(TYPE_TICK_MS * 4));
+    expect(container.querySelector('a')).toBeNull();
+    act(() => vi.advanceTimersByTime(TYPE_TICK_MS * 10));
+    expect(container.querySelector('a')?.getAttribute('href')).toBe('mailto:hello@denisvarga.dev');
+    expect(container.querySelector('.visually-hidden, [aria-hidden]')).toBeNull();
+    expect(container.textContent).toBe(reply);
   });
 
   it('shows the full text at once under reduced motion', () => {

@@ -28,7 +28,7 @@ const WHERE =
 export const COUNT_FILTERED_SQL = `SELECT COUNT(*) AS n FROM chat_log ${WHERE}`;
 export const PAGE_SQL = `SELECT created_at, lang, question, answer, latency_ms, outcome FROM chat_log ${WHERE} ORDER BY created_at DESC, id DESC LIMIT ?4 OFFSET ?5`;
 export const SUMMARY_SQL =
-  "SELECT COUNT(*) AS total, COALESCE(SUM(lang = 'sk'), 0) AS sk, COALESCE(SUM(lang = 'en'), 0) AS en, AVG(latency_ms) AS avg_latency_ms, COALESCE(SUM(input_tokens), 0) AS input_tokens, COALESCE(SUM(output_tokens), 0) AS output_tokens FROM chat_log";
+  "SELECT COUNT(*) AS total, COALESCE(SUM(lang = 'sk'), 0) AS sk, COALESCE(SUM(lang = 'en'), 0) AS en, AVG(latency_ms) AS avg_latency_ms, COALESCE(SUM(input_tokens), 0) AS input_tokens, COALESCE(SUM(output_tokens), 0) AS output_tokens, COALESCE(SUM(cached_tokens), 0) AS cached_tokens, COALESCE(SUM(cache_write_tokens), 0) AS cache_write_tokens FROM chat_log";
 export const OUTCOMES_SQL = 'SELECT outcome, COUNT(*) AS n FROM chat_log GROUP BY outcome';
 // Bratislava is always a whole number of hours off UTC, so each UTC hour falls inside one local day.
 export const HOURLY_SQL = 'SELECT created_at / 3600000 AS hour, COUNT(*) AS n FROM chat_log WHERE created_at >= ?1 GROUP BY hour';
@@ -65,6 +65,9 @@ export interface Summary {
   readonly avgLatencyMs: number | null;
   readonly inputTokens: number;
   readonly outputTokens: number;
+  /** Cache reads and writes, both counted inside `inputTokens`. */
+  readonly cachedTokens: number;
+  readonly cacheWriteTokens: number;
   readonly costUsd: number;
   readonly daily: readonly DayCount[];
 }
@@ -115,8 +118,12 @@ export async function loadOverview(db: D1Database, filter: OverviewFilter, now: 
   const totals = summary?.results[0] ?? {};
   const outcomeCounts = new Map((outcomes?.results ?? []).map((row) => [row.outcome, num(row.n)]));
   const daily = dailyCounts(hourly?.results ?? [], now);
-  const inputTokens = num(totals.input_tokens);
-  const outputTokens = num(totals.output_tokens);
+  const tokens = {
+    inputTokens: num(totals.input_tokens),
+    outputTokens: num(totals.output_tokens),
+    cachedTokens: num(totals.cached_tokens),
+    cacheWriteTokens: num(totals.cache_write_tokens),
+  };
   const avg = numOrNull(totals.avg_latency_ms);
   return {
     summary: {
@@ -127,9 +134,8 @@ export async function loadOverview(db: D1Database, filter: OverviewFilter, now: 
       en: num(totals.en),
       outcomes: CHAT_OUTCOMES.map((outcome) => ({ outcome, count: outcomeCounts.get(outcome) ?? 0 })),
       avgLatencyMs: avg === null ? null : Math.round(avg),
-      inputTokens,
-      outputTokens,
-      costUsd: estimateCostUsd(inputTokens, outputTokens),
+      ...tokens,
+      costUsd: estimateCostUsd(tokens),
       daily,
     },
     rows: (page?.results ?? []).map(toLogRow),

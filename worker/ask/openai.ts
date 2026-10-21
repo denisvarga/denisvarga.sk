@@ -4,7 +4,9 @@ import { cleanContent, plainReply } from './clean-text';
 // Runs in the Worker and in Node (scripts/eval-agent.ts): standard fetch and WebCrypto only.
 
 export const OPENAI_URL = 'https://api.openai.com/v1/responses';
-export const PROMPT_CACHE_KEY = 'cv-chat-v1';
+export const PROMPT_CACHE_KEY = 'cv-chat-v2';
+/** Explicit mode caches only the marked prefix, so no request pays a write for its own turns. */
+export const PROMPT_CACHE_OPTIONS = { mode: 'explicit', ttl: '30m' } as const;
 export const MAX_OUTPUT_TOKENS = 400;
 export const ATTEMPT_TIMEOUT_MS = 15_000;
 /** Whole-request budget on the server; the client waits 25 s. */
@@ -33,15 +35,29 @@ export interface ModelResult {
   readonly model: string;
   readonly inputTokens: number | null;
   readonly outputTokens: number | null;
+  /** Input tokens billed as cache reads; part of `inputTokens`. */
+  readonly cachedTokens: number | null;
+  /** Input tokens billed as cache writes; part of `inputTokens`. */
+  readonly cacheWriteTokens: number | null;
   /** Upstream HTTP status, 0 for network errors and timeouts. */
   readonly httpStatus: number;
+}
+
+/**
+ * `shared` is identical for every request and carries the cache breakpoint; `perRequest` follows
+ * it uncached. Top-level `instructions` cannot carry a breakpoint, so both go in as developer
+ * messages ahead of the turns.
+ */
+export interface PromptParts {
+  readonly shared: string;
+  readonly perRequest: string;
 }
 
 export interface OpenAIRequest {
   readonly apiKey: string;
   readonly model: string;
   readonly effort: string | undefined;
-  readonly instructions: string;
+  readonly instructions: PromptParts;
   readonly messages: readonly { readonly role: 'user' | 'assistant'; readonly content: string }[];
   readonly safetyIdentifier: string;
   /** Epoch ms after which no attempt may run. */
@@ -58,17 +74,25 @@ export function resolveEffort(value: string | undefined): ReasoningEffort {
 export function buildRequestBody(req: OpenAIRequest): Record<string, unknown> {
   return {
     model: req.model,
-    instructions: req.instructions,
-    input: req.messages.map(({ role, content }) => ({ role, content })),
+    input: [
+      {
+        role: 'developer',
+        content: [{ type: 'input_text', text: req.instructions.shared, prompt_cache_breakpoint: { mode: 'explicit' } }],
+      },
+      { role: 'developer', content: [{ type: 'input_text', text: req.instructions.perRequest }] },
+      ...req.messages.map(({ role, content }) => ({ role, content })),
+    ],
     store: false,
     max_output_tokens: MAX_OUTPUT_TOKENS,
     reasoning: { effort: resolveEffort(req.effort) },
     prompt_cache_key: PROMPT_CACHE_KEY,
+    prompt_cache_options: PROMPT_CACHE_OPTIONS,
     safety_identifier: req.safetyIdentifier,
   };
 }
 
 const optionalString = z.optional(z.nullable(z.string()));
+const optionalCount = z.optional(z.nullable(z.number()));
 
 const responseSchema = z.object({
   status: optionalString,
@@ -82,7 +106,19 @@ const responseSchema = z.object({
     ),
   ),
   incomplete_details: z.optional(z.nullable(z.object({ reason: optionalString }))),
-  usage: z.optional(z.nullable(z.object({ input_tokens: z.number(), output_tokens: z.number() }))),
+  usage: z.optional(
+    z.nullable(
+      z.object({
+        input_tokens: z.number(),
+        output_tokens: z.number(),
+        // Telemetry only: an unexpected shape here must never turn an answer into an error.
+        input_tokens_details: z.catch(
+          z.optional(z.nullable(z.object({ cached_tokens: optionalCount, cache_write_tokens: optionalCount }))),
+          undefined,
+        ),
+      }),
+    ),
+  ),
 });
 
 const errorSchema = z.object({ error: z.object({ code: optionalString, type: optionalString }) });
@@ -94,7 +130,17 @@ export function trimToLastSentence(text: string): string {
 }
 
 function failure(outcome: ModelOutcome, model: string, httpStatus: number): ModelResult {
-  return { outcome, text: null, responseStatus: null, model, inputTokens: null, outputTokens: null, httpStatus };
+  return {
+    outcome,
+    text: null,
+    responseStatus: null,
+    model,
+    inputTokens: null,
+    outputTokens: null,
+    cachedTokens: null,
+    cacheWriteTokens: null,
+    httpStatus,
+  };
 }
 
 export function parseResponse(json: unknown, requestedModel: string, httpStatus = 200): ModelResult {
@@ -118,6 +164,8 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
     model: data.model ?? requestedModel,
     inputTokens: data.usage?.input_tokens ?? null,
     outputTokens: data.usage?.output_tokens ?? null,
+    cachedTokens: data.usage?.input_tokens_details?.cached_tokens ?? null,
+    cacheWriteTokens: data.usage?.input_tokens_details?.cache_write_tokens ?? null,
     httpStatus,
   };
 
