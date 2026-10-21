@@ -32,6 +32,21 @@ const PAGES = [
   { file: '404.html', lang: 'sk', canonical: null },
 ] as const;
 const HREFLANGS = ['en', 'sk', 'x-default'];
+// The Worker source map under dist/denisvarga_sk is fine (uploaded privately); dist/client is public.
+const FORBIDDEN_CLIENT_FILES: readonly (readonly [RegExp, string])[] = [
+  [/\.map$/, 'source map must not ship'],
+  [/(^|[/\\])\.env[^/\\]*$/, '.env file must not ship'],
+  [/(^|[/\\])wrangler\.json[^/\\]*$/, 'wrangler config must not ship'],
+];
+const SCANNED_TEXT = /\.(?:html|js|css|txt|xml|json|webmanifest)$/;
+// Failures name the kind only, never the match: they end up in CI logs.
+const SECRET_PATTERNS: readonly (readonly [RegExp, string])[] = [
+  // The lookbehind skips CSS names such as "mask-...", which contain "sk-" mid-word.
+  [/(?<![\w-])sk-(proj-)?[A-Za-z0-9_-]{20,}/, 'an OpenAI API key'],
+  [/-----BEGIN [A-Z ]*PRIVATE KEY/, 'a private key'],
+  // The public Turnstile site key ships in the bundle; only the longer secret key matches.
+  [/0x4AAAAAAA[A-Za-z0-9_-]{25,}/, 'a Turnstile secret key'],
+];
 const TAG = /<([a-zA-Z][\w-]*)((?:\s+[^\s"'=/>]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*\/?>/g;
 const ATTR = /([^\s"'=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
@@ -142,6 +157,19 @@ export async function checkDist(distDir: string, { deploy = false } = {}): Promi
 
   for (const file of deploy ? await walk(distDir) : clientFiles) {
     if (/(^|[/\\])\.dev\.vars[^/\\]*$/.test(file)) failures.add(`${show(file)}: .dev.vars must not ship`);
+  }
+
+  for (const file of clientFiles) {
+    for (const [pattern, reason] of FORBIDDEN_CLIENT_FILES) {
+      if (pattern.test(file)) failures.add(`${show(file)}: ${reason}`);
+    }
+  }
+
+  for (const file of clientFiles.filter((f) => SCANNED_TEXT.test(f))) {
+    const text = await readFile(file, 'utf8');
+    for (const [pattern, kind] of SECRET_PATTERNS) {
+      if (pattern.test(text)) failures.add(`${show(file)}: looks like ${kind}`);
+    }
   }
 
   return [...failures];
