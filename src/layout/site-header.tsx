@@ -1,7 +1,8 @@
 import type { RefObject } from 'react';
 import { LangSwitch } from '../components/lang-switch';
 import { useLang } from '../i18n/lang-context';
-import type { ScrollTarget } from '../motion/scroll-to';
+import { sectionIds } from '../i18n/ui-copy';
+import { onScrollLinkClick, type ScrollTarget } from '../motion/scroll-to';
 import styles from './site-header.module.css';
 
 const CONTACT_SECTION = 6;
@@ -15,18 +16,22 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ open, menuId, toggleRef, onToggle, onGo }: SiteHeaderProps) {
-  const { t, ui } = useLang();
+  const { lang, t, ui } = useLang();
 
   return (
     <header className={styles.header} data-open={open ? '' : undefined}>
-      <button type="button" className={styles.name} onClick={() => onGo('#top')}>
+      <a href="#top" className={styles.name} onClick={(event) => onScrollLinkClick(event, () => onGo('#top'))}>
         Denis Varga
-      </button>
+      </a>
       <div className={styles.actions}>
         <LangSwitch />
-        <button type="button" className={styles.contact} onClick={() => onGo(CONTACT_SECTION)}>
+        <a
+          href={`#${sectionIds[lang].contact}`}
+          className={styles.contact}
+          onClick={(event) => onScrollLinkClick(event, () => onGo(CONTACT_SECTION))}
+        >
           {t.nav.contact}
-        </button>
+        </a>
         <button
           ref={toggleRef}
           type="button"

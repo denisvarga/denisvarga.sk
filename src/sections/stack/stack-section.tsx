@@ -3,6 +3,7 @@ import heading from '../../components/split-heading.module.css';
 import { SplitHeading } from '../../components/split-heading';
 import { skillLabel, SKILLS } from '../../data/skills';
 import { useLang } from '../../i18n/lang-context';
+import { sectionIds } from '../../i18n/ui-copy';
 import { FRAME_PRIORITY, subscribeFrame } from '../../motion/frame-loop';
 import { useInViewport } from '../../motion/use-in-viewport';
 import { REDUCED_MOTION_QUERY, useMediaQuery } from '../../motion/use-media-query';
@@ -46,7 +47,7 @@ export function StackSection() {
   }, []);
 
   return (
-    <section data-sec className={styles.section}>
+    <section data-sec id={sectionIds[lang].stack} className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <span ref={labelRef} data-reveal className={styles.label}>

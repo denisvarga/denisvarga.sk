@@ -1,12 +1,16 @@
 import type { Ref } from 'react';
 import { LangSwitch } from '../components/lang-switch';
 import { useLang } from '../i18n/lang-context';
-import { contact } from '../i18n/ui-copy';
-import type { ScrollTarget } from '../motion/scroll-to';
+import { contact, sectionIds, type SectionIds } from '../i18n/ui-copy';
+import { onScrollLinkClick, type ScrollTarget } from '../motion/scroll-to';
 import styles from './menu-overlay.module.css';
 
-// Section indices of the three menu items (O mne, AI, Projekty).
-const NAV_SECTIONS = [1, 3, 4] as const;
+// Section indices and anchors of the three menu items (O mne, AI, Projekty).
+const NAV_SECTIONS: ReadonlyArray<readonly [index: number, anchor: keyof SectionIds]> = [
+  [1, 'about'],
+  [3, 'ai'],
+  [4, 'work'],
+];
 
 interface MenuOverlayProps {
   readonly id: string;
@@ -18,6 +22,7 @@ interface MenuOverlayProps {
 export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
   const { lang, t, ui } = useLang();
   const links = contact[lang];
+  const ids = sectionIds[lang];
 
   return (
     <div
@@ -31,14 +36,14 @@ export function MenuOverlay({ id, ref, open, onGo }: MenuOverlayProps) {
       inert={!open}
     >
       <nav className={styles.nav}>
-        {t.nav.items.map((name, i) => (
-          <div key={NAV_SECTIONS[i]} className={styles.row}>
-            <button type="button" className={styles.item} onClick={() => onGo(NAV_SECTIONS[i] ?? 0)}>
+        {NAV_SECTIONS.map(([index, anchor], i) => (
+          <div key={index} className={styles.row}>
+            <a href={`#${ids[anchor]}`} className={styles.item} onClick={(event) => onScrollLinkClick(event, () => onGo(index))}>
               <span className={styles.index} aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <span className={styles.label}>{name}</span>
-            </button>
+              <span className={styles.label}>{t.nav.items[i]}</span>
+            </a>
           </div>
         ))}
       </nav>

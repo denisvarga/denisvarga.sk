@@ -3,7 +3,7 @@ import pill from '../../components/pill-link.module.css';
 import { SplitHeading } from '../../components/split-heading';
 import { LINKEDIN_URL } from '../../i18n/head-copy';
 import { useLang } from '../../i18n/lang-context';
-import { contact } from '../../i18n/ui-copy';
+import { contact, sectionIds } from '../../i18n/ui-copy';
 import { SiteFooter } from '../../layout/site-footer';
 import { useMagnet } from '../../motion/use-magnet';
 import { useReveal } from '../../motion/use-reveal';
@@ -41,7 +41,7 @@ export function ContactSection() {
   useReveal(linksRef);
 
   return (
-    <section data-sec="" className={styles.contact}>
+    <section data-sec="" id={sectionIds[lang].contact} className={styles.contact}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <SplitHeading as="h2" text={t.contact.title} className={styles.title} />

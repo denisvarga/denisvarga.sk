@@ -3,6 +3,7 @@ import { SplitHeading } from '../../components/split-heading';
 import heading from '../../components/split-heading.module.css';
 import { useLang } from '../../i18n/lang-context';
 import type { Fact } from '../../i18n/types';
+import { sectionIds } from '../../i18n/ui-copy';
 import { useReveal } from '../../motion/use-reveal';
 import styles from './about.module.css';
 
@@ -20,14 +21,14 @@ function FactItem({ fact, delay }: { fact: Fact; delay: string }) {
 }
 
 export function AboutSection() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const labelRef = useRef<HTMLSpanElement>(null);
   const bodyRef = useRef<HTMLParagraphElement>(null);
   useReveal(labelRef);
   useReveal(bodyRef);
 
   return (
-    <section data-sec="" className={styles.about}>
+    <section data-sec="" id={sectionIds[lang].about} className={styles.about}>
       <div className={styles.inner}>
         <span ref={labelRef} className={styles.label} data-reveal="">
           {t.about.label}

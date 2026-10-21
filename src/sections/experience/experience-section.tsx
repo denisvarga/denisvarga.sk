@@ -3,6 +3,7 @@ import { SplitHeading } from '../../components/split-heading';
 import heading from '../../components/split-heading.module.css';
 import { formatPeriod, JOBS } from '../../data/jobs';
 import { useLang } from '../../i18n/lang-context';
+import { sectionIds } from '../../i18n/ui-copy';
 import { useCurrentYear } from '../../lib/use-current-year';
 import { useReveal } from '../../motion/use-reveal';
 import styles from './experience.module.css';
@@ -16,7 +17,7 @@ export function ExperienceSection() {
   useReveal(cardRef);
 
   return (
-    <section data-sec="" className={styles.experience}>
+    <section data-sec="" id={sectionIds[lang].experience} className={styles.experience}>
       <div className={styles.inner}>
         <div className={styles.head}>
           <span ref={labelRef} className={styles.label} data-reveal="">
