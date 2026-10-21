@@ -101,7 +101,7 @@ askRoute.post('/ask', async (c) => {
     apiKey: env.OPENAI_API_KEY.trim(),
     model: env.OPENAI_MODEL.trim(),
     effort: env.OPENAI_REASONING_EFFORT,
-    instructions: buildInstructions(),
+    instructions: buildInstructions(input.lang, new Date(now).getUTCFullYear()),
     messages,
     safetyIdentifier: await safetyIdentifier(salt, key),
     deadline,

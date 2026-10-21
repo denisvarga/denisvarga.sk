@@ -6,7 +6,16 @@ const EN_DASH = String.fromCodePoint(0x2013);
 const EM_DASH = String.fromCodePoint(0x2014);
 
 describe('buildInstructions', () => {
-  const text = buildInstructions();
+  const text = buildInstructions('sk', 2026).shared;
+
+  it('shares one prefix between both sites and puts the site and year after it', () => {
+    const sk = buildInstructions('sk', 2026);
+    const en = buildInstructions('en', 2027);
+    expect(en.shared).toBe(sk.shared);
+    expect(sk.perRequest).toBe('Návštevník je na slovenskej verzii webu (denisvarga.sk). Aktuálny rok je 2026.');
+    expect(en.perRequest).toBe('Návštevník je na anglickej verzii webu (denisvarga.dev). Aktuálny rok je 2027.');
+    expect(sk.shared).not.toMatch(/Aktuálny rok|Návštevník je na/);
+  });
 
   it('uses only plain hyphens', () => {
     expect(text).not.toContain(EN_DASH);
@@ -70,6 +79,6 @@ describe('buildInstructions', () => {
   });
 
   it('exposes the prompt version of this wording', () => {
-    expect(PROMPT_VERSION).toBe('2026-10-14.3');
+    expect(PROMPT_VERSION).toBe('2026-10-21.1');
   });
 });

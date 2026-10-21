@@ -115,7 +115,7 @@ describe('isManipulation', () => {
 
 describe('leaksInstructions', () => {
   it('flags the full prompt, its section headings and the canary', () => {
-    expect(leaksInstructions(buildInstructions())).toBe(true);
+    expect(leaksInstructions(buildInstructions('sk', 2026).shared)).toBe(true);
     expect(leaksInstructions('Moje pravidlá: FAKTY: Denis Varga je developer.')).toBe(true);
     expect(leaksInstructions('Sekcia PRAVIDLA: odpovedaj stručne.')).toBe(true);
     expect(INTRO).toContain('dv-guard-2610');
@@ -163,7 +163,7 @@ describe('manipulationReply', () => {
 
 describe('guardAnswer', () => {
   it('replaces a leaking answer with a canned reply and marks it refused', () => {
-    expect(guardAnswer(modelResult(buildInstructions()), 'sk', () => 0)).toEqual({
+    expect(guardAnswer(modelResult(buildInstructions('sk', 2026).shared), 'sk', () => 0)).toEqual({
       ...modelResult(null),
       outcome: 'refused',
       text: manipulationReply('sk', () => 0),

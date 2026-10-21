@@ -4,7 +4,9 @@ import { cleanContent, plainReply } from './clean-text';
 // Runs in the Worker and in Node (scripts/eval-agent.ts): standard fetch and WebCrypto only.
 
 export const OPENAI_URL = 'https://api.openai.com/v1/responses';
-export const PROMPT_CACHE_KEY = 'cv-chat-v1';
+export const PROMPT_CACHE_KEY = 'cv-chat-v2';
+/** Explicit mode caches only the marked prefix, so no request pays a write for its own turns. */
+export const PROMPT_CACHE_OPTIONS = { mode: 'explicit', ttl: '30m' } as const;
 export const MAX_OUTPUT_TOKENS = 400;
 export const ATTEMPT_TIMEOUT_MS = 15_000;
 /** Whole-request budget on the server; the client waits 25 s. */
@@ -37,11 +39,21 @@ export interface ModelResult {
   readonly httpStatus: number;
 }
 
+/**
+ * `shared` is identical for every request and carries the cache breakpoint; `perRequest` follows
+ * it uncached. Top-level `instructions` cannot carry a breakpoint, so both go in as developer
+ * messages ahead of the turns.
+ */
+export interface PromptParts {
+  readonly shared: string;
+  readonly perRequest: string;
+}
+
 export interface OpenAIRequest {
   readonly apiKey: string;
   readonly model: string;
   readonly effort: string | undefined;
-  readonly instructions: string;
+  readonly instructions: PromptParts;
   readonly messages: readonly { readonly role: 'user' | 'assistant'; readonly content: string }[];
   readonly safetyIdentifier: string;
   /** Epoch ms after which no attempt may run. */
@@ -58,12 +70,19 @@ export function resolveEffort(value: string | undefined): ReasoningEffort {
 export function buildRequestBody(req: OpenAIRequest): Record<string, unknown> {
   return {
     model: req.model,
-    instructions: req.instructions,
-    input: req.messages.map(({ role, content }) => ({ role, content })),
+    input: [
+      {
+        role: 'developer',
+        content: [{ type: 'input_text', text: req.instructions.shared, prompt_cache_breakpoint: { mode: 'explicit' } }],
+      },
+      { role: 'developer', content: [{ type: 'input_text', text: req.instructions.perRequest }] },
+      ...req.messages.map(({ role, content }) => ({ role, content })),
+    ],
     store: false,
     max_output_tokens: MAX_OUTPUT_TOKENS,
     reasoning: { effort: resolveEffort(req.effort) },
     prompt_cache_key: PROMPT_CACHE_KEY,
+    prompt_cache_options: PROMPT_CACHE_OPTIONS,
     safety_identifier: req.safetyIdentifier,
   };
 }

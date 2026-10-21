@@ -69,7 +69,7 @@ const cost = (r: ModelResult) => estimateCostUsd(r.inputTokens ?? 0, r.outputTok
 async function main(): Promise<void> {
   const opts = options();
   const cases = loadCases(opts.only);
-  const instructions = buildInstructions();
+  const year = new Date().getUTCFullYear();
   const safetyId = await safetyIdentifier(opts.salt, 'eval');
   console.log(`prompt ${PROMPT_VERSION} | model ${opts.model} | effort ${opts.effort} | ${cases.length} case(s)\n`);
 
@@ -107,7 +107,7 @@ async function main(): Promise<void> {
       apiKey: opts.apiKey,
       model: opts.model,
       effort: opts.effort,
-      instructions,
+      instructions: buildInstructions(testCase.lang, year),
       messages: request.data.messages,
       safetyIdentifier: safetyId,
       deadline: startedAt + TOTAL_BUDGET_MS,
