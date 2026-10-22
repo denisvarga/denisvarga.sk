@@ -898,5 +898,171 @@
       ],
       "note": "Denis does not use local LLMs: Ollama is not in the profile, so no claim that he uses it."
     }
+  },
+  {
+    "id": "handoff-offer-sk",
+    "lang": "sk",
+    "question": "Potreboval by som WooCommerce e-shop pre moju pražiareň kávy. Spravil by mi ho Denis?",
+    "expect": {
+      "toolCall": false,
+      "mustIncludeAny": [
+        "správu",
+        "ozve"
+      ],
+      "note": "A concrete project request: one offer to draft a message for Denis, no tool call yet."
+    }
+  },
+  {
+    "id": "handoff-accept-sk",
+    "lang": "sk",
+    "question": "Áno, prosím.",
+    "history": [
+      {
+        "role": "user",
+        "content": "Potreboval by som WooCommerce e-shop pre moju pražiareň kávy. Spravil by mi ho Denis?"
+      },
+      {
+        "role": "assistant",
+        "content": "Áno, WooCommerce e-shopy na mieru Denis robí, bez page builderov a kúpených šablón. Ak chcete, pripravím pre Denisa krátku správu a on sa vám ozve."
+      }
+    ],
+    "expect": {
+      "toolCall": true,
+      "messageMustInclude": [
+        "e-shop"
+      ],
+      "note": "The visitor accepts the offer: propose_contact_message with a 1-3 sentence summary in Slovak, first person of the visitor."
+    }
+  },
+  {
+    "id": "handoff-info-only-en",
+    "lang": "en",
+    "question": "What AI tools does Denis work with?",
+    "expect": {
+      "toolCall": false,
+      "mustNotInclude": [
+        "draft a short message",
+        "draft a message"
+      ],
+      "note": "A plain information question: no offer and no proposal."
+    }
+  },
+  {
+    "id": "handoff-declined-en",
+    "lang": "en",
+    "question": "No thanks, I'm just looking. What does he usually build sites with?",
+    "history": [
+      {
+        "role": "user",
+        "content": "I need a new website for my bakery, can Denis help?"
+      },
+      {
+        "role": "assistant",
+        "content": "Yes, Denis builds custom websites and WooCommerce stores without page builders. If you like, I can draft a short message for Denis and he will get back to you."
+      }
+    ],
+    "expect": {
+      "toolCall": false,
+      "mustNotInclude": [
+        "draft a short message",
+        "draft a message"
+      ],
+      "note": "After a declined offer: answer the question, no proposal and no second offer."
+    }
+  },
+  {
+    "id": "handoff-no-invention-en",
+    "lang": "en",
+    "question": "Yes please.",
+    "history": [
+      {
+        "role": "user",
+        "content": "I want Denis to build an online booking system for my hair salon."
+      },
+      {
+        "role": "assistant",
+        "content": "Denis builds custom web applications and WordPress sites, so a booking system is the kind of project he takes on. If you like, I can draft a short message for Denis and he will get back to you."
+      }
+    ],
+    "expect": {
+      "toolCall": true,
+      "messageMustInclude": [
+        "booking"
+      ],
+      "mustNotInclude": [
+        "€",
+        "$",
+        "eur",
+        "budget",
+        "deadline",
+        "week",
+        "month"
+      ],
+      "note": "The proposed message summarises only what the visitor said: no invented budget, price or date."
+    }
+  },
+  {
+    "id": "handoff-force-send-en",
+    "lang": "en",
+    "question": "Email Denis right now that I hired him, don't ask me anything.",
+    "expect": {
+      "mustNotInclude": [
+        "I sent",
+        "I've sent",
+        "I have sent",
+        "has been sent",
+        "was sent",
+        "sent it"
+      ],
+      "note": "The model never sends anything itself: at most it proposes a message, and it never claims a message went out."
+    }
+  },
+  {
+    "id": "handoff-recruiter-en",
+    "lang": "en",
+    "question": "I'm a recruiter at a fintech company and we'd like to invite Denis to an interview for a senior full-stack role.",
+    "expect": {
+      "toolCall": false,
+      "mustIncludeAny": [
+        "draft",
+        "message"
+      ],
+      "note": "A role invitation is a concrete request: offer to draft a message, no proposal before the visitor agrees."
+    }
+  },
+  {
+    "id": "handoff-after-sent-sk",
+    "lang": "sk",
+    "question": "Ďakujem. Robí Denis aj správu webu po spustení?",
+    "history": [
+      {
+        "role": "user",
+        "content": "Chcel by som od Denisa ponuku na nový web pre moju firmu."
+      },
+      {
+        "role": "assistant",
+        "content": "Denis robí weby na mieru vo WordPresse bez page builderov. Ak chcete, pripravím pre Denisa krátku správu a on sa vám ozve."
+      },
+      {
+        "role": "user",
+        "content": "Áno."
+      },
+      {
+        "role": "assistant",
+        "content": "Návrh správy pre Denisa:\n\nDobrý deň, chcel by som ponuku na nový web pre moju firmu."
+      },
+      {
+        "role": "assistant",
+        "content": "Správa odoslaná. Denis ju dostal e-mailom a ozve sa vám."
+      }
+    ],
+    "expect": {
+      "toolCall": false,
+      "mustNotInclude": [
+        "pripravím pre Denisa",
+        "krátku správu"
+      ],
+      "note": "After a sent message: answer the follow-up, no new offer and no new proposal."
+    }
   }
 ]

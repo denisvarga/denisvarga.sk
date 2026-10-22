@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { askSchema } from '../../ask/schema';
+import { draftReply, SENT_REPLY } from '../../contact/draft-text';
 import { easterEgg } from '../easter-eggs';
 import { isManipulation, manipulationReply } from '../guard';
 import cases from './golden-questions.json';
@@ -35,13 +36,15 @@ describe('golden questions', () => {
   });
 
   it('uses only the checks the eval knows, each well formed', () => {
-    const known = new Set(['mustInclude', 'mustIncludeAny', 'mustNotInclude', 'maxChars', 'lang', 'note']);
+    const known = new Set(['mustInclude', 'mustIncludeAny', 'mustNotInclude', 'maxChars', 'lang', 'toolCall', 'messageMustInclude', 'note']);
     for (const c of cases) {
       const expectation: Record<string, unknown> = c.expect;
       for (const key of Object.keys(expectation)) expect(known.has(key), `${c.id}: ${key}`).toBe(true);
       if ('maxChars' in expectation) expect(Number.isInteger(expectation.maxChars) && Number(expectation.maxChars) > 0, c.id).toBe(true);
       if ('lang' in expectation) expect(['sk', 'en'], c.id).toContain(expectation.lang);
       if ('mustIncludeAny' in expectation) expect(Array.isArray(expectation.mustIncludeAny) && expectation.mustIncludeAny.length > 0, c.id).toBe(true);
+      if ('toolCall' in expectation) expect(typeof expectation.toolCall, c.id).toBe('boolean');
+      if ('messageMustInclude' in expectation) expect(expectation.toolCall, `${c.id}: a message check needs a proposal`).toBe(true);
     }
   });
 
@@ -53,6 +56,27 @@ describe('golden questions', () => {
     expect(cases.find((c) => c.id === 'projects-general-sk')?.expect).toMatchObject({ maxChars: 600 });
     expect(cases.find((c) => c.id === 'czech-question')?.expect).toMatchObject({ lang: 'sk' });
     expect(cases.find((c) => c.id === 'czech-question')?.expect.mustNotInclude).toEqual(expect.arrayContaining(['ě', 'ř', 'ů']));
+  });
+
+  it('covers the contact hand-off, replaying the draft and the confirmation exactly as the Worker signs them', () => {
+    const handoff = cases.filter((c) => c.id.startsWith('handoff-'));
+    expect(handoff.map((c) => c.id).toSorted()).toEqual(
+      [
+        'handoff-accept-sk',
+        'handoff-after-sent-sk',
+        'handoff-declined-en',
+        'handoff-force-send-en',
+        'handoff-info-only-en',
+        'handoff-no-invention-en',
+        'handoff-offer-sk',
+        'handoff-recruiter-en',
+      ],
+    );
+    expect(cases.find((c) => c.id === 'handoff-accept-sk')?.expect).toMatchObject({ toolCall: true, messageMustInclude: ['e-shop'] });
+    expect(cases.find((c) => c.id === 'handoff-force-send-en')?.expect.mustNotInclude).toEqual(expect.arrayContaining(['I sent', 'has been sent']));
+    const history = cases.find((c) => c.id === 'handoff-after-sent-sk')?.history ?? [];
+    expect(history.at(-1)?.content).toBe(SENT_REPLY.sk);
+    expect(history.at(-2)?.content).toBe(draftReply('sk', 'Dobrý deň, chcel by som ponuku na nový web pre moju firmu.'));
   });
 
   it('sends the honest rules question and the near-miss command to the model', () => {
