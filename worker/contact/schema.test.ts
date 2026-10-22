@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CONTACT_EMAIL_PATTERN } from '../../shared/contact-contract';
 import { contactEmail, contactSchema, oneLine, parseDraftArguments } from './schema';
 
 const EM_DASH = String.fromCodePoint(0x2014);
@@ -14,10 +15,36 @@ describe('oneLine', () => {
 
 describe('contactEmail', () => {
   it('accepts ordinary addresses and rejects anything that is not one address', () => {
-    for (const ok of ['jana@firma.sk', 'o.neil+web@mail.co.uk', "o'neil@x.io"]) expect(contactEmail.safeParse(ok).success, ok).toBe(true);
+    for (const ok of ['jana@firma.sk', 'o.neil+web@mail.co.uk', "o'neil@x.io", 'a@b-c.d-e.sk', `${'a'.repeat(64)}@b.sk`]) {
+      expect(contactEmail.safeParse(ok).success, ok).toBe(true);
+    }
     for (const bad of ['jana@firma', 'a b@c.sk', 'a@b.sk\r\nBcc: x@y.sk', 'a@b.sk, c@d.sk', '<a@b.sk>', `${'a'.repeat(250)}@b.sk`]) {
       expect(contactEmail.safeParse(bad).success, bad).toBe(false);
     }
+  });
+
+  it('rejects stray dots in the local part and malformed domain labels', () => {
+    for (const bad of [
+      '.jana@firma.sk',
+      'jana.@firma.sk',
+      'ja..na@firma.sk',
+      `${'a'.repeat(65)}@b.sk`,
+      'jana@-firma.sk',
+      'jana@firma-.sk',
+      'jana@firma..sk',
+      'jana@.firma.sk',
+      `jana@${'a'.repeat(64)}.sk`,
+      'jana@firma.s',
+      'jana@firma.sk1',
+    ]) {
+      expect(contactEmail.safeParse(bad).success, bad).toBe(false);
+    }
+  });
+
+  it('is valid under the v flag browsers compile the pattern attribute with', () => {
+    const browser = new RegExp(`^(?:${CONTACT_EMAIL_PATTERN})$`, 'v');
+    expect(browser.test('jana@firma.sk')).toBe(true);
+    expect(browser.test('ja..na@firma.sk')).toBe(false);
   });
 });
 
