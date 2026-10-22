@@ -144,6 +144,10 @@ export const copyEn: Copy = {
         text: 'The site runs on Cloudflare, and the question log sits in a Cloudflare D1 database in the EU jurisdiction. Before a question is sent, Cloudflare Turnstile checks browser signals and your IP address to tell people from bots. Your IP address also drives the limit of 5 questions a minute, and I do not store it.',
       },
       {
+        title: 'Messages to me from the chat',
+        text: 'When the agent drafts a message to me and you send it, I receive your name, email, the message and your conversation with the agent by email so I can reply. Cloudflare Email Routing delivers it. The site stores none of it; the message stays in my mailbox. OpenAI does not receive the name and email from the form. Email addresses and phone numbers you type into the chat itself are replaced with placeholders in the question log.',
+      },
+      {
         title: 'Analytics',
         text: 'Google Analytics loads only after you accept it in the cookie bar. You can change your choice any time under Cookie settings in the footer.',
       },

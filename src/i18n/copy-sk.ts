@@ -145,6 +145,10 @@ export const copySk: Copy = {
         text: 'Web beží na Cloudflare a záznamy otázok sú v databáze Cloudflare D1 v jurisdikcii EÚ. Pred odoslaním otázky Cloudflare Turnstile podľa signálov prehliadača a IP adresy overí, že nie ste robot. IP adresa slúži aj na limit 5 otázok za minútu a neukladám ju.',
       },
       {
+        title: 'Správy pre mňa z chatu',
+        text: 'Keď agent pripraví správu pre mňa a vy ju odošlete, dostanem e-mailom vaše meno, e-mail, text správy a váš rozhovor s agentom, aby som vám mohol odpovedať. Doručí ju Cloudflare Email Routing. Web z toho nič neukladá, správa zostáva v mojej e-mailovej schránke. Meno a e-mail z formulára OpenAI nedostane. E-mailové adresy a telefónne čísla, ktoré napíšete priamo do chatu, v zázname otázok nahrádzam zástupným textom.',
+      },
+      {
         title: 'Analytika',
         text: 'Google Analytics sa načíta iba po vašom súhlase v lište cookies. Voľbu môžete kedykoľvek zmeniť cez Nastavenia cookies v pätičke.',
       },

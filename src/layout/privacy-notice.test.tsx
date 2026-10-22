@@ -58,6 +58,12 @@ describe('PrivacyNotice', () => {
     expect(text).not.toContain(EMAILS[lang === 'sk' ? 'en' : 'sk']);
   });
 
+  it.each(LANGS)('says in %s what Denis receives from a contact message and that the site keeps none of it', (lang) => {
+    const section = COPY[lang].privacy.sections.find((s) => s.text.includes('Cloudflare Email Routing'));
+    const facts = lang === 'sk' ? ['meno', 'e-mail', 'text správy', 'rozhovor', 'nič neukladá', 'schránke'] : ['name', 'email', 'the message', 'conversation', 'stores none', 'mailbox'];
+    for (const fact of facts) expect(section?.text, fact).toContain(fact);
+  });
+
   it.each(LANGS)('opens, scrolls to and focuses its summary in %s', (lang) => {
     const scrollTo = vi.fn();
     vi.stubGlobal('scrollTo', scrollTo);
