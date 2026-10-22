@@ -24,7 +24,11 @@ Personal CV site of Denis Varga, in Slovak at [denisvarga.sk](https://denisvarga
 
 ## Contact hand-off rollout
 
-`CONTACT_ENABLED` in `wrangler.jsonc` is the kill switch: while it is not `"true"` the model is not offered the tool, the prompt has no contact rule and `/api/contact` answers 503. Before turning it on, in the Cloudflare dashboard:
+`CONTACT_ENABLED` in `wrangler.jsonc` is the kill switch: while it is not `"true"` the model is not offered the tool, the prompt has no contact rule and `/api/contact` answers 503.
+
+0. Before the first deploy of this code, flag off or not, run `pnpm db:migrate:remote`: every logged answer writes the `reply_kind` column from migration `0004`, so the Worker must never run before it.
+
+Before turning the flag on, in the Cloudflare dashboard:
 
 1. Export the DNS records (rollback).
 2. Enable Email Routing on the subdomain `notify.denisvarga.sk` only, which `CONTACT_FROM` uses. Stop if the dashboard proposes changing the apex MX records.
