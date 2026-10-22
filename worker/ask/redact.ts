@@ -1,10 +1,13 @@
 import { CONTACT_EMAIL_EN, CONTACT_EMAIL_SK, CONTACT_PHONE } from '../agent/facts';
 
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+// Letters and marks of any script, so "jožko@firma.sk" or an internationalised domain is caught whole.
+const EMAIL = /[\p{L}\p{M}\p{N}._%+-]+@[\p{L}\p{M}\p{N}-]+(?:\.[\p{L}\p{M}\p{N}-]+)*\.[\p{L}\p{M}]{2,}/gu;
 // 9 to 15 digits with common separators. Nine is the shortest Slovak number without its leading 0,
-// and stays above dates such as 21.10.2026 or year ranges such as 2015-2017. A longer digit run
-// that is not a phone number gets redacted too, which is the safe direction for a log.
-const PHONE = /(?<![\w+])\+?\d(?:[ \t()./-]{0,3}\d){8,14}(?!\w)/g;
+// and stays above dates such as 21.10.2026 or year ranges such as 2015-2017. A leading "+" may
+// follow a word ("Tel+421..."); a bare digit run glued to letters or digits is left alone, and so is
+// a run followed by ":" and a digit, the time in "2026-10-21 14:30". Another long digit run gets
+// redacted too, which is the safe direction for a log.
+const PHONE = /(?:\+|(?<![\p{L}\p{N}+]))\d(?:[ \t()./-]{0,3}\d){8,14}(?![\p{L}\p{N}]|:\d)/gu;
 
 const OWN_EMAILS = new Set([CONTACT_EMAIL_SK, CONTACT_EMAIL_EN].map((email) => email.toLowerCase()));
 const digits = (value: string): string => value.replace(/\D/g, '');
