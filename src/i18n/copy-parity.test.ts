@@ -49,7 +49,7 @@ describe('copy parity', () => {
 
   it('data has the design counts', () => {
     expect(JOBS).toHaveLength(6);
-    expect(PROJECTS).toHaveLength(40);
+    expect(PROJECTS).toHaveLength(41);
     expect(SKILLS).toHaveLength(6);
     expect(new Set(PROJECTS.map((p) => p.slug)).size).toBe(PROJECTS.length);
   });

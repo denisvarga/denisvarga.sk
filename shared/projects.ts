@@ -242,6 +242,18 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     },
   },
   {
+    name: 'HABERA & TEAM',
+    url: 'https://team-online.sk',
+    slug: 'teamonline',
+    context: 'denva',
+    featured: false,
+    kind: { sk: 'Web hudobnej skupiny', en: 'Band website' },
+    desc: {
+      sk: 'Redizajn webu kapely na WordPress tému na mieru namiesto šablóny a page buildera Divi',
+      en: 'Band site redesigned onto a custom-built WordPress theme in place of the Divi theme and page builder',
+    },
+  },
+  {
     name: 'Jaroslav Koštial',
     url: 'https://jaroslavkostial.sk',
     slug: 'jaroslavkostial',
