@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { CONTACT_EMAIL_PATTERN, MAX_CONTACT_EMAIL, MAX_CONTACT_MESSAGE, MAX_CONTACT_NAME } from '../../shared/contact-contract';
 import type { ContactCopy } from '../i18n/types';
-import type { DraftState } from './chat-reducer';
+import { isDraftOpen, type DraftState } from './chat-reducer';
 import styles from './contact-card.module.css';
 import { linkify } from './linkify';
 import type { ContactFields, ContactTokens } from './use-agent-chat';
@@ -38,6 +38,7 @@ function ContactForm({ draft, copy, onSend, onCancel }: ContactCardProps) {
     email: useRef<HTMLInputElement>(null),
     message: useRef<HTMLTextAreaElement>(null),
   };
+  const formRef = useRef<HTMLFormElement>(null);
   const sendRef = useRef<HTMLButtonElement>(null);
   const leadId = useId();
   const nameId = useId();
@@ -45,12 +46,16 @@ function ContactForm({ draft, copy, onSend, onCancel }: ContactCardProps) {
   const sending = draft.status === 'sending';
   const proposal = draft.proposal;
 
-  // preventScroll leaves scrolling to the chat log, which keeps a new reply's top in view.
+  // Takes focus once, when the card appears, and only if the visitor's last action was a button in
+  // the chat (#ask is the chat card: send, a suggestion, retry). While they type in the chat input or
+  // work elsewhere on the page, the chat's live region announces the card instead. preventScroll
+  // leaves scrolling to the chat log, which keeps a new reply's top in view.
   useEffect(() => {
     tokens.warmUp();
+    const active = document.activeElement;
+    if (!(active instanceof HTMLButtonElement) || !formRef.current?.closest('#ask')?.contains(active)) return;
     const first = !proposal.name ? refs.name.current : !proposal.email ? refs.email.current : sendRef.current;
     first?.focus({ preventScroll: true });
-    // Mount only: the card takes focus once, when it appears.
   }, []);
 
   useEffect(() => {
@@ -77,7 +82,7 @@ function ContactForm({ draft, copy, onSend, onCancel }: ContactCardProps) {
   };
 
   return (
-    <form className={styles.form} aria-busy={sending} onSubmit={submit}>
+    <form ref={formRef} className={styles.form} aria-busy={sending} onSubmit={submit}>
       <p id={leadId} className={styles.lead}>
         {copy.lead}
       </p>
@@ -150,35 +155,49 @@ function ContactForm({ draft, copy, onSend, onCancel }: ContactCardProps) {
   );
 }
 
+function statusText(draft: DraftState, copy: ContactCopy): string {
+  if (draft.status === 'sent') return copy.sent.replace('{email}', draft.sentTo ?? '');
+  if (draft.status === 'cancelled') return copy.cancelled;
+  return copy[draft.failure ?? 'failed'];
+}
+
 /**
- * Confirm card for a message the agent proposed. Nothing is sent until the visitor presses Send;
- * the form, and with it the card's own Turnstile widget, goes away once the message is sent or
- * cancelled, and focus moves to the status line.
+ * Confirm card for a message the agent proposed. Nothing is sent until the visitor presses Send.
+ * The form, and with it the card's own Turnstile widget, goes away once the message is sent,
+ * cancelled or failed in a way a retry cannot fix, and the status line takes its place.
  */
 export function ContactCard(props: ContactCardProps) {
   const { draft, copy } = props;
   const titleId = useId();
+  const cardRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
-  const done = draft.status === 'sent' || draft.status === 'cancelled';
+  const [announceFinal, setAnnounceFinal] = useState(false);
+  const final = !isDraftOpen(draft) && draft.status !== 'sending';
 
+  // Focus left behind by the removed form moves to the status line, which reads it out. Focus the
+  // visitor took elsewhere stays there, and the live region reads the status instead.
   useEffect(() => {
-    if (done) statusRef.current?.focus({ preventScroll: true });
-  }, [done]);
+    if (!final) return;
+    const active = document.activeElement;
+    if (!active || active === document.body || cardRef.current?.contains(active)) statusRef.current?.focus({ preventScroll: true });
+    else setAnnounceFinal(true);
+  }, [final]);
 
+  const status = statusText(draft, copy);
   return (
-    <div className={styles.card} role="group" aria-labelledby={titleId}>
+    <div ref={cardRef} className={styles.card} role="group" aria-labelledby={titleId}>
       <span id={titleId} className={styles.title}>
         {copy.title}
       </span>
-      {done ? (
+      {final ? (
         <p ref={statusRef} className={styles.status} tabIndex={-1}>
-          {draft.status === 'sent' ? copy.sent.replace('{email}', draft.sentTo ?? '') : copy.cancelled}
+          {draft.status === 'failed' ? linkify(status) : status}
         </p>
       ) : (
         <ContactForm {...props} />
       )}
       <span className="visually-hidden" aria-live="polite">
-        {draft.status === 'failed' ? copy.failed : ''}
+        {draft.status === 'failed' && !final ? copy.failed : announceFinal ? status : ''}
       </span>
     </div>
   );

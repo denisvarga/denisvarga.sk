@@ -1,8 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import type { AskLang } from '../../shared/ask-contract';
 import type { ContactRequest } from '../../shared/contact-contract';
-import { postAsk, postContact, type AskFailure, type AskOutcome, type ContactOutcome } from './api-client';
-import { chatReducer, initialChatState, requestMessages, transcriptMessages, type ChatAction, type ChatState } from './chat-reducer';
+import { postAsk, postContact, type AskFailure, type AskOutcome, type ContactFailure, type ContactOutcome } from './api-client';
+import {
+  chatReducer,
+  initialChatState,
+  isDraftOpen,
+  requestMessages,
+  transcriptMessages,
+  type ChatAction,
+  type ChatState,
+  type DraftFailure,
+} from './chat-reducer';
 import type { TokenClient } from './use-turnstile-token';
 
 export type ContactFields = Pick<ContactRequest, 'name' | 'email' | 'message'>;
@@ -39,6 +48,26 @@ export interface AgentChat {
 export function failureReply(error: AskFailure | null, errors: AskErrorCopy): Extract<ChatAction, { type: 'fail' }> {
   if (error === 'daily_cap') return { type: 'fail', text: errors.dailyCap, retryable: false };
   return { type: 'fail', text: error === 'rate_limited' ? errors.rateLimited : errors.fallback, retryable: true };
+}
+
+/**
+ * No retry where it cannot help: the caps and the switch last, and the limiter is meant to slow a
+ * visitor down. After a timeout the message may already be in Denis's inbox, so a retry could
+ * send it twice. Everything else, a missing token included, sent nothing and may be tried again.
+ */
+export function contactFailure(error: ContactFailure | null): DraftFailure {
+  switch (error) {
+    case 'daily_cap':
+      return 'dailyCap';
+    case 'rate_limited':
+      return 'rateLimited';
+    case 'unavailable':
+      return 'unavailable';
+    case 'timeout':
+      return 'timeout';
+    default:
+      return 'failed';
+  }
 }
 
 export function useAgentChat({ lang, errors, tokens, post = postAsk, send: sendContact = postContact }: AgentChatOptions): AgentChat {
@@ -117,9 +146,9 @@ export function useAgentChat({ lang, errors, tokens, post = postAsk, send: sendC
 
   const sendDraft = useCallback(
     async (id: number, fields: ContactFields, contactTokens: ContactTokens) => {
-      const status = committed.current.messages.find((m) => m.id === id)?.draft?.status;
+      const draft = committed.current.messages.find((m) => m.id === id)?.draft;
       // The map also stops a second click that lands before the sending state is committed.
-      if ((status !== 'pending' && status !== 'failed') || contactRequests.current.has(id)) return;
+      if (!draft || !isDraftOpen(draft) || contactRequests.current.has(id)) return;
       const controller = new AbortController();
       contactRequests.current.set(id, controller);
       const messages = transcriptMessages(committed.current.messages, id);
@@ -130,7 +159,7 @@ export function useAgentChat({ lang, errors, tokens, post = postAsk, send: sendC
         const turnstileToken = await contactTokens.getToken();
         outcome = await sendContact({ lang, turnstileToken, ...fields, messages }, { signal: controller.signal });
       } catch {
-        // Token deadline, script or widget failure: the failed copy covers it.
+        // Token deadline, script or widget failure: nothing was sent, so the retryable copy covers it.
       }
       contactRequests.current.delete(id);
       if (controller.signal.aborted) return;
@@ -138,9 +167,10 @@ export function useAgentChat({ lang, errors, tokens, post = postAsk, send: sendC
         dispatch({ type: 'sent', id, email: fields.email, reply: outcome.reply, sig: outcome.sig });
         return;
       }
-      // Only a failed send can be tried again, so only then is a fresh token worth fetching.
-      contactTokens.refresh();
-      dispatch({ type: 'draft', id, status: 'failed' });
+      const failure = contactFailure(outcome?.error ?? null);
+      // A fresh token is worth fetching only when the visitor may send again.
+      if (failure === 'failed') contactTokens.refresh();
+      dispatch({ type: 'failed', id, failure });
     },
     [lang, sendContact],
   );

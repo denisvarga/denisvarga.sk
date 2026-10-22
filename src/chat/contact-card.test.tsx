@@ -53,14 +53,19 @@ function type(element: HTMLInputElement | HTMLTextAreaElement, value: string) {
 }
 
 async function ask(question: string) {
+  act(() => input().focus());
   type(input(), question);
   await act(async () => {
     input().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
   });
 }
 
+// Pressing a button focuses it in browsers, which jsdom's click() alone does not.
 async function click(label: string) {
-  await act(async () => button(label)?.click());
+  await act(async () => {
+    button(label)?.focus();
+    button(label)?.click();
+  });
 }
 
 beforeEach(async () => {
@@ -97,17 +102,26 @@ afterEach(() => {
 });
 
 describe('ContactCard', () => {
-  it('shows the proposal with prefilled fields, focuses the first empty one and announces the card', () => {
+  it('shows the proposal with prefilled fields and announces it, leaving focus in the chat input', () => {
     expect(card()?.textContent).toContain(t.contact.title);
     expect(card()?.textContent).toContain(PROPOSAL.message);
     expect(card()?.textContent).toContain(t.contact.consent);
     expect(card()?.textContent).not.toContain('Draft message for Denis:');
     expect(field(t.contact.name).value).toBe('');
     expect(field(t.contact.email).value).toBe('jana@firma.sk');
-    expect(document.activeElement).toBe(field(t.contact.name));
+    expect(document.activeElement).toBe(input());
     expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(`${t.contact.title}. ${t.contact.lead} ${PROPOSAL.message}`);
     expect(window.turnstile?.render).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ action: 'contact' }));
     expect(bodies('/api/contact')).toHaveLength(0);
+  });
+
+  it('focuses the first empty field when the question came from a button in the chat', async () => {
+    const chip = button(t.suggestions[0]);
+    chip?.focus();
+    await act(async () => chip?.click());
+    const cards = container.querySelectorAll('[role="group"]');
+    expect(cards).toHaveLength(2);
+    expect(document.activeElement).toBe(cards[1]?.querySelector('input'));
   });
 
   it('sends the edited message with its own token and the transcript, then confirms and keeps the confirmation as history', async () => {
@@ -165,6 +179,33 @@ describe('ContactCard', () => {
     await click(t.contact.send);
     expect(bodies('/api/contact')).toHaveLength(2);
     expect(card()?.textContent).toContain('Done, Denis has your message');
+  });
+
+  it.each([
+    ['daily_cap', 429, t.contact.dailyCap],
+    ['rate_limited', 429, t.contact.rateLimited],
+    ['unavailable', 503, t.contact.unavailable],
+  ])('ends the card after %s with its copy and no retry', async (error, status, copy) => {
+    contactResponse = () => Response.json({ error }, { status });
+    type(field(t.contact.name), 'Jana');
+    await click(t.contact.send);
+    const line = card()?.querySelector('p');
+    expect(line?.textContent).toBe(copy);
+    expect(document.activeElement).toBe(line);
+    expect(card()?.querySelector('form')).toBeNull();
+    expect(button(t.contact.send)).toBeUndefined();
+    expect(card()?.querySelector('a[href="mailto:hello@denisvarga.dev"]')).not.toBeNull();
+  });
+
+  it('leaves focus where the visitor moved it while sending and announces the outcome instead', async () => {
+    let answer: ((response: Response) => void) | undefined;
+    fetchMock.mockImplementationOnce(() => new Promise<Response>((resolve) => (answer = resolve)));
+    type(field(t.contact.name), 'Jana');
+    await click(t.contact.send);
+    act(() => input().focus());
+    await act(async () => answer?.(Response.json({ reply: 'Message sent.', sig: 'sig-sent' })));
+    expect(document.activeElement).toBe(input());
+    expect(card()?.querySelector('[aria-live="polite"]')?.textContent).toBe('Done, Denis has your message and will reply to jana@firma.sk.');
   });
 
   it('keeps a name of spaces from being sent and marks the field', async () => {

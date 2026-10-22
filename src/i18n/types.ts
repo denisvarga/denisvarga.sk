@@ -32,7 +32,13 @@ export interface ContactCopy {
   readonly edit: string;
   readonly cancel: string;
   readonly sent: string;
+  /** A failure the visitor may retry; the four after it end the card. */
   readonly failed: string;
+  readonly dailyCap: string;
+  readonly rateLimited: string;
+  readonly unavailable: string;
+  /** The message may have gone out, so the card offers the address instead of a retry. */
+  readonly timeout: string;
   readonly cancelled: string;
 }
 

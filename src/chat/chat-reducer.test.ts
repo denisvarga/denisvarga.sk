@@ -154,17 +154,26 @@ describe('contact drafts', () => {
   it('moves through sending, failed and sent, keeping the address and the signed confirmation', () => {
     const sending = chatReducer(drafted(), { type: 'draft', id: 4, status: 'sending' });
     expect(sending.messages[3]?.draft?.status).toBe('sending');
-    const failed = chatReducer(sending, { type: 'draft', id: 4, status: 'failed' });
-    expect(failed.messages[3]?.draft?.status).toBe('failed');
+    const failed = chatReducer(sending, { type: 'failed', id: 4, failure: 'failed' });
+    expect(failed.messages[3]?.draft).toMatchObject({ status: 'failed', failure: 'failed' });
     const again = chatReducer(failed, { type: 'draft', id: 4, status: 'sending' });
+    expect(again.messages[3]?.draft).not.toHaveProperty('failure');
     const sent = chatReducer(again, { type: 'sent', id: 4, email: 'jana@firma.sk', reply: 'Message sent.', sig: 's3' });
     expect(sent.messages[3]?.draft).toEqual({ proposal, status: 'sent', sentTo: 'jana@firma.sk', confirmation: { text: 'Message sent.', sig: 's3' } });
+  });
+
+  it.each(['dailyCap', 'rateLimited', 'unavailable', 'timeout'] as const)('ends the draft after a %s failure', (failure) => {
+    const sending = chatReducer(drafted(), { type: 'draft', id: 4, status: 'sending' });
+    const failed = chatReducer(sending, { type: 'failed', id: 4, failure });
+    expect(failed.messages[3]?.draft).toMatchObject({ status: 'failed', failure });
+    expect(chatReducer(failed, { type: 'draft', id: 4, status: 'sending' })).toBe(failed);
+    expect(chatReducer(failed, { type: 'draft', id: 4, status: 'cancelled' })).toBe(failed);
   });
 
   it('ignores moves a status does not allow and unknown ids', () => {
     const pending = drafted();
     expect(chatReducer(pending, { type: 'sent', id: 4, email: 'x@y.sk', reply: 'r', sig: 's' })).toBe(pending);
-    expect(chatReducer(pending, { type: 'draft', id: 4, status: 'failed' })).toBe(pending);
+    expect(chatReducer(pending, { type: 'failed', id: 4, failure: 'failed' })).toBe(pending);
     expect(chatReducer(pending, { type: 'draft', id: 2, status: 'sending' })).toBe(pending);
     expect(chatReducer(pending, { type: 'draft', id: 99, status: 'sending' })).toBe(pending);
     const cancelled = chatReducer(pending, { type: 'draft', id: 4, status: 'cancelled' });

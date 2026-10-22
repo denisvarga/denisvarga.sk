@@ -10,10 +10,15 @@ import {
 
 export type DraftStatus = 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled';
 
+/** Copy key of a failed send. Only `failed` may be sent again; after `timeout` it may have gone out. */
+export type DraftFailure = 'failed' | 'dailyCap' | 'rateLimited' | 'unavailable' | 'timeout';
+
 /** A proposed message for Denis and where the visitor is with it; edits live in the card. */
 export interface DraftState {
   readonly proposal: ContactDraft;
   readonly status: DraftStatus;
+  /** Set with status `failed`. */
+  readonly failure?: DraftFailure;
   /** Address the sent copy names. */
   readonly sentTo?: string;
   /** Signed confirmation from /api/contact, sent back right after the draft turn. */
@@ -50,17 +55,19 @@ export type ChatAction =
   | { readonly type: 'fail'; readonly text: string; readonly retryable: boolean }
   /** Removes the failed reply `id` and its question, then asks that question again. */
   | { readonly type: 'retry'; readonly id: number }
-  | { readonly type: 'draft'; readonly id: number; readonly status: 'sending' | 'failed' | 'cancelled' }
+  | { readonly type: 'draft'; readonly id: number; readonly status: 'sending' | 'cancelled' }
+  | { readonly type: 'failed'; readonly id: number; readonly failure: DraftFailure }
   | { readonly type: 'sent'; readonly id: number; readonly email: string; readonly reply: string; readonly sig: string };
 
-/** Statuses each draft status may be entered from; `sent` and `cancelled` are final. */
-const DRAFT_FROM: Readonly<Record<DraftStatus, readonly DraftStatus[]>> = {
-  pending: [],
-  sending: ['pending', 'failed'],
-  failed: ['sending'],
-  cancelled: ['pending', 'failed'],
-  sent: ['sending'],
-};
+/** True while the visitor may still send or cancel: not yet sent, or failed in a way a retry can fix. */
+export function isDraftOpen(draft: DraftState): boolean {
+  return draft.status === 'pending' || (draft.status === 'failed' && draft.failure === 'failed');
+}
+
+function canEnter(next: DraftStatus, draft: DraftState): boolean {
+  if (next === 'sending' || next === 'cancelled') return isDraftOpen(draft);
+  return (next === 'failed' || next === 'sent') && draft.status === 'sending';
+}
 
 export const initialChatState: ChatState = {
   messages: [],
@@ -85,8 +92,9 @@ function appendAssistant(state: ChatState, reply: Omit<ChatMessage, 'id' | 'role
 function updateDraft(state: ChatState, id: number, next: DraftStatus, patch: Partial<DraftState> = {}): ChatState {
   const index = state.messages.findIndex((m) => m.id === id);
   const draft = state.messages[index]?.draft;
-  if (!draft || !DRAFT_FROM[next].includes(draft.status)) return state;
-  const messages = state.messages.map((m, i) => (i === index ? { ...m, draft: { ...draft, ...patch, status: next } } : m));
+  if (!draft || !canEnter(next, draft)) return state;
+  const { failure: _previous, ...rest } = draft;
+  const messages = state.messages.map((m, i) => (i === index ? { ...m, draft: { ...rest, ...patch, status: next } } : m));
   return { ...state, messages };
 }
 
@@ -126,6 +134,8 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return appendAssistant(state, { text: action.text, failed: true, ...(action.retryable ? { retryable: true } : {}) });
     case 'draft':
       return updateDraft(state, action.id, action.status);
+    case 'failed':
+      return updateDraft(state, action.id, 'failed', { failure: action.failure });
     case 'sent':
       return updateDraft(state, action.id, 'sent', { sentTo: action.email, confirmation: { text: action.reply, sig: action.sig } });
   }
