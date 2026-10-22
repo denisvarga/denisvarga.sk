@@ -6,7 +6,7 @@ import { CONTACT_TOOL } from '../ask/openai';
 import { buildInstructions, PROMPT_VERSION, promptVersion } from './prompt';
 
 /** Update both together whenever the prompt text changes; the test below says when. */
-const PINNED = { version: '2026-10-22.1', hash: '4f0abf773a5f' };
+const PINNED = { version: '2026-10-22.2', hash: '23eea8b0514d' };
 
 async function promptHash(): Promise<string> {
   const year = 2026;

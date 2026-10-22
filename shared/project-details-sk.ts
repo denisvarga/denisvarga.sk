@@ -181,6 +181,18 @@ export const PROJECT_DETAILS_SK: ProjectDetailsBySlug = {
       'Rezervačný formulár s Turnstile a nonce, HTML e-maily majiteľovi aj hosťovi a komentáre vypnuté naprieč webom, REST API aj XML-RPC',
     ],
   },
+  teamonline: {
+    summary: 'Oficiálny web skupiny HABERA & TEAM s koncertmi, diskografiou, členmi kapely, históriou a fotogalériou. Web prešiel redizajnom zo šablóny Divi s page builderom na vlastnú WordPress tému na mieru a všetky verejné adresy zostali zachované.',
+    scope: [
+      'WordPress téma na mieru s ACF blokmi namiesto šablóny a page buildera Divi: koncerty, diskografia, členovia kapely, história, galéria a novinky',
+      'Redizajn podstránok: história ako zvislá časová os so sticky rokmi, tracklisty albumov, karty albumov s počtom fotiek a žltý akcent s textúrou z plagátu turné',
+      'Koncerty zoradené podľa dátumu vedľa plagátu pre každú krajinu, s odkazom na vstupenky v Ticketportali; koncert, ktorý už prebehol, sa stlmí a stratí tlačidlá',
+      'Opakovateľný migračný skript, ktorý previedol 18 stránok z Divi shortcodov na ACF bloky, s kontrolou vykresleného výsledku a druhým behom bez jedinej zmeny',
+      'Fotogaléria s lightboxom GLightbox a vlastným počítadlom, YouTube video sa načíta až po kliknutí a príspevky z Facebooku až pri priblížení k sekcii',
+      'Skutočná 404 v dizajne webu namiesto presmerovania na úvod, 301 zo starých adries a archívov a zatvorené miesta, ktoré prezrádzali login administrátora',
+      'SEO titulky, popisy, og:image a alt texty pre 567 obrázkov nasadené skriptom, spustenie na hostingu len s FTP cez výmenu prefixu tabuliek s rollbackom prepnutím späť',
+    ],
+  },
   jaroslavkostial: {
     summary: 'Kampaňový web nezávislého kandidáta podľa jeho požiadaviek, od návrhu po vývoj. Jednostránkový web zo 7 blokov, ktorý ľuďom ukazuje konkrétne riešenia pre ich lokalitu.',
     scope: [

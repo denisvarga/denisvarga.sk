@@ -181,6 +181,18 @@ export const PROJECT_DETAILS_EN: ProjectDetailsBySlug = {
       'A reservation form with Turnstile and a nonce, HTML emails to the owner and the guest, and comments switched off across the site, the REST API and XML-RPC',
     ],
   },
+  teamonline: {
+    summary: 'The official site of the band HABERA & TEAM with concerts, discography, band members, history and a photo gallery. It was redesigned from the Divi theme and page builder onto a custom-built WordPress theme, with every public URL kept.',
+    scope: [
+      'A custom-built WordPress theme with ACF blocks in place of the Divi theme and page builder: concerts, discography, band members, history, gallery and news',
+      'Redesigned subpages: history as a vertical timeline with sticky years, album tracklists, album cards with a photo count, and a yellow accent with a texture from the tour poster',
+      'Concerts sorted by date beside each country\'s tour poster, with a link to tickets on Ticketportal; a concert that has passed is dimmed and loses its buttons',
+      'A repeatable migration script that converted 18 pages from Divi shortcodes to ACF blocks, with a check of the rendered result and a second run that changes nothing',
+      'A photo gallery with a GLightbox lightbox and its own counter; the YouTube video loads only on click and the Facebook posts only as their section comes near',
+      'A real 404 page in the site design instead of a redirect to the home page, 301s from old addresses and archives, and closed routes that exposed the admin login',
+      'SEO titles, descriptions, og:image and alt texts for 567 images applied by a script, and a go-live on FTP-only hosting through a table prefix swap that rolls back by switching back',
+    ],
+  },
   jaroslavkostial: {
     summary: 'An independent candidate\'s campaign site built to his brief, from design to development. A one-page site of 7 blocks that shows residents concrete solutions for their area.',
     scope: [
