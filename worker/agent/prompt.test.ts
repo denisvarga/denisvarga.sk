@@ -3,7 +3,7 @@ import { JOBS } from '../../shared/jobs';
 import { PROJECT_INFO } from '../../shared/projects';
 import { SKILLS, skillLabel } from '../../shared/skills';
 import { CONTACT_TOOL } from '../ask/openai';
-import { buildInstructions, PROMPT_VERSION } from './prompt';
+import { buildInstructions, PROMPT_VERSION, promptVersion } from './prompt';
 
 /** Update both together whenever the prompt text changes; the test below says when. */
 const PINNED = { version: '2026-10-22.1', hash: '4f0abf773a5f' };
@@ -189,6 +189,11 @@ describe('buildInstructions', () => {
     expect(withContact.shared.replace(/\n- Keď návštevník chce od Denisa[^\n]*/, '')).toBe(text);
     expect(withContact.shared).not.toContain(EN_DASH);
     expect(withContact.shared).not.toContain(EM_DASH);
+  });
+
+  it('marks the contact variant in the logged revision', () => {
+    expect(promptVersion(false)).toBe(PROMPT_VERSION);
+    expect(promptVersion(true)).toBe(`${PROMPT_VERSION}+contact`);
   });
 
   it('ties the prompt text to its version', async () => {

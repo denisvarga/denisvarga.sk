@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { manipulationReply } from '../agent/guard';
-import { buildInstructions } from '../agent/prompt';
+import { buildInstructions, PROMPT_VERSION } from '../agent/prompt';
 import { RULES } from '../agent/rules';
 import { createReplySigner } from '../ask/reply-sig';
 import { draftReply } from '../contact/draft-text';
@@ -64,7 +64,7 @@ describe('proposed contact message', () => {
     const signer = await createReplySigner('salt');
     expect(await signer.verify({ lang: 'sk', anchor: 'Áno, pripravte správu.', reply }, res.sig, Date.now())).toBe(true);
     expect(db.rows).toHaveLength(1);
-    expect(db.rows[0]).toMatchObject({ question: 'Áno, pripravte správu.', answer: null, outcome: 'ok', reply_kind: 'handoff_draft', output_tokens: 60 });
+    expect(db.rows[0]).toMatchObject({ question: 'Áno, pripravte správu.', answer: null, outcome: 'ok', reply_kind: 'handoff_draft', output_tokens: 60, prompt_version: `${PROMPT_VERSION}+contact` });
     expect(JSON.stringify(db.rows)).not.toMatch(/kávu|Jana|jana@firma/);
   });
 

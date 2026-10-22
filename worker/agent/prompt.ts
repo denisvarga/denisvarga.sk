@@ -10,6 +10,11 @@ import { CONTACT_RULE, INTRO, RULES } from './rules';
  */
 export const PROMPT_VERSION = '2026-10-22.1';
 
+/** Revision as logged and printed: the contact variant is marked, since it is a different prompt. */
+export function promptVersion(contact: boolean): string {
+  return contact ? `${PROMPT_VERSION}+contact` : PROMPT_VERSION;
+}
+
 const bullets = (lines: readonly string[]): string => lines.map((line) => `- ${line}`).join('\n');
 
 const shared = (rules: readonly string[]): string => `${INTRO}\n\nFAKTY:\n${bullets(FACTS)}\n\nPRAVIDLÁ:\n${bullets(rules)}`;

@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { ContactDraft } from '../shared/ask-contract.ts';
 import { easterEgg } from '../worker/agent/easter-eggs.ts';
 import { guardAnswer, isManipulation, manipulationReply } from '../worker/agent/guard.ts';
-import { buildInstructions, PROMPT_VERSION } from '../worker/agent/prompt.ts';
+import { buildInstructions, promptVersion } from '../worker/agent/prompt.ts';
 import { callOpenAI, type ModelResult, REASONING_EFFORTS, TOTAL_BUDGET_MS } from '../worker/ask/openai.ts';
 import { estimateCostUsd } from '../worker/ask/pricing.ts';
 import { safetyIdentifier } from '../worker/ask/safety-id.ts';
@@ -128,7 +128,7 @@ async function main(): Promise<void> {
   const cases = loadCases(opts.only);
   const year = new Date().getUTCFullYear();
   const safetyId = await safetyIdentifier(opts.salt, 'eval');
-  console.log(`prompt ${PROMPT_VERSION} | model ${opts.model} | effort ${opts.effort} | ${cases.length} case(s)\n`);
+  console.log(`prompt ${promptVersion(true)} | model ${opts.model} | effort ${opts.effort} | ${cases.length} case(s)\n`);
 
   let hardFailures = 0;
   let softFailures = 0;
