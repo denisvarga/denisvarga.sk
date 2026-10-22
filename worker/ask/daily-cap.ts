@@ -72,6 +72,12 @@ export async function reserveSlot(db: D1Database, input: ReserveInput): Promise<
 /** Counter of all contact messages per UTC day. Client keys are hex HMACs, so it never collides with one. */
 export const CONTACT_TOTAL_KEY = 'contact:global';
 
+// Raises the day's total only while the client row ?3, already counted earlier in the same batch,
+// is within the client cap ?4; for a capped client it inserts nothing and returns no row. The WHERE
+// clause also keeps SQLite from reading ON CONFLICT as a join constraint.
+export const UPSERT_CONTACT_TOTAL_SQL =
+  'INSERT INTO client_quota (day, key, n) SELECT ?1, ?2, 1 WHERE (SELECT n FROM client_quota WHERE day = ?1 AND key = ?3) <= ?4 ON CONFLICT (day, key) DO UPDATE SET n = n + 1 RETURNING n';
+
 export interface ContactReserveInput {
   readonly now: number;
   readonly clientCap: number;
@@ -83,20 +89,21 @@ export interface ContactReserveInput {
 export type ContactReservation = { readonly status: 'reserved' } | { readonly status: 'capped'; readonly scope: CapScope };
 
 /**
- * Counts one contact message for the client and for the day, both including this one, in one
- * batch. A message over either cap still counts, which only makes the limit stricter. Throws on
- * any D1 error so the caller can fail closed.
+ * Counts one contact message for the client and, while the client is within its cap, for the day,
+ * both including this one, in one batch. A client over its cap therefore never uses up the day's
+ * total for everyone else. Throws on any D1 error so the caller can fail closed.
  */
 export async function reserveContactSlot(db: D1Database, input: ContactReserveInput): Promise<ContactReservation> {
   const day = utcMidnight(input.now);
   const [client, total] = await db.batch<{ n?: number }>([
     db.prepare(UPSERT_QUOTA_SQL).bind(day, input.quotaKey),
-    db.prepare(UPSERT_QUOTA_SQL).bind(day, CONTACT_TOTAL_KEY),
+    db.prepare(UPSERT_CONTACT_TOTAL_SQL).bind(day, CONTACT_TOTAL_KEY, input.quotaKey, input.clientCap),
   ]);
   const clientCount = client?.results[0]?.n;
-  const count = total?.results[0]?.n;
-  if (typeof clientCount !== 'number' || typeof count !== 'number') throw new Error('unexpected D1 result');
+  if (typeof clientCount !== 'number' || !total) throw new Error('unexpected D1 result');
   if (clientCount > input.clientCap) return { status: 'capped', scope: 'client' };
+  const count = total.results[0]?.n;
+  if (typeof count !== 'number') throw new Error('unexpected D1 result');
   if (count > input.cap) return { status: 'capped', scope: 'global' };
   return { status: 'reserved' };
 }

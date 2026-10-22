@@ -68,7 +68,15 @@ describe('POST /api/contact availability', () => {
 
   it('fails closed before siteverify on a malformed cap, a missing sender or an invalid Turnstile config', async () => {
     const fetchMock = stubFetch({});
-    for (const overrides of [{ CONTACT_DAILY_CAP: 'many' }, { CONTACT_CLIENT_DAILY_CAP: '' }, { CONTACT_FROM: ' ' }, { SAFETY_SALT: '' }, { TURNSTILE_HOSTNAME: '' }]) {
+    for (const overrides of [
+      { CONTACT_DAILY_CAP: 'many' },
+      { CONTACT_CLIENT_DAILY_CAP: '' },
+      { CONTACT_FROM: ' ' },
+      { SAFETY_SALT: '' },
+      { TURNSTILE_HOSTNAME: '' },
+      { TURNSTILE_CONTACT_ACTION: ' ' },
+      { TURNSTILE_CONTACT_ACTION: ' ', TURNSTILE_HOSTNAME: '', TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA' },
+    ]) {
       const { env, db } = contactEnv(overrides);
       await expectError(await send({ env, path: PATH, body: body() }), 503, 'unavailable');
       expect(db.writes).toBe(0);
@@ -135,6 +143,18 @@ describe('POST /api/contact daily caps', () => {
     expect((await send({ env, path: PATH, body: body(), headers: { 'CF-Connecting-IP': '198.51.100.1' } })).status).toBe(200);
     expect(mail.sent).toHaveLength(4);
     expect(JSON.stringify(db.quota)).not.toContain(CLIENT_IP);
+  });
+
+  it('keeps a client hammering past its cap from using up the day for everyone else', async () => {
+    stubFetch({ siteverify: contactOk });
+    const { env, db, mail } = contactEnv();
+    const statuses: number[] = [];
+    for (let i = 0; i < 30; i++) statuses.push((await send({ env, path: PATH, body: body() })).status);
+    expect(statuses.filter((s) => s === 200)).toHaveLength(3);
+    expect(statuses.filter((s) => s === 429)).toHaveLength(27);
+    expect(db.quota.find((q) => q.key === 'contact:global')?.n).toBe(3);
+    expect((await send({ env, path: PATH, body: body(), headers: { 'CF-Connecting-IP': '198.51.100.1' } })).status).toBe(200);
+    expect(mail.sent).toHaveLength(4);
   });
 
   it('stops every client once the day is full', async () => {

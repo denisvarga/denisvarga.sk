@@ -52,7 +52,8 @@ contactRoute.post('/contact', async (c) => {
 
   // Checked before siteverify so a broken deploy neither burns the visitor's token nor counts a message.
   const turnstile = { secret: env.TURNSTILE_SECRET_KEY, hostname: env.TURNSTILE_HOSTNAME, action: env.TURNSTILE_CONTACT_ACTION };
-  if (!isTurnstileConfigValid(turnstile)) {
+  // Unlike the chat, a blank action is refused: it would let a token minted for /api/ask send mail.
+  if (!isTurnstileConfigValid(turnstile) || !turnstile.action?.trim()) {
     logEvent('turnstile_error', 503);
     return contactError(c, 'unavailable');
   }

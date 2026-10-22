@@ -6,6 +6,7 @@ import {
   parseDailyCap,
   reserveContactSlot,
   reserveSlot,
+  UPSERT_CONTACT_TOTAL_SQL,
   UPSERT_QUOTA_SQL,
   utcMidnight,
   type ReserveInput,
@@ -68,7 +69,7 @@ describe('reserveContactSlot', () => {
     expect(await reserveContactSlot(db.asBinding(), input)).toEqual({ status: 'reserved' });
     expect(db.executed).toEqual([
       { sql: UPSERT_QUOTA_SQL, args: [Date.UTC(2026, 10, 2), 'contact-k1'] },
-      { sql: UPSERT_QUOTA_SQL, args: [Date.UTC(2026, 10, 2), CONTACT_TOTAL_KEY] },
+      { sql: UPSERT_CONTACT_TOTAL_SQL, args: [Date.UTC(2026, 10, 2), CONTACT_TOTAL_KEY, 'contact-k1', 2] },
     ]);
     expect(db.rows).toHaveLength(0);
   });
@@ -78,7 +79,15 @@ describe('reserveContactSlot', () => {
     await reserveContactSlot(db.asBinding(), input);
     await reserveContactSlot(db.asBinding(), input);
     expect(await reserveContactSlot(db.asBinding(), input)).toEqual({ status: 'capped', scope: 'client' });
-    expect(await reserveContactSlot(db.asBinding(), { ...input, quotaKey: 'contact-k2' })).toEqual({ status: 'capped', scope: 'global' });
+    expect(await reserveContactSlot(db.asBinding(), { ...input, quotaKey: 'contact-k2' })).toEqual({ status: 'reserved' });
+    expect(await reserveContactSlot(db.asBinding(), { ...input, quotaKey: 'contact-k3' })).toEqual({ status: 'capped', scope: 'global' });
+  });
+
+  it('leaves the day total alone for a client over its cap', async () => {
+    const db = new FakeD1();
+    for (let i = 0; i < 5; i++) await reserveContactSlot(db.asBinding(), input);
+    expect(db.quota.find((q) => q.key === 'contact-k1')?.n).toBe(5);
+    expect(db.quota.find((q) => q.key === CONTACT_TOTAL_KEY)?.n).toBe(2);
   });
 
   it('throws on a D1 error so the caller fails closed', async () => {
