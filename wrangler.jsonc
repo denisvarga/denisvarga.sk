@@ -72,7 +72,7 @@
     // Kill switch for the contact hand-off: while not "true" the model is not offered the tool and
     // /api/contact answers 503 unavailable. Enable only after the Email Routing subdomain, the
     // verified destination and the WAF rule for POST /api/contact are in place.
-    "CONTACT_ENABLED": "false",
+    "CONTACT_ENABLED": "true",
     "CONTACT_FROM": "web@notify.denisvarga.sk",
     // Must equal destination_address of the CONTACT_MAIL binding.
     "CONTACT_TO": "hello@denisvarga.sk",

@@ -8,7 +8,7 @@ import { CONTACT_RULE, INTRO, RULES } from './rules';
  * runs and logged answers can be tied to a prompt revision. prompt.test.ts pins a hash of the
  * text next to this value and fails until both are updated.
  */
-export const PROMPT_VERSION = '2026-10-22.2';
+export const PROMPT_VERSION = '2026-10-22.4';
 
 /** Revision as logged and printed: the contact variant is marked, since it is a different prompt. */
 export function promptVersion(contact: boolean): string {
