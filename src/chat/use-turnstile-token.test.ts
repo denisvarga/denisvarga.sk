@@ -62,7 +62,7 @@ afterEach(() => {
 describe('createTokenSource', () => {
   it('renders a managed, execute-on-demand, interaction-only widget for the ask action', async () => {
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const token = source.getToken();
     await flush();
     expect(fake.options()).toMatchObject({
@@ -76,10 +76,19 @@ describe('createTokenSource', () => {
     await expect(token).resolves.toBe('tok-1');
   });
 
+  it('renders the widget for the action it was created for', async () => {
+    const fake = fakeTurnstile();
+    const source = createTokenSource(container, { siteKey: 'site', action: 'contact', load: () => Promise.resolve(fake.api) });
+    void source.getToken().catch(() => undefined);
+    await flush();
+    expect(fake.options()).toMatchObject({ action: 'contact' });
+    source.dispose();
+  });
+
   it('rejects at the 15 s deadline when no token ever arrives, and resets the widget', async () => {
     vi.useFakeTimers();
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const token = source.getToken();
     const settled = vi.fn();
     token.then(settled, settled);
@@ -92,7 +101,7 @@ describe('createTokenSource', () => {
 
   it('does not execute a solved widget again when the input is refocused', async () => {
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     source.warmUp();
     await flush();
     fake.options().callback?.('warm');
@@ -108,7 +117,7 @@ describe('createTokenSource', () => {
   it('stops the deadline while an interactive challenge is on screen', async () => {
     vi.useFakeTimers();
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const token = source.getToken();
     await vi.advanceTimersByTimeAsync(0);
     fake.options()['before-interactive-callback']?.();
@@ -119,7 +128,7 @@ describe('createTokenSource', () => {
 
   it('rejects immediately on a widget error and retries from a clean state', async () => {
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const first = source.getToken();
     await flush();
     expect(fake.options()['error-callback']?.('300030')).toBe(true);
@@ -134,7 +143,7 @@ describe('createTokenSource', () => {
   it('reuses a pre-fetched token only while it is younger than 280 s', async () => {
     let now = 0;
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api), now: () => now });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api), now: () => now });
     source.warmUp();
     await flush();
     fake.options().callback?.('early');
@@ -153,7 +162,7 @@ describe('createTokenSource', () => {
 
   it('spaces the container while a challenge shows and until the widget is reset', async () => {
     const fake = fakeTurnstile();
-    const source = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const token = source.getToken();
     await flush();
     fake.options()['before-interactive-callback']?.();
@@ -170,7 +179,7 @@ describe('createTokenSource', () => {
       .fn<() => Promise<TurnstileApi>>()
       .mockRejectedValueOnce(new Error('blocked'))
       .mockResolvedValue(fake.api);
-    const source = createTokenSource(container, { siteKey: 'site', load });
+    const source = createTokenSource(container, { siteKey: 'site', action: 'ask', load });
     await expect(source.getToken()).rejects.toThrow('blocked');
     const retry = source.getToken();
     await flush();
@@ -222,7 +231,7 @@ describe('chat wiring', () => {
     const client: { current: TokenClient | null } = { current: null };
     function Probe() {
       const ref = useRef<HTMLDivElement>(null);
-      client.current = useTurnstileToken(ref);
+      client.current = useTurnstileToken(ref, 'ask');
       return createElement('div', { ref });
     }
     act(() => root.render(createElement(Probe)));
@@ -234,7 +243,7 @@ describe('chat wiring', () => {
   it('clears loading and shows the error copy when the token never arrives', async () => {
     vi.useFakeTimers();
     const fake = fakeTurnstile();
-    const tokens = createTokenSource(container, { siteKey: 'site', load: () => Promise.resolve(fake.api) });
+    const tokens = createTokenSource(container, { siteKey: 'site', action: 'ask', load: () => Promise.resolve(fake.api) });
     const post = vi.fn();
     const chat: { current: AgentChat | null } = { current: null };
     function Probe() {

@@ -69,6 +69,23 @@ export const copySk: Copy = {
       'Ako vznikol tento web?',
       'Na akých projektoch robil?',
     ],
+    contact: {
+      title: 'Správa pre Denisa',
+      lead: 'Takto Denisovi pošlem vašu správu:',
+      name: 'Meno',
+      email: 'E-mail',
+      notice: 'Správa sa odošle, až keď kliknete na Odoslať Denisovi. Denis potom dostane e-mailom vaše meno, e-mail, túto správu a tento rozhovor, aby vám mohol odpovedať.',
+      send: 'Odoslať Denisovi',
+      edit: 'Upraviť',
+      cancel: 'Zrušiť',
+      sent: 'Hotovo, Denis má vašu správu a ozve sa na {email}.',
+      failed: 'Správu sa nepodarilo odoslať. Napíšte Denisovi na hello@denisvarga.sk.',
+      dailyCap: 'Cez chat sa dnes ďalšia správa odoslať nedá. Napíšte Denisovi na hello@denisvarga.sk.',
+      rateLimited: 'Príliš veľa správ naraz, túto som neodoslal. Napíšte Denisovi na hello@denisvarga.sk.',
+      unavailable: 'Odosielanie správ z chatu je teraz vypnuté. Napíšte Denisovi na hello@denisvarga.sk.',
+      timeout: 'Neviem overiť, či správa odišla, Denis ju už možno má. Aby neprišla dvakrát, prípadne mu napíšte na hello@denisvarga.sk.',
+      cancelled: 'V poriadku, nič som neodoslal.',
+    },
   },
   work: {
     label: 'Projekty',
@@ -125,11 +142,15 @@ export const copySk: Copy = {
       },
       {
         title: 'Pseudonymné identifikátory',
-        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Druhý sa mení každý deň, počíta vaše otázky (najviac 20 za deň) a do troch dní sa zmaže.',
+        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Ďalšie dva sa menia každý deň, počítajú vaše otázky (najviac 20 za deň) a vaše správy pre mňa z chatu (najviac 3 za deň) a do troch dní sa zmažú.',
       },
       {
         title: 'Cloudflare',
         text: 'Web beží na Cloudflare a záznamy otázok sú v databáze Cloudflare D1 v jurisdikcii EÚ. Pred odoslaním otázky Cloudflare Turnstile podľa signálov prehliadača a IP adresy overí, že nie ste robot. IP adresa slúži aj na limit 5 otázok za minútu a neukladám ju.',
+      },
+      {
+        title: 'Správy pre mňa z chatu',
+        text: 'Keď agent pripraví správu pre mňa, nič sa neodošle, kým sa ju sami nerozhodnete odoslať. Potom dostanem e-mailom vaše meno, e-mail, text správy a váš rozhovor s agentom, aby som vám mohol odpovedať. Doručí ju Cloudflare Email Routing. Právnym základom je odpoveď na vašu žiadosť: pri dopyte po spolupráci kroky pred uzavretím zmluvy na vašu žiadosť (čl. 6 ods. 1 písm. b) GDPR), inak môj oprávnený záujem odpovedať na správy (čl. 6 ods. 1 písm. f) GDPR). Web z toho nič neukladá. E-mail zostáva v mojej e-mailovej schránke, kým ho nevymažem, a uchovávam ho, kým je potrebný pre našu komunikáciu alebo spoluprácu, ktorá z nej vznikne. Meno a e-mail z formulára OpenAI nedostane. E-mailové adresy a telefónne čísla, ktoré napíšete priamo do chatu, v zázname otázok nahrádzam zástupným textom.',
       },
       {
         title: 'Analytika',

@@ -1,6 +1,7 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { copyEn } from '../i18n/copy-en';
 import { ChatLog } from './chat-log';
 import type { ChatMessage } from './chat-reducer';
 
@@ -13,6 +14,7 @@ const IMG = '<img src=x onerror="alert(1)">';
 const LINK = '[x](javascript:alert(1))';
 const LABELS = { you: 'You', agent: 'Agent', thinking: 'Thinking', retry: 'Try again' };
 const noRetry = () => undefined;
+const DRAFTS = { contact: copyEn.ask.contact, onSendDraft: () => undefined, onCancelDraft: () => undefined };
 
 let container: HTMLDivElement;
 let root: Root;
@@ -33,7 +35,7 @@ afterEach(() => {
 const VIEW = 300;
 
 const render = (messages: ChatMessage[], loading: boolean) =>
-  act(() => root.render(<ChatLog messages={messages} loading={loading} typingId={null} labels={LABELS} onRetry={noRetry} />));
+  act(() => root.render(<ChatLog messages={messages} loading={loading} typingId={null} labels={LABELS} onRetry={noRetry} {...DRAFTS} />));
 
 /** A fake layout for the log: content height, scroll position and the top of each message. */
 function fakeLayout(log: HTMLElement) {
@@ -60,7 +62,7 @@ describe('ChatLog', () => {
       { id: 1, role: 'user', text: `${IMG} ${LINK}`, failed: false },
       { id: 2, role: 'assistant', text: `Sure: ${IMG} and ${LINK}`, failed: false },
     ];
-    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={noRetry} />));
+    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={noRetry} {...DRAFTS} />));
 
     expect(container.querySelector('img, a, script, iframe')).toBeNull();
     expect(container.textContent).toContain(`${IMG} ${LINK}`);
@@ -78,7 +80,7 @@ describe('ChatLog', () => {
       },
       { id: 3, role: 'assistant', text: 'Email Denis at hello@denisvarga.dev.', failed: true, retryable: true },
     ];
-    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={noRetry} />));
+    act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={noRetry} {...DRAFTS} />));
     const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
     expect(hrefs).toEqual(['mailto:hello@denisvarga.dev', 'https://github.com/denisvarga', 'mailto:hello@denisvarga.dev']);
     expect(container.querySelector('[data-message-id="1"] a')).toBeNull();
@@ -136,7 +138,7 @@ describe('ChatLog', () => {
     const busy: ChatMessage = { id: 2, role: 'assistant', text: 'Busy, try again in a minute.', failed: true, retryable: true };
     const history: ChatMessage[] = [{ id: 1, role: 'user', text: 'q1', failed: false }, busy];
     const show = (messages: ChatMessage[]) =>
-      act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={onRetry} />));
+      act(() => root.render(<ChatLog messages={messages} loading={false} typingId={null} labels={LABELS} onRetry={onRetry} {...DRAFTS} />));
 
     show(history);
     const buttons = container.querySelectorAll('button');

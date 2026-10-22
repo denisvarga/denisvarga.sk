@@ -1,5 +1,5 @@
 import { FINALIZE_SQL } from '../ask/chat-log';
-import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL, UPSERT_QUOTA_SQL } from '../ask/daily-cap';
+import { COUNT_TODAY_SQL, INSERT_PENDING_SQL, MARK_CAPPED_SQL, UPSERT_CONTACT_TOTAL_SQL, UPSERT_QUOTA_SQL } from '../ask/daily-cap';
 import { DELETE_OLD_CHATS_SQL, DELETE_OLD_QUOTA_SQL } from '../scheduled';
 import { executeOverviewSql } from './fake-overview-sql';
 
@@ -17,6 +17,7 @@ export interface ChatRow {
   prompt_version: string | null;
   cached_tokens: number | null;
   cache_write_tokens: number | null;
+  reply_kind: string | null;
 }
 
 export interface QuotaRow {
@@ -49,6 +50,7 @@ export class FakeD1 {
       prompt_version: null,
       cached_tokens: null,
       cache_write_tokens: null,
+      reply_kind: null,
       ...row,
     });
   }
@@ -67,13 +69,14 @@ export class FakeD1 {
         const n = this.rows.filter((r) => r.created_at >= since && BILLABLE.has(r.outcome)).length;
         return [{ n: Math.min(n, Number(args[1])) }];
       }
-      case UPSERT_QUOTA_SQL: {
-        this.writes++;
-        const [day, key] = [Number(args[0]), String(args[1])];
-        const row = this.quota.find((q) => q.day === day && q.key === key);
-        if (row) row.n++;
-        else this.quota.push({ day, key, n: 1 });
-        return [{ n: row?.n ?? 1 }];
+      case UPSERT_QUOTA_SQL:
+        return [{ n: this.upsertQuota(Number(args[0]), String(args[1])) }];
+      case UPSERT_CONTACT_TOTAL_SQL: {
+        const [day, key, clientKey, clientCap] = [Number(args[0]), String(args[1]), String(args[2]), Number(args[3])];
+        const client = this.quota.find((q) => q.day === day && q.key === clientKey);
+        // As in SQL: a missing client row compares as NULL, which is never <= the cap.
+        if (!client || client.n > clientCap) return [];
+        return [{ n: this.upsertQuota(day, key) }];
       }
       case DELETE_OLD_CHATS_SQL:
         this.writes++;
@@ -89,7 +92,8 @@ export class FakeD1 {
         return [];
       case FINALIZE_SQL: {
         this.writes++;
-        const [answer, model, latency_ms, input_tokens, output_tokens, outcome, cached_tokens, cache_write_tokens, prompt_version, id] = args;
+        const [answer, model, latency_ms, input_tokens, output_tokens, outcome, cached_tokens, cache_write_tokens, prompt_version, reply_kind, id] =
+          args;
         this.update(Number(id), {
           answer: answer as string | null,
           model: model as string | null,
@@ -100,6 +104,7 @@ export class FakeD1 {
           cached_tokens: cached_tokens as number | null,
           cache_write_tokens: cache_write_tokens as number | null,
           prompt_version: prompt_version as string | null,
+          reply_kind: reply_kind as string | null,
         });
         return [];
       }
@@ -109,6 +114,14 @@ export class FakeD1 {
         throw new Error(`FakeD1: unexpected SQL ${sql}`);
       }
     }
+  }
+
+  private upsertQuota(day: number, key: string): number {
+    this.writes++;
+    const row = this.quota.find((q) => q.day === day && q.key === key);
+    if (row) row.n++;
+    else this.quota.push({ day, key, n: 1 });
+    return row?.n ?? 1;
   }
 
   private update(id: number, patch: Partial<ChatRow>): void {

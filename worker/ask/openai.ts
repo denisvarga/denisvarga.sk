@@ -1,4 +1,6 @@
 import * as z from 'zod/mini';
+import type { ContactDraft } from '../../shared/ask-contract';
+import { parseDraftArguments } from '../contact/schema';
 import { cleanContent, plainReply } from './clean-text';
 
 // Runs in the Worker and in Node (scripts/eval-agent.ts): standard fetch and WebCrypto only.
@@ -25,12 +27,35 @@ const QUOTA_CODES = new Set([
   'credit_balance_exhausted',
 ]);
 
-export type ModelOutcome = 'ok' | 'truncated' | 'refused' | 'error' | 'unavailable_quota';
+export const CONTACT_TOOL_NAME = 'propose_contact_message';
+
+/** A constant, so the tool definition stays part of the cached prompt prefix. */
+export const CONTACT_TOOL = {
+  type: 'function',
+  name: CONTACT_TOOL_NAME,
+  description: 'Navrhne krátku správu pre Denisa. Návštevník ju skontroluje a odošle sám, nástroj nič neodosiela.',
+  strict: true,
+  parameters: {
+    type: 'object',
+    properties: {
+      message: { type: 'string', description: 'Požiadavka návštevníka v 1-3 vetách, v jazyku rozhovoru, v 1. osobe návštevníka.' },
+      name: { type: ['string', 'null'], description: 'Meno, len ak ho návštevník v rozhovore sám uviedol, inak null.' },
+      email: { type: ['string', 'null'], description: 'E-mail, len ak ho návštevník v rozhovore sám uviedol, inak null.' },
+    },
+    required: ['message', 'name', 'email'],
+    additionalProperties: false,
+  },
+} as const;
+
+/** `handoff`: the model proposed a contact message through CONTACT_TOOL instead of answering. */
+export type ModelOutcome = 'ok' | 'truncated' | 'refused' | 'error' | 'unavailable_quota' | 'handoff';
 
 /** Never carries upstream error text; `text` is set only for `ok` and `truncated`. */
 export interface ModelResult {
   readonly outcome: ModelOutcome;
   readonly text: string | null;
+  /** Set only for `handoff`. */
+  readonly draft?: ContactDraft;
   readonly responseStatus: string | null;
   readonly model: string;
   readonly inputTokens: number | null;
@@ -60,6 +85,8 @@ export interface OpenAIRequest {
   readonly instructions: PromptParts;
   readonly messages: readonly { readonly role: 'user' | 'assistant'; readonly content: string }[];
   readonly safetyIdentifier: string;
+  /** Offers CONTACT_TOOL; the Worker never answers a call with a function_call_output. */
+  readonly contact?: boolean;
   /** Epoch ms after which no attempt may run. */
   readonly deadline: number;
   readonly fetchImpl?: typeof fetch;
@@ -88,6 +115,7 @@ export function buildRequestBody(req: OpenAIRequest): Record<string, unknown> {
     prompt_cache_key: PROMPT_CACHE_KEY,
     prompt_cache_options: PROMPT_CACHE_OPTIONS,
     safety_identifier: req.safetyIdentifier,
+    ...(req.contact ? { tools: [CONTACT_TOOL], tool_choice: 'auto', parallel_tool_calls: false } : {}),
   };
 }
 
@@ -102,6 +130,8 @@ const responseSchema = z.object({
       z.object({
         type: z.string(),
         content: z.optional(z.array(z.object({ type: z.string(), text: optionalString }))),
+        name: optionalString,
+        arguments: optionalString,
       }),
     ),
   ),
@@ -172,6 +202,10 @@ export function parseResponse(json: unknown, requestedModel: string, httpStatus 
   if (parts.some((part) => part.type === 'refusal') || reason === 'content_filter') {
     return { ...base, outcome: 'refused', text: null };
   }
+  // A call with an unknown name or invalid arguments falls back to the text, like no call at all.
+  const call = (data.output ?? []).find((item) => item.type === 'function_call' && item.name === CONTACT_TOOL_NAME);
+  const draft = data.status === 'completed' && call ? parseDraftArguments(call.arguments ?? '') : null;
+  if (draft) return { ...base, outcome: 'handoff', text: null, draft };
   if (data.status === 'completed' && text) return { ...base, outcome: 'ok', text };
   if (data.status === 'incomplete' && reason === 'max_output_tokens' && text) {
     return { ...base, outcome: 'truncated', text: trimToLastSentence(text) };

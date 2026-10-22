@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ASK_ERROR_CODES, type AskRequest } from '../../shared/ask-contract';
-import { ASK_ENDPOINT, postAsk } from './api-client';
+import { CONTACT_ERROR_CODES, type ContactRequest } from '../../shared/contact-contract';
+import { ASK_ENDPOINT, CONTACT_ENDPOINT, postAsk, postContact } from './api-client';
 
 const request: AskRequest = { messages: [{ role: 'user', content: 'Hi' }], lang: 'en', turnstileToken: 'tok' };
 
@@ -25,6 +26,18 @@ describe('postAsk', () => {
       const outcome = await postAsk(request, { fetchImpl: stub(json({ reply: 'Hi', kind: 'answer', sig })) });
       expect(outcome).toStrictEqual({ ok: true, reply: 'Hi' });
     }
+  });
+
+  it('returns the draft of a handoff reply, and the plain reply when the draft is malformed', async () => {
+    const draft = { message: ' I need a shop. ', name: null, email: 'jana@firma.sk' };
+    const outcome = await postAsk(request, { fetchImpl: stub(json({ reply: 'Draft message for Denis:\n\nI need a shop.', kind: 'handoff_draft', sig: 's', draft })) });
+    expect(outcome).toEqual({ ok: true, reply: 'Draft message for Denis:\n\nI need a shop.', sig: 's', draft: { ...draft, message: 'I need a shop.' } });
+    for (const bad of [null, { message: '' }, { message: 'x', name: 1, email: null }, { message: 'x', name: null }]) {
+      const plain = await postAsk(request, { fetchImpl: stub(json({ reply: 'Text', kind: 'handoff_draft', sig: 's', draft: bad })) });
+      expect(plain).toStrictEqual({ ok: true, reply: 'Text', sig: 's' });
+    }
+    const notDraft = await postAsk(request, { fetchImpl: stub(json({ reply: 'Text', kind: 'answer', sig: 's', draft })) });
+    expect(notDraft).toStrictEqual({ ok: true, reply: 'Text', sig: 's' });
   });
 
   it.each(ASK_ERROR_CODES)('maps the %s error code', async (code) => {
@@ -88,5 +101,35 @@ describe('postAsk', () => {
     } finally {
       AbortSignal.any = original;
     }
+  });
+});
+
+describe('postContact', () => {
+  const contact: ContactRequest = {
+    lang: 'sk',
+    turnstileToken: 'tok',
+    name: 'Jana',
+    email: 'jana@firma.sk',
+    message: 'Potrebujem e-shop.',
+    messages: [{ role: 'user', content: 'Áno.' }],
+  };
+
+  it('posts the request as JSON to the contact endpoint and returns the signed confirmation', async () => {
+    const fetchImpl = stub(json({ reply: ' Správa odoslaná. ', sig: 'sig-2' }));
+    await expect(postContact(contact, { fetchImpl })).resolves.toEqual({ ok: true, reply: 'Správa odoslaná.', sig: 'sig-2' });
+    const [url, init] = fetchImpl.mock.calls[0] ?? [];
+    expect(url).toBe(CONTACT_ENDPOINT);
+    expect(JSON.parse(String(init?.body))).toEqual(contact);
+  });
+
+  it.each(CONTACT_ERROR_CODES)('maps the %s error code', async (code) => {
+    await expect(postContact(contact, { fetchImpl: stub(json({ error: code }, 503)) })).resolves.toEqual({ ok: false, error: code });
+  });
+
+  it('never throws and treats an unsigned or odd body as a bad response', async () => {
+    for (const response of [json({ reply: 'Odoslané.' }), json({ error: 'upstream_unavailable' }, 502), json('x'), new Response('nope', { status: 403 })]) {
+      await expect(postContact(contact, { fetchImpl: stub(response) })).resolves.toEqual({ ok: false, error: 'bad_response' });
+    }
+    await expect(postContact(contact, { fetchImpl: stub(new TypeError('offline')) })).resolves.toEqual({ ok: false, error: 'network' });
   });
 });

@@ -1,15 +1,18 @@
 // Golden-question eval for the chat agent. Calls the real OpenAI API with the same prompt, client and
-// manipulation guards as the Worker. Local only (`pnpm eval`, keys from .dev.vars); never runs in CI.
+// manipulation guards as the Worker, with the contact hand-off enabled. Local only (`pnpm eval`, keys
+// from .dev.vars); never runs in CI.
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { z } from 'zod';
+import type { ContactDraft } from '../shared/ask-contract.ts';
 import { easterEgg } from '../worker/agent/easter-eggs.ts';
 import { guardAnswer, isManipulation, manipulationReply } from '../worker/agent/guard.ts';
-import { buildInstructions, PROMPT_VERSION } from '../worker/agent/prompt.ts';
+import { buildInstructions, promptVersion } from '../worker/agent/prompt.ts';
 import { callOpenAI, type ModelResult, REASONING_EFFORTS, TOTAL_BUDGET_MS } from '../worker/ask/openai.ts';
 import { estimateCostUsd } from '../worker/ask/pricing.ts';
 import { safetyIdentifier } from '../worker/ask/safety-id.ts';
 import { askSchema, lastUserMessage } from '../worker/ask/schema.ts';
+import { draftReply } from '../worker/contact/draft-text.ts';
 
 const CASES_FILE = new URL('../worker/agent/evals/golden-questions.json', import.meta.url);
 
@@ -26,6 +29,10 @@ const caseSchema = z.object({
     maxChars: z.number().int().positive().optional(),
     /** Language the reply must be in, whatever the site language. */
     lang: z.enum(['sk', 'en']).optional(),
+    /** Whether the model must (true) or must not (false) propose a contact message. */
+    toolCall: z.boolean().optional(),
+    /** Strings the proposed message itself must contain; implies a proposal. */
+    messageMustInclude: z.array(z.string()).min(1).optional(),
     note: z.string(),
   }),
 });
@@ -82,11 +89,23 @@ function languageChecks(lower: string, lang: Lang): string[] {
   ];
 }
 
-function softChecks(answer: string, expect: EvalCase['expect']): string[] {
+function toolChecks(draft: ContactDraft | undefined, expect: EvalCase['expect']): string[] {
+  const message = draft?.message.toLowerCase() ?? '';
+  const expectCall = expect.toolCall ?? (expect.messageMustInclude ? true : undefined);
+  return [
+    ...(expectCall === true && !draft ? ['no contact proposal'] : []),
+    ...(expectCall === false && draft ? ['unexpected contact proposal'] : []),
+    ...(draft ? (expect.messageMustInclude ?? []).filter((s) => !message.includes(s.toLowerCase())).map((s) => `message missing "${s}"`) : []),
+  ];
+}
+
+/** `answer` is the visible reply; for a proposal that is the draft text the Worker would sign. */
+function softChecks(answer: string, expect: EvalCase['expect'], draft?: ContactDraft): string[] {
   const lower = answer.toLowerCase();
   const has = (s: string) => lower.includes(s.toLowerCase());
   const any = expect.mustIncludeAny;
   return [
+    ...toolChecks(draft, expect),
     ...(expect.mustInclude ?? []).filter((s) => !has(s)).map((s) => `missing "${s}"`),
     ...(any && !any.some(has) ? [`missing any of ${any.map((s) => `"${s}"`).join(', ')}`] : []),
     ...(expect.mustNotInclude ?? []).filter(has).map((s) => `contains "${s}"`),
@@ -109,7 +128,7 @@ async function main(): Promise<void> {
   const cases = loadCases(opts.only);
   const year = new Date().getUTCFullYear();
   const safetyId = await safetyIdentifier(opts.salt, 'eval');
-  console.log(`prompt ${PROMPT_VERSION} | model ${opts.model} | effort ${opts.effort} | ${cases.length} case(s)\n`);
+  console.log(`prompt ${promptVersion(true)} | model ${opts.model} | effort ${opts.effort} | ${cases.length} case(s)\n`);
 
   let hardFailures = 0;
   let softFailures = 0;
@@ -146,15 +165,19 @@ async function main(): Promise<void> {
       apiKey: opts.apiKey,
       model: opts.model,
       effort: opts.effort,
-      instructions: buildInstructions(testCase.lang, year),
+      instructions: buildInstructions(testCase.lang, year, true),
       messages: request.data.messages,
       safetyIdentifier: safetyId,
+      contact: true,
       deadline: startedAt + TOTAL_BUDGET_MS,
     });
     const latency = Date.now() - startedAt;
-    const result = guardAnswer(answer, testCase.lang);
-    const completed = answer.outcome === 'ok' && answer.responseStatus === 'completed';
-    const checks = result.text ? softChecks(result.text, testCase.expect) : [];
+    // Same as the route: a proposal is checked and guarded as the draft text the visitor would see.
+    const draft = answer.outcome === 'handoff' ? answer.draft : undefined;
+    const shown = draft ? { ...answer, text: draftReply(testCase.lang, draft.message) } : answer;
+    const result = guardAnswer(shown, testCase.lang);
+    const completed = (answer.outcome === 'ok' || answer.outcome === 'handoff') && answer.responseStatus === 'completed';
+    const checks = result.text ? softChecks(result.text, testCase.expect, result.outcome === 'handoff' ? draft : undefined) : [];
     if (!completed) hardFailures++;
     if (checks.length > 0) softFailures++;
     const used = usage(result);
@@ -164,7 +187,8 @@ async function main(): Promise<void> {
     totals.outputTokens += used.outputTokens;
 
     console.log(`  answer: ${result.text ?? '(none)'}`);
-    if (result !== answer) console.log(`  guard:  leaked instructions replaced, model said: ${answer.text ?? ''}`);
+    if (draft) console.log(`  draft:  name ${draft.name ?? 'null'} | email ${draft.email ?? 'null'}`);
+    if (result !== shown) console.log(`  guard:  leaked instructions replaced, model said: ${shown.text ?? ''}`);
     console.log(`  status: ${result.responseStatus ?? 'none'} | outcome ${result.outcome} | http ${result.httpStatus}${completed ? '' : ' | FAIL'}`);
     console.log(softLine(checks, testCase.expect.note));
     console.log(

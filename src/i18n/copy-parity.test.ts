@@ -83,6 +83,11 @@ describe('copy parity', () => {
       expect(headCopy[lang].consoleGreeting).toContain(headCopy[lang].email);
       expect(contact[lang]).toMatchObject({ email: headCopy[lang].email, emailHref: `mailto:${headCopy[lang].email}` });
       expect([...Object.values(copy.ask.errors), headCopy[lang].consoleGreeting].join('\n')).not.toContain(other);
+      for (const key of ['failed', 'dailyCap', 'rateLimited', 'unavailable', 'timeout'] as const) {
+        expect(copy.ask.contact[key], key).toContain(headCopy[lang].email);
+      }
+      expect(Object.values(copy.ask.contact).join('\n')).not.toContain(other);
+      expect(copy.ask.contact.sent).toContain('{email}');
     }
   });
 });

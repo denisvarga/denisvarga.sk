@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { AskSuccess } from '../../shared/ask-contract';
 import { easterEgg } from '../agent/easter-eggs';
 import { dropFlaggedTurns, guardAnswer, isManipulation, manipulationReply } from '../agent/guard';
-import { buildInstructions, PROMPT_VERSION } from '../agent/prompt';
+import { buildInstructions, promptVersion } from '../agent/prompt';
 import { finalizeRow } from '../ask/chat-log';
 import { clientKey } from '../ask/client-key';
 import { parseDailyCap, reserveSlot, utcMidnight, type Reservation } from '../ask/daily-cap';
@@ -13,9 +13,18 @@ import { createReplySigner, keepSignedTurns } from '../ask/reply-sig';
 import { quotaKey, safetyIdentifier } from '../ask/safety-id';
 import { askSchema, lastUserMessage } from '../ask/schema';
 import { isTurnstileConfigValid, TURNSTILE_TIMEOUT_MS, verifyTurnstile } from '../ask/turnstile';
+import { draftReply } from '../contact/draft-text';
+import { isContactEnabled } from '../contact/mail';
 
-/** The limiter binding may be missing (Free-plan fallback); every other binding is required. */
-export type AskEnv = Omit<CloudflareBindings, 'ASK_LIMITER'> & { readonly ASK_LIMITER?: RateLimit };
+/**
+ * The limiter bindings may be missing (Free-plan fallback) and so may the contact mail binding
+ * (the hand-off is then off); every other binding is required.
+ */
+export type AskEnv = Omit<CloudflareBindings, 'ASK_LIMITER' | 'CONTACT_LIMITER' | 'CONTACT_MAIL'> & {
+  readonly ASK_LIMITER?: RateLimit;
+  readonly CONTACT_LIMITER?: RateLimit;
+  readonly CONTACT_MAIL?: SendEmail;
+};
 
 export const askRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -96,19 +105,23 @@ askRoute.post('/ask', async (c) => {
     return askError(c, 'daily_cap');
   }
 
+  const contact = isContactEnabled(env);
   const modelStartedAt = Date.now();
   const answer = await callOpenAI({
     apiKey: env.OPENAI_API_KEY.trim(),
     model: env.OPENAI_MODEL.trim(),
     effort: env.OPENAI_REASONING_EFFORT,
-    instructions: buildInstructions(input.lang, new Date(now).getUTCFullYear()),
+    instructions: buildInstructions(input.lang, new Date(now).getUTCFullYear(), contact),
     messages,
     safetyIdentifier: await safetyIdentifier(salt, key),
+    contact,
     deadline,
   });
-  const result = guardAnswer(answer, input.lang);
+  // A proposed message is shown and replayed like an answer, so it passes the same leak guard.
+  const draft = answer.outcome === 'handoff' ? answer.draft : undefined;
+  const result = guardAnswer(draft ? { ...answer, text: draftReply(input.lang, draft.message) } : answer, input.lang);
   c.executionCtx.waitUntil(
-    finalizeRow(env.DB, reservation.id, result, Date.now() - modelStartedAt, PROMPT_VERSION).catch(() => logEvent('d1_error', 500)),
+    finalizeRow(env.DB, reservation.id, result, Date.now() - modelStartedAt, promptVersion(contact)).catch(() => logEvent('d1_error', 500)),
   );
 
   if (result.outcome === 'unavailable_quota') logEvent('openai_quota', result.httpStatus);
@@ -118,5 +131,8 @@ askRoute.post('/ask', async (c) => {
   // stays unsigned, so the question that drew the leak never returns as answered history.
   if (result.outcome === 'refused') return c.json({ reply: result.text, kind: 'answer' } satisfies AskSuccess);
   const sig = await signer.sign({ lang: input.lang, anchor: question, reply: result.text }, Date.now());
+  if (result.outcome === 'handoff' && draft) {
+    return c.json({ reply: result.text, kind: 'handoff_draft', sig, draft } satisfies AskSuccess);
+  }
   return c.json({ reply: result.text, kind: 'answer', sig } satisfies AskSuccess);
 });

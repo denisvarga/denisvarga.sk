@@ -58,6 +58,23 @@ describe('PrivacyNotice', () => {
     expect(text).not.toContain(EMAILS[lang === 'sk' ? 'en' : 'sk']);
   });
 
+  it.each(LANGS)('says in %s what Denis receives from a contact message, on what basis and how long he keeps it', (lang) => {
+    const section = COPY[lang].privacy.sections.find((s) => s.text.includes('Cloudflare Email Routing'));
+    const facts =
+      lang === 'sk'
+        ? ['nič sa neodošle', 'meno', 'e-mail', 'text správy', 'rozhovor', 'čl. 6 ods. 1 písm. b)', 'nič neukladá', 'kým ho nevymažem', 'kým je potrebný']
+        : ['nothing is sent', 'name', 'email', 'the message', 'conversation', 'Art. 6(1)(b)', 'stores none', 'until I delete it', 'as long as'];
+    for (const fact of facts) expect(section?.text, fact).toContain(fact);
+    expect(section?.text).not.toMatch(/súhlas|consent/i);
+  });
+
+  it.each(LANGS)('discloses the daily counters for questions and contact messages in %s', (lang) => {
+    const text = COPY[lang].privacy.sections.map((s) => s.text).join(' ');
+    expect(text).toContain(lang === 'sk' ? '(najviac 20 za deň)' : '(at most 20 a day)');
+    expect(text).toContain(lang === 'sk' ? '(najviac 3 za deň)' : '(at most 3 a day)');
+    expect(COPY[lang].ask.contact.notice).not.toMatch(/súhlas|agree/i);
+  });
+
   it.each(LANGS)('opens, scrolls to and focuses its summary in %s', (lang) => {
     const scrollTo = vi.fn();
     vi.stubGlobal('scrollTo', scrollTo);

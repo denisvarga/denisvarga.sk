@@ -4,10 +4,10 @@ import { createTokenSource, TokenError, type TokenSource } from './turnstile-tok
 export type TokenClient = Pick<TokenSource, 'warmUp' | 'getToken' | 'refresh'>;
 
 /**
- * Turnstile token client bound to a container element. Nothing loads until the first warmUp()
- * or getToken(), so api.js stays off the page until the chat is used.
+ * Turnstile token client bound to a container element and an action. Nothing loads until the
+ * first warmUp() or getToken(), so api.js stays off the page until the chat is used.
  */
-export function useTurnstileToken(containerRef: RefObject<HTMLElement | null>): TokenClient {
+export function useTurnstileToken(containerRef: RefObject<HTMLElement | null>, action: string): TokenClient {
   const sourceRef = useRef<TokenSource | null>(null);
 
   useEffect(
@@ -23,7 +23,7 @@ export function useTurnstileToken(containerRef: RefObject<HTMLElement | null>): 
       if (sourceRef.current) return sourceRef.current;
       const container = containerRef.current;
       if (!container) return null;
-      sourceRef.current = createTokenSource(container, { siteKey: import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '' });
+      sourceRef.current = createTokenSource(container, { siteKey: import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '', action });
       return sourceRef.current;
     };
     return {
@@ -31,5 +31,5 @@ export function useTurnstileToken(containerRef: RefObject<HTMLElement | null>): 
       getToken: () => source()?.getToken() ?? Promise.reject(new TokenError('widget container missing')),
       refresh: () => sourceRef.current?.refresh(),
     };
-  }, [containerRef]);
+  }, [containerRef, action]);
 }

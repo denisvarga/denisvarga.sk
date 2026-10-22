@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { FakeD1 } from '../test-support/fake-d1';
-import { INSERT_PENDING_SQL, parseDailyCap, reserveSlot, UPSERT_QUOTA_SQL, utcMidnight, type ReserveInput } from './daily-cap';
+import {
+  CONTACT_TOTAL_KEY,
+  INSERT_PENDING_SQL,
+  parseDailyCap,
+  reserveContactSlot,
+  reserveSlot,
+  UPSERT_CONTACT_TOTAL_SQL,
+  UPSERT_QUOTA_SQL,
+  utcMidnight,
+  type ReserveInput,
+} from './daily-cap';
 
 describe('daily cap helpers', () => {
   it('computes UTC midnight regardless of local offset', () => {
@@ -47,5 +57,42 @@ describe('reserveSlot', () => {
     const db = new FakeD1();
     db.seed({ created_at: now, outcome: 'ok' });
     expect(await reserveSlot(db.asBinding(), input({ cap: 1 }))).toEqual({ status: 'capped', scope: 'global' });
+  });
+});
+
+describe('reserveContactSlot', () => {
+  const now = Date.UTC(2026, 10, 2, 9);
+  const input = { now, clientCap: 2, cap: 3, quotaKey: 'contact-k1' };
+
+  it('counts the client and the day in one batch, writing no chat row', async () => {
+    const db = new FakeD1();
+    expect(await reserveContactSlot(db.asBinding(), input)).toEqual({ status: 'reserved' });
+    expect(db.executed).toEqual([
+      { sql: UPSERT_QUOTA_SQL, args: [Date.UTC(2026, 10, 2), 'contact-k1'] },
+      { sql: UPSERT_CONTACT_TOTAL_SQL, args: [Date.UTC(2026, 10, 2), CONTACT_TOTAL_KEY, 'contact-k1', 2] },
+    ]);
+    expect(db.rows).toHaveLength(0);
+  });
+
+  it('caps the client first, then the day', async () => {
+    const db = new FakeD1();
+    await reserveContactSlot(db.asBinding(), input);
+    await reserveContactSlot(db.asBinding(), input);
+    expect(await reserveContactSlot(db.asBinding(), input)).toEqual({ status: 'capped', scope: 'client' });
+    expect(await reserveContactSlot(db.asBinding(), { ...input, quotaKey: 'contact-k2' })).toEqual({ status: 'reserved' });
+    expect(await reserveContactSlot(db.asBinding(), { ...input, quotaKey: 'contact-k3' })).toEqual({ status: 'capped', scope: 'global' });
+  });
+
+  it('leaves the day total alone for a client over its cap', async () => {
+    const db = new FakeD1();
+    for (let i = 0; i < 5; i++) await reserveContactSlot(db.asBinding(), input);
+    expect(db.quota.find((q) => q.key === 'contact-k1')?.n).toBe(5);
+    expect(db.quota.find((q) => q.key === CONTACT_TOTAL_KEY)?.n).toBe(2);
+  });
+
+  it('throws on a D1 error so the caller fails closed', async () => {
+    const db = new FakeD1();
+    db.fail = true;
+    await expect(reserveContactSlot(db.asBinding(), input)).rejects.toThrow();
   });
 });

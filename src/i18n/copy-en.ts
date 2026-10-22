@@ -68,6 +68,23 @@ export const copyEn: Copy = {
       'How was this site built?',
       'What projects has he worked on?',
     ],
+    contact: {
+      title: 'Message for Denis',
+      lead: 'I will send Denis this message:',
+      name: 'Name',
+      email: 'Email',
+      notice: 'Nothing is sent until you press Send to Denis. Denis then receives your name, email, this message and this conversation by email so he can reply.',
+      send: 'Send to Denis',
+      edit: 'Edit',
+      cancel: 'Cancel',
+      sent: 'Done, Denis has your message and will reply to {email}.',
+      failed: 'The message did not go through. Email Denis at hello@denisvarga.dev.',
+      dailyCap: 'No more messages can be sent through the chat today. Email Denis at hello@denisvarga.dev.',
+      rateLimited: 'Too many messages at once, this one was not sent. Email Denis at hello@denisvarga.dev.',
+      unavailable: 'Sending messages from the chat is switched off right now. Email Denis at hello@denisvarga.dev.',
+      timeout: "I couldn't confirm the message went out, Denis may already have it. To avoid sending it twice, email him at hello@denisvarga.dev if needed.",
+      cancelled: 'No problem, nothing was sent.',
+    },
   },
   work: {
     label: 'Work',
@@ -124,11 +141,15 @@ export const copyEn: Copy = {
       },
       {
         title: 'Pseudonymous identifiers',
-        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address without the secret key. One goes to OpenAI for abuse detection. The other changes every day, counts your questions (at most 20 a day) and is deleted within three days.',
+        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address without the secret key. One goes to OpenAI for abuse detection. Two others change every day, count your questions (at most 20 a day) and your messages to me from the chat (at most 3 a day) and are deleted within three days.',
       },
       {
         title: 'Cloudflare',
         text: 'The site runs on Cloudflare, and the question log sits in a Cloudflare D1 database in the EU jurisdiction. Before a question is sent, Cloudflare Turnstile checks browser signals and your IP address to tell people from bots. Your IP address also drives the limit of 5 questions a minute, and I do not store it.',
+      },
+      {
+        title: 'Messages to me from the chat',
+        text: 'When the agent drafts a message to me, nothing is sent until you choose to send it. I then receive your name, email, the message and your conversation with the agent by email so I can reply. Cloudflare Email Routing delivers it. The legal basis is answering your request: for an enquiry about working together, steps taken at your request before a contract (Art. 6(1)(b) GDPR), otherwise my legitimate interest in replying to messages (Art. 6(1)(f) GDPR). The site stores none of it. The email stays in my mailbox until I delete it, and I keep it as long as our conversation or a project that comes out of it needs it. OpenAI does not receive the name and email from the form. Email addresses and phone numbers you type into the chat itself are replaced with placeholders in the question log.',
       },
       {
         title: 'Analytics',

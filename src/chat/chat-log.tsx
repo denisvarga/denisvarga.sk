@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import type { ContactCopy } from '../i18n/types';
 import styles from './chat-log.module.css';
 import type { ChatMessage } from './chat-reducer';
+import { ContactCard, draftAnnouncement } from './contact-card';
 import { TypingBubble } from './typing-bubble';
+import type { ContactFields, ContactTokens } from './use-agent-chat';
 
 /** How close to the bottom the reader must stay for the log to keep following new text. */
 export const FOLLOW_SLACK_PX = 24;
@@ -11,12 +14,16 @@ interface ChatLogProps {
   readonly loading: boolean;
   readonly typingId: number | null;
   readonly labels: { readonly you: string; readonly agent: string; readonly thinking: string; readonly retry: string };
+  readonly contact: ContactCopy;
   readonly onRetry: (id: number) => void;
+  readonly onSendDraft: (id: number, fields: ContactFields, tokens: ContactTokens) => void;
+  readonly onCancelDraft: (id: number) => void;
 }
 
-function liveText(messages: readonly ChatMessage[], loading: boolean, thinking: string): string {
+function liveText(messages: readonly ChatMessage[], loading: boolean, thinking: string, contact: ContactCopy): string {
   if (loading) return thinking;
   const last = messages.at(-1);
+  if (last?.draft) return draftAnnouncement(last.draft, contact);
   return last?.role === 'assistant' ? last.text : '';
 }
 
@@ -79,16 +86,17 @@ function useChatScroll(visible: boolean, last: ChatMessage | undefined) {
 
 /**
  * The visible log is not a live region; the hidden polite region below announces the thinking
- * line and then each reply once, in full, while the bubble types it out.
+ * line and then each reply once, in full, while the bubble types it out. A proposed message is
+ * announced as its card; the card announces a failed send itself.
  */
-export function ChatLog({ messages, loading, typingId, labels, onRetry }: ChatLogProps) {
+export function ChatLog({ messages, loading, typingId, labels, contact, onRetry, onSendDraft, onCancelDraft }: ChatLogProps) {
   const visible = messages.length > 0 || loading;
   const { logRef, stackRef } = useChatScroll(visible, messages.at(-1));
 
   return (
     <>
       <div className="visually-hidden" aria-live="polite" aria-atomic="true">
-        {liveText(messages, loading, labels.thinking)}
+        {liveText(messages, loading, labels.thinking, contact)}
       </div>
       {visible && (
         <div ref={logRef} className={styles.log} data-lenis-prevent="" aria-busy={loading}>
@@ -102,6 +110,13 @@ export function ChatLog({ messages, loading, typingId, labels, onRetry }: ChatLo
                   <span className={styles.who}>{user ? labels.you : labels.agent}</span>
                   {user ? (
                     <span className={styles.bubble}>{m.text}</span>
+                  ) : m.draft ? (
+                    <ContactCard
+                      draft={m.draft}
+                      copy={contact}
+                      onSend={(fields, tokens) => onSendDraft(m.id, fields, tokens)}
+                      onCancel={() => onCancelDraft(m.id)}
+                    />
                   ) : (
                     <TypingBubble
                       className={m.failed ? `${styles.bubble} ${styles.failed}` : styles.bubble}

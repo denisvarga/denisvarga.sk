@@ -3,6 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { secureHeaders } from 'hono/secure-headers';
 import { askError, logEvent } from './ask/errors';
 import { askRoute } from './routes/ask';
+import { contactRoute } from './routes/contact';
 import { overviewRoute } from './routes/overview';
 import { runRetention } from './scheduled';
 
@@ -30,6 +31,7 @@ app.use(
 );
 
 app.route('/api', askRoute);
+app.route('/api', contactRoute);
 app.route('/prehlad', overviewRoute);
 
 app.notFound((c) => c.json({ error: 'not_found' }, 404));

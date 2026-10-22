@@ -1,7 +1,7 @@
 import type { AskLang, AskRole } from '../../shared/ask-contract';
 import type { ModelResult } from '../ask/openai';
 import { CONTACT_EMAIL_EN, CONTACT_EMAIL_SK } from './facts';
-import { INTRO, RULES } from './rules';
+import { CONTACT_RULE, INTRO, RULES } from './rules';
 
 // Only high-precision patterns: an imperative paired with its target, or a template marker nobody
 // types by accident. Anything subtler is left to the prompt rule, so honest questions about
@@ -95,7 +95,7 @@ function shingles(text: string): string[] {
 
 // Facts are left out on purpose: answers are supposed to repeat them.
 const SHINGLE_INDEX = new Map<string, Set<number>>();
-[INTRO, ...RULES].forEach((entry, i) => {
+[INTRO, ...RULES, CONTACT_RULE].forEach((entry, i) => {
   for (const shingle of shingles(entry)) SHINGLE_INDEX.set(shingle, (SHINGLE_INDEX.get(shingle) ?? new Set()).add(i));
 });
 

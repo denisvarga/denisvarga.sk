@@ -22,7 +22,16 @@ export interface AskRequest {
   readonly turnstileToken: string;
 }
 
-export type AskReplyKind = 'answer' | 'easter_egg';
+export type AskReplyKind = 'answer' | 'easter_egg' | 'handoff_draft';
+
+/** A message for Denis the model proposed; nothing is sent until the visitor confirms it. */
+export interface ContactDraft {
+  readonly message: string;
+  /** Prefilled only when the visitor gave it in the chat. */
+  readonly name: string | null;
+  /** Prefilled only when the visitor gave it in the chat. */
+  readonly email: string | null;
+}
 
 export interface AskSuccess {
   readonly reply: string;
@@ -33,6 +42,8 @@ export interface AskSuccess {
    * canned replies to a manipulation attempt and to an answer that leaked the instructions.
    */
   readonly sig?: string;
+  /** Set with kind `handoff_draft`; `reply` then carries the draft text for the history. */
+  readonly draft?: ContactDraft;
 }
 
 export const ASK_ERROR_CODES = [

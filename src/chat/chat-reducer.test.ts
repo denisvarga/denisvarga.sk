@@ -4,6 +4,7 @@ import {
   chatReducer,
   initialChatState,
   requestMessages,
+  transcriptMessages,
   type ChatAction,
   type ChatMessage,
   type ChatState,
@@ -130,5 +131,80 @@ describe('requestMessages', () => {
   it('keeps the question alone when the history holds only replies', () => {
     const history: ChatMessage[] = [{ id: 1, role: 'assistant', text: 'orphan', failed: false }];
     expect(requestMessages(history, 'q')).toEqual([{ role: 'user', content: 'q' }]);
+  });
+});
+
+const proposal = { message: 'I need a shop.', name: null, email: 'jana@firma.sk' };
+const drafted = () =>
+  run([...exchange('q1', 'a1', 's1'), { type: 'ask', text: 'Yes' }, { type: 'reply', text: 'Draft message for Denis:\n\nI need a shop.', sig: 's2', draft: proposal }]);
+
+describe('contact drafts', () => {
+  it('stores a proposed message as a pending draft on its reply', () => {
+    expect(drafted().messages[3]).toEqual({
+      id: 4,
+      role: 'assistant',
+      text: 'Draft message for Denis:\n\nI need a shop.',
+      failed: false,
+      sig: 's2',
+      draft: { proposal, status: 'pending' },
+    });
+    expect(run(exchange('q', 'a')).messages[1]).not.toHaveProperty('draft');
+  });
+
+  it('moves through sending, failed and sent, keeping the address and the signed confirmation', () => {
+    const sending = chatReducer(drafted(), { type: 'draft', id: 4, status: 'sending' });
+    expect(sending.messages[3]?.draft?.status).toBe('sending');
+    const failed = chatReducer(sending, { type: 'failed', id: 4, failure: 'failed' });
+    expect(failed.messages[3]?.draft).toMatchObject({ status: 'failed', failure: 'failed' });
+    const again = chatReducer(failed, { type: 'draft', id: 4, status: 'sending' });
+    expect(again.messages[3]?.draft).not.toHaveProperty('failure');
+    const sent = chatReducer(again, { type: 'sent', id: 4, email: 'jana@firma.sk', reply: 'Message sent.', sig: 's3' });
+    expect(sent.messages[3]?.draft).toEqual({ proposal, status: 'sent', sentTo: 'jana@firma.sk', confirmation: { text: 'Message sent.', sig: 's3' } });
+  });
+
+  it.each(['dailyCap', 'rateLimited', 'unavailable', 'timeout'] as const)('ends the draft after a %s failure', (failure) => {
+    const sending = chatReducer(drafted(), { type: 'draft', id: 4, status: 'sending' });
+    const failed = chatReducer(sending, { type: 'failed', id: 4, failure });
+    expect(failed.messages[3]?.draft).toMatchObject({ status: 'failed', failure });
+    expect(chatReducer(failed, { type: 'draft', id: 4, status: 'sending' })).toBe(failed);
+    expect(chatReducer(failed, { type: 'draft', id: 4, status: 'cancelled' })).toBe(failed);
+  });
+
+  it('ignores moves a status does not allow and unknown ids', () => {
+    const pending = drafted();
+    expect(chatReducer(pending, { type: 'sent', id: 4, email: 'x@y.sk', reply: 'r', sig: 's' })).toBe(pending);
+    expect(chatReducer(pending, { type: 'failed', id: 4, failure: 'failed' })).toBe(pending);
+    expect(chatReducer(pending, { type: 'draft', id: 2, status: 'sending' })).toBe(pending);
+    expect(chatReducer(pending, { type: 'draft', id: 99, status: 'sending' })).toBe(pending);
+    const cancelled = chatReducer(pending, { type: 'draft', id: 4, status: 'cancelled' });
+    expect(cancelled.messages[3]?.draft?.status).toBe('cancelled');
+    expect(chatReducer(cancelled, { type: 'draft', id: 4, status: 'sending' })).toBe(cancelled);
+    const sending = chatReducer(pending, { type: 'draft', id: 4, status: 'sending' });
+    expect(chatReducer(sending, { type: 'draft', id: 4, status: 'cancelled' })).toBe(sending);
+  });
+
+  it('sends the signed draft and, once sent, the signed confirmation back as assistant turns', () => {
+    const sending = chatReducer(drafted(), { type: 'draft', id: 4, status: 'sending' });
+    const sent = chatReducer(sending, { type: 'sent', id: 4, email: 'jana@firma.sk', reply: 'Message sent.', sig: 's3' });
+    expect(requestMessages(sent.messages, 'Thanks')).toStrictEqual([
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1', sig: 's1' },
+      { role: 'user', content: 'Yes' },
+      { role: 'assistant', content: 'Draft message for Denis:\n\nI need a shop.', sig: 's2' },
+      { role: 'assistant', content: 'Message sent.', sig: 's3' },
+      { role: 'user', content: 'Thanks' },
+    ]);
+    expect(JSON.stringify(requestMessages(sent.messages, 'Thanks'))).not.toContain('jana@firma.sk');
+  });
+
+  it('builds the contact transcript up to the draft, leaving out later turns', () => {
+    const later = run([{ type: 'ask', text: 'Another question' }, { type: 'reply', text: 'Another answer', sig: 's4' }], drafted());
+    expect(transcriptMessages(later.messages, 4)).toStrictEqual([
+      { role: 'user', content: 'q1' },
+      { role: 'assistant', content: 'a1', sig: 's1' },
+      { role: 'user', content: 'Yes' },
+      { role: 'assistant', content: 'Draft message for Denis:\n\nI need a shop.', sig: 's2' },
+    ]);
+    expect(transcriptMessages(later.messages, 99)).toEqual([]);
   });
 });

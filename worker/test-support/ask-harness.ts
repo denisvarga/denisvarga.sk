@@ -19,6 +19,24 @@ export function fakeLimiter(limit = 5): RateLimit {
   };
 }
 
+export interface FakeMail extends SendEmail {
+  /** Every message passed to send(), in order, failed attempts included. */
+  readonly sent: EmailMessageBuilder[];
+}
+
+/** Records send() calls; `failWith` makes every send reject with that Cloudflare error code. */
+export function fakeMail(failWith?: string): FakeMail {
+  const sent: EmailMessageBuilder[] = [];
+  const record = async (message: EmailMessage | EmailMessageBuilder): Promise<EmailSendResult> => {
+    if (!('subject' in message)) throw new Error('FakeMail: only the builder form is used');
+    sent.push(message);
+    if (failWith) throw Object.assign(new Error(`${failWith}: upstream detail jana@firma.sk`), { code: failWith });
+    return { messageId: `<${sent.length}@notify.denisvarga.sk>` };
+  };
+  // One implementation stands in for both overloads of SendEmail.send.
+  return { sent, send: record } as FakeMail;
+}
+
 export function makeEnv(overrides: Partial<AskEnv> = {}): { env: AskEnv; db: FakeD1 } {
   const db = new FakeD1();
   const env: AskEnv = {
@@ -32,6 +50,12 @@ export function makeEnv(overrides: Partial<AskEnv> = {}): { env: AskEnv; db: Fak
     ALLOWED_ORIGINS: ORIGIN,
     TURNSTILE_HOSTNAME: 'denisvarga.sk',
     TURNSTILE_ACTION: 'ask',
+    CONTACT_ENABLED: 'false',
+    CONTACT_FROM: 'web@notify.denisvarga.sk',
+    CONTACT_TO: 'hello@denisvarga.sk',
+    TURNSTILE_CONTACT_ACTION: 'contact',
+    CONTACT_CLIENT_DAILY_CAP: '3',
+    CONTACT_DAILY_CAP: '30',
     ACCESS_TEAM_DOMAIN: 'https://denva.cloudflareaccess.com',
     ACCESS_AUD: '',
     ACCESS_ALLOWED_EMAILS: '',
