@@ -6,7 +6,7 @@ import { CONTACT_TOOL } from '../ask/openai';
 import { buildInstructions, PROMPT_VERSION } from './prompt';
 
 /** Update both together whenever the prompt text changes; the test below says when. */
-const PINNED = { version: '2026-10-21.3', hash: 'a1d3977dc246' };
+const PINNED = { version: '2026-10-22.1', hash: '4f0abf773a5f' };
 
 async function promptHash(): Promise<string> {
   const year = 2026;
@@ -32,8 +32,8 @@ describe('buildInstructions', () => {
     const sk = buildInstructions('sk', 2026);
     const en = buildInstructions('en', 2027);
     expect(en.shared).toBe(sk.shared);
-    expect(sk.perRequest).toBe('Návštevník je na slovenskej verzii webu (denisvarga.sk). Aktuálny rok je 2026.');
-    expect(en.perRequest).toBe('Návštevník je na anglickej verzii webu (denisvarga.dev). Aktuálny rok je 2027.');
+    expect(sk.perRequest).toBe('Návštevník je na slovenskej verzii webu (denisvarga.sk). Otázku bez jednoznačného jazyka (jedno slovo, názov technológie) zodpovedz slovensky. Aktuálny rok je 2026.');
+    expect(en.perRequest).toBe('Návštevník je na anglickej verzii webu (denisvarga.dev). Otázku bez jednoznačného jazyka (jedno slovo, názov technológie) zodpovedz anglicky. Aktuálny rok je 2027.');
     expect(sk.shared).not.toMatch(/Aktuálny rok|Návštevník je na/);
   });
 

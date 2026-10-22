@@ -1022,12 +1022,11 @@
     "lang": "en",
     "question": "I'm a recruiter at a fintech company and we'd like to invite Denis to an interview for a senior full-stack role.",
     "expect": {
-      "toolCall": false,
       "mustIncludeAny": [
         "draft",
         "message"
       ],
-      "note": "A role invitation is a concrete request: offer to draft a message, no proposal before the visitor agrees."
+      "note": "A role invitation is itself a message for Denis: an offer to draft one or a direct proposal are both fine, since the visitor still confirms in the card."
     }
   },
   {

@@ -174,7 +174,8 @@ async function main(): Promise<void> {
     const latency = Date.now() - startedAt;
     // Same as the route: a proposal is checked and guarded as the draft text the visitor would see.
     const draft = answer.outcome === 'handoff' ? answer.draft : undefined;
-    const result = guardAnswer(draft ? { ...answer, text: draftReply(testCase.lang, draft.message) } : answer, testCase.lang);
+    const shown = draft ? { ...answer, text: draftReply(testCase.lang, draft.message) } : answer;
+    const result = guardAnswer(shown, testCase.lang);
     const completed = (answer.outcome === 'ok' || answer.outcome === 'handoff') && answer.responseStatus === 'completed';
     const checks = result.text ? softChecks(result.text, testCase.expect, result.outcome === 'handoff' ? draft : undefined) : [];
     if (!completed) hardFailures++;
@@ -187,7 +188,7 @@ async function main(): Promise<void> {
 
     console.log(`  answer: ${result.text ?? '(none)'}`);
     if (draft) console.log(`  draft:  name ${draft.name ?? 'null'} | email ${draft.email ?? 'null'}`);
-    if (result !== answer) console.log(`  guard:  leaked instructions replaced, model said: ${answer.text ?? ''}`);
+    if (result !== shown) console.log(`  guard:  leaked instructions replaced, model said: ${shown.text ?? ''}`);
     console.log(`  status: ${result.responseStatus ?? 'none'} | outcome ${result.outcome} | http ${result.httpStatus}${completed ? '' : ' | FAIL'}`);
     console.log(softLine(checks, testCase.expect.note));
     console.log(
