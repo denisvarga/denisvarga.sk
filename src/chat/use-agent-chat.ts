@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import type { AskLang } from '../../shared/ask-contract';
-import { postAsk, type AskFailure, type AskOutcome } from './api-client';
-import { chatReducer, initialChatState, requestMessages, type ChatAction, type ChatState } from './chat-reducer';
+import type { ContactRequest } from '../../shared/contact-contract';
+import { postAsk, postContact, type AskFailure, type AskOutcome, type ContactOutcome } from './api-client';
+import { chatReducer, initialChatState, requestMessages, transcriptMessages, type ChatAction, type ChatState } from './chat-reducer';
 import type { TokenClient } from './use-turnstile-token';
+
+export type ContactFields = Pick<ContactRequest, 'name' | 'email' | 'message'>;
+export type ContactTokens = Pick<TokenClient, 'getToken' | 'refresh'>;
 
 /** Copy shown in place of a reply (`t.ask.errors`). */
 export interface AskErrorCopy {
@@ -17,6 +21,7 @@ export interface AgentChatOptions {
   readonly errors: AskErrorCopy;
   readonly tokens: Pick<TokenClient, 'getToken' | 'refresh'>;
   readonly post?: typeof postAsk;
+  readonly send?: typeof postContact;
 }
 
 export interface AgentChat {
@@ -25,6 +30,9 @@ export interface AgentChat {
   readonly ask: (question: string) => Promise<void>;
   /** Asks the question of the failed reply `id` again. */
   readonly retry: (id: number) => Promise<void>;
+  /** Posts the draft of reply `id` with the card's fields; `tokens` carry the contact action. */
+  readonly sendDraft: (id: number, fields: ContactFields, tokens: ContactTokens) => Promise<void>;
+  readonly cancelDraft: (id: number) => void;
 }
 
 /** The daily cap lasts until midnight UTC, so it offers no retry; everything else does. */
@@ -33,20 +41,27 @@ export function failureReply(error: AskFailure | null, errors: AskErrorCopy): Ex
   return { type: 'fail', text: error === 'rate_limited' ? errors.rateLimited : errors.fallback, retryable: true };
 }
 
-export function useAgentChat({ lang, errors, tokens, post = postAsk }: AgentChatOptions): AgentChat {
+export function useAgentChat({ lang, errors, tokens, post = postAsk, send: sendContact = postContact }: AgentChatOptions): AgentChat {
   const [state, dispatch] = useReducer(chatReducer, initialChatState);
   const committed = useRef(state);
   // Set synchronously on ask and released only once a non-loading state is committed, so a second
   // question can neither overlap a request nor read a history that misses the previous reply.
   const busy = useRef(false);
   const request = useRef<AbortController | null>(null);
+  const contactRequests = useRef(new Map<number, AbortController>());
 
   useLayoutEffect(() => {
     committed.current = state;
     if (!state.loading) busy.current = false;
   });
 
-  useEffect(() => () => request.current?.abort(), []);
+  useEffect(() => {
+    const contacts = contactRequests.current;
+    return () => {
+      request.current?.abort();
+      for (const controller of contacts.values()) controller.abort();
+    };
+  }, []);
 
   const setInput = useCallback((value: string) => dispatch({ type: 'input', value }), []);
 
@@ -74,7 +89,7 @@ export function useAgentChat({ lang, errors, tokens, post = postAsk }: AgentChat
         // Token deadline, script or widget failure: the fallback copy covers it.
       }
       if (controller.signal.aborted) return;
-      dispatch(reply === null ? failureReply(error, errors) : { type: 'reply', text: reply.reply, sig: reply.sig });
+      dispatch(reply === null ? failureReply(error, errors) : { type: 'reply', text: reply.reply, sig: reply.sig, draft: reply.draft });
     },
     [lang, errors, tokens, post],
   );
@@ -100,5 +115,37 @@ export function useAgentChat({ lang, errors, tokens, post = postAsk }: AgentChat
     [send],
   );
 
-  return { state, setInput, ask, retry };
+  const sendDraft = useCallback(
+    async (id: number, fields: ContactFields, contactTokens: ContactTokens) => {
+      const status = committed.current.messages.find((m) => m.id === id)?.draft?.status;
+      // The map also stops a second click that lands before the sending state is committed.
+      if ((status !== 'pending' && status !== 'failed') || contactRequests.current.has(id)) return;
+      const controller = new AbortController();
+      contactRequests.current.set(id, controller);
+      const messages = transcriptMessages(committed.current.messages, id);
+      dispatch({ type: 'draft', id, status: 'sending' });
+
+      let outcome: ContactOutcome | null = null;
+      try {
+        const turnstileToken = await contactTokens.getToken();
+        outcome = await sendContact({ lang, turnstileToken, ...fields, messages }, { signal: controller.signal });
+      } catch {
+        // Token deadline, script or widget failure: the failed copy covers it.
+      }
+      contactRequests.current.delete(id);
+      if (controller.signal.aborted) return;
+      if (outcome?.ok) {
+        dispatch({ type: 'sent', id, email: fields.email, reply: outcome.reply, sig: outcome.sig });
+        return;
+      }
+      // Only a failed send can be tried again, so only then is a fresh token worth fetching.
+      contactTokens.refresh();
+      dispatch({ type: 'draft', id, status: 'failed' });
+    },
+    [lang, sendContact],
+  );
+
+  const cancelDraft = useCallback((id: number) => dispatch({ type: 'draft', id, status: 'cancelled' }), []);
+
+  return { state, setInput, ask, retry, sendDraft, cancelDraft };
 }

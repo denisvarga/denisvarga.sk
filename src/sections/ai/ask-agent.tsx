@@ -21,8 +21,8 @@ export function AskAgent() {
   const noteId = useId();
   useReveal(cardRef);
 
-  const tokens = useTurnstileToken(widgetRef);
-  const { state, setInput, ask, retry } = useAgentChat({ lang, errors: t.ask.errors, tokens });
+  const tokens = useTurnstileToken(widgetRef, 'ask');
+  const { state, setInput, ask, retry, sendDraft, cancelDraft } = useAgentChat({ lang, errors: t.ask.errors, tokens });
   const submit = (question: string) => void ask(question);
   // Stays focusable while a question is pending; the chat ignores clicks until the reply lands.
   const busy = state.loading || undefined;
@@ -81,7 +81,10 @@ export function AskAgent() {
         loading={state.loading}
         typingId={state.typingId}
         labels={{ you: t.ask.you, agent: t.ask.agent, thinking: t.ask.thinking, retry: t.ask.retry }}
+        contact={t.ask.contact}
         onRetry={(id) => void retry(id)}
+        onSendDraft={(id, fields, contactTokens) => void sendDraft(id, fields, contactTokens)}
+        onCancelDraft={cancelDraft}
       />
       <span id={noteId} className={styles.note}>
         {t.ask.note} {t.ask.privacyNote}{' '}

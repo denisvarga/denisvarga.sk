@@ -21,6 +21,21 @@ export interface CookieInfo {
   readonly desc: string;
 }
 
+/** The confirm card for a message the agent proposed; `sent` carries an `{email}` placeholder. */
+export interface ContactCopy {
+  readonly title: string;
+  readonly lead: string;
+  readonly name: string;
+  readonly email: string;
+  readonly consent: string;
+  readonly send: string;
+  readonly edit: string;
+  readonly cancel: string;
+  readonly sent: string;
+  readonly failed: string;
+  readonly cancelled: string;
+}
+
 export interface PrivacySection {
   readonly title: string;
   readonly text: string;
@@ -68,6 +83,7 @@ export interface Copy {
     readonly errors: { readonly rateLimited: string; readonly dailyCap: string; readonly fallback: string };
     readonly retry: string;
     readonly suggestions: Three<string>;
+    readonly contact: ContactCopy;
   };
   readonly work: {
     readonly label: string;

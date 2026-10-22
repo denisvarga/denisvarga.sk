@@ -21,6 +21,8 @@ export interface TokenSource {
 
 export interface TokenSourceOptions {
   readonly siteKey: string;
+  /** Turnstile action the Worker expects for the endpoint the token is for. */
+  readonly action: string;
   readonly load?: () => Promise<TurnstileApi>;
   readonly deadlineMs?: number;
   readonly now?: () => number;
@@ -33,7 +35,7 @@ interface Waiter {
 }
 
 export function createTokenSource(container: HTMLElement, options: TokenSourceOptions): TokenSource {
-  const { siteKey, load = loadTurnstile, deadlineMs = TOKEN_DEADLINE_MS, now = Date.now } = options;
+  const { siteKey, action, load = loadTurnstile, deadlineMs = TOKEN_DEADLINE_MS, now = Date.now } = options;
   let api: TurnstileApi | null = null;
   let widgetId: string | null = null;
   let widgetPromise: Promise<void> | null = null;
@@ -77,7 +79,7 @@ export function createTokenSource(container: HTMLElement, options: TokenSourceOp
         if (!siteKey) throw new TokenError('missing site key');
         const id = turnstile.render(container, {
           sitekey: siteKey,
-          action: 'ask',
+          action,
           execution: 'execute',
           appearance: 'interaction-only',
           theme: 'dark',
