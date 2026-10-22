@@ -23,13 +23,13 @@
 }
 
 .lead,
-.consent {
+.notice {
   font-size: 14px;
   line-height: 1.5;
   color: var(--grey-200);
 }
 
-.consent {
+.notice {
   font-size: 13px;
   color: var(--grey-400);
 }

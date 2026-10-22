@@ -73,7 +73,7 @@ export const copyEn: Copy = {
       lead: 'I will send Denis this message:',
       name: 'Name',
       email: 'Email',
-      consent: 'By sending, you agree that Denis receives your name, email, this message and this conversation so he can reply.',
+      notice: 'Nothing is sent until you press Send to Denis. Denis then receives your name, email, this message and this conversation by email so he can reply.',
       send: 'Send to Denis',
       edit: 'Edit',
       cancel: 'Cancel',
@@ -141,7 +141,7 @@ export const copyEn: Copy = {
       },
       {
         title: 'Pseudonymous identifiers',
-        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address without the secret key. One goes to OpenAI for abuse detection. The other changes every day, counts your questions (at most 20 a day) and is deleted within three days.',
+        text: 'From your IP address I derive keyed hashes that cannot be turned back into the address without the secret key. One goes to OpenAI for abuse detection. Two others change every day, count your questions (at most 20 a day) and your messages to me from the chat (at most 3 a day) and are deleted within three days.',
       },
       {
         title: 'Cloudflare',
@@ -149,7 +149,7 @@ export const copyEn: Copy = {
       },
       {
         title: 'Messages to me from the chat',
-        text: 'When the agent drafts a message to me and you send it, I receive your name, email, the message and your conversation with the agent by email so I can reply. Cloudflare Email Routing delivers it. The site stores none of it; the message stays in my mailbox. OpenAI does not receive the name and email from the form. Email addresses and phone numbers you type into the chat itself are replaced with placeholders in the question log.',
+        text: 'When the agent drafts a message to me, nothing is sent until you choose to send it. I then receive your name, email, the message and your conversation with the agent by email so I can reply. Cloudflare Email Routing delivers it. The legal basis is answering your request: for an enquiry about working together, steps taken at your request before a contract (Art. 6(1)(b) GDPR), otherwise my legitimate interest in replying to messages (Art. 6(1)(f) GDPR). The site stores none of it. The email stays in my mailbox until I delete it, and I keep it as long as our conversation or a project that comes out of it needs it. OpenAI does not receive the name and email from the form. Email addresses and phone numbers you type into the chat itself are replaced with placeholders in the question log.',
       },
       {
         title: 'Analytics',

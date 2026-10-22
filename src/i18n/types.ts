@@ -27,7 +27,8 @@ export interface ContactCopy {
   readonly lead: string;
   readonly name: string;
   readonly email: string;
-  readonly consent: string;
+  /** What sending does, without asking for consent: the visitor chooses to send. */
+  readonly notice: string;
   readonly send: string;
   readonly edit: string;
   readonly cancel: string;

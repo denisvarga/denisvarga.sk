@@ -105,7 +105,7 @@ describe('ContactCard', () => {
   it('shows the proposal with prefilled fields and announces it, leaving focus in the chat input', () => {
     expect(card()?.textContent).toContain(t.contact.title);
     expect(card()?.textContent).toContain(PROPOSAL.message);
-    expect(card()?.textContent).toContain(t.contact.consent);
+    expect(card()?.textContent).toContain(t.contact.notice);
     expect(card()?.textContent).not.toContain('Draft message for Denis:');
     expect(field(t.contact.name).value).toBe('');
     expect(field(t.contact.email).value).toBe('jana@firma.sk');

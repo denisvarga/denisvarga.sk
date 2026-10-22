@@ -133,7 +133,7 @@ function ContactForm({ draft, copy, onSend, onCancel }: ContactCardProps) {
           />
         </label>
       </div>
-      <p className={styles.consent}>{copy.consent}</p>
+      <p className={styles.notice}>{copy.notice}</p>
       {draft.status === 'failed' && <p className={styles.failed}>{linkify(copy.failed)}</p>}
       <div>
         <div className={styles.actions}>

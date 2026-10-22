@@ -74,7 +74,7 @@ export const copySk: Copy = {
       lead: 'Takto Denisovi pošlem vašu správu:',
       name: 'Meno',
       email: 'E-mail',
-      consent: 'Odoslaním súhlasíte, že Denis dostane vaše meno, e-mail, túto správu a tento rozhovor, aby vám mohol odpovedať.',
+      notice: 'Správa sa odošle, až keď kliknete na Odoslať Denisovi. Denis potom dostane e-mailom vaše meno, e-mail, túto správu a tento rozhovor, aby vám mohol odpovedať.',
       send: 'Odoslať Denisovi',
       edit: 'Upraviť',
       cancel: 'Zrušiť',
@@ -142,7 +142,7 @@ export const copySk: Copy = {
       },
       {
         title: 'Pseudonymné identifikátory',
-        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Druhý sa mení každý deň, počíta vaše otázky (najviac 20 za deň) a do troch dní sa zmaže.',
+        text: 'Z vašej IP adresy vypočítam pomocou tajného kľúča odtlačky, z ktorých sa adresa bez tohto kľúča spätne zistiť nedá. Jeden posielam OpenAI na odhaľovanie zneužitia. Ďalšie dva sa menia každý deň, počítajú vaše otázky (najviac 20 za deň) a vaše správy pre mňa z chatu (najviac 3 za deň) a do troch dní sa zmažú.',
       },
       {
         title: 'Cloudflare',
@@ -150,7 +150,7 @@ export const copySk: Copy = {
       },
       {
         title: 'Správy pre mňa z chatu',
-        text: 'Keď agent pripraví správu pre mňa a vy ju odošlete, dostanem e-mailom vaše meno, e-mail, text správy a váš rozhovor s agentom, aby som vám mohol odpovedať. Doručí ju Cloudflare Email Routing. Web z toho nič neukladá, správa zostáva v mojej e-mailovej schránke. Meno a e-mail z formulára OpenAI nedostane. E-mailové adresy a telefónne čísla, ktoré napíšete priamo do chatu, v zázname otázok nahrádzam zástupným textom.',
+        text: 'Keď agent pripraví správu pre mňa, nič sa neodošle, kým sa ju sami nerozhodnete odoslať. Potom dostanem e-mailom vaše meno, e-mail, text správy a váš rozhovor s agentom, aby som vám mohol odpovedať. Doručí ju Cloudflare Email Routing. Právnym základom je odpoveď na vašu žiadosť: pri dopyte po spolupráci kroky pred uzavretím zmluvy na vašu žiadosť (čl. 6 ods. 1 písm. b) GDPR), inak môj oprávnený záujem odpovedať na správy (čl. 6 ods. 1 písm. f) GDPR). Web z toho nič neukladá. E-mail zostáva v mojej e-mailovej schránke, kým ho nevymažem, a uchovávam ho, kým je potrebný pre našu komunikáciu alebo spoluprácu, ktorá z nej vznikne. Meno a e-mail z formulára OpenAI nedostane. E-mailové adresy a telefónne čísla, ktoré napíšete priamo do chatu, v zázname otázok nahrádzam zástupným textom.',
       },
       {
         title: 'Analytika',
