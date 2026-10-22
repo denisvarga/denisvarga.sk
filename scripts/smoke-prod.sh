@@ -3,13 +3,16 @@
 #   pnpm smoke
 #   CONNECT_IP=104.21.65.48 pnpm smoke   # pin every request to one Cloudflare edge IP
 # Each host gets 3 requests to /api/ask; 4 POSTs in total pass the Worker limiter (5 per IP per
-# minute, shared by both hosts), so run it at most once a minute.
+# minute, shared by both hosts), so run it at most once a minute. The POST to /api/contact carries a
+# foreign Origin and must get 403: the WAF lets only the sites' own Origin through to the Worker,
+# which checks it again once contact is enabled.
 set -euo pipefail
 
 HOSTS="denisvarga.sk denisvarga.dev"
 EN_ROOT="https://denisvarga.dev/"
 EGG_BODY='{"messages":[{"role":"user","content":"whoami"}],"lang":"sk","turnstileToken":"x"}'
 DUMMY_BODY='{"messages":[{"role":"user","content":"What does Denis build?"}],"lang":"en","turnstileToken":"XXXX.DUMMY.TOKEN.XXXX"}'
+CONTACT_BODY='{"lang":"en","turnstileToken":"x","name":"Smoke test","email":"smoke@example.com","message":"Smoke test.","messages":[]}'
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -112,6 +115,10 @@ for host in $HOSTS; do
   expect_body '"sig":"[A-Za-z0-9_-]+"'
   expect_no_store
   expect_hsts_without_subdomains
+
+  request "$host POST /api/contact foreign Origin" "$host" "$base/api/contact" \
+    -X POST -H 'Origin: https://evil.example' -H 'Content-Type: application/json' --data "$CONTACT_BODY"
+  expect_status 403
 
   request "$host POST /api/ask dummy Turnstile token" "$host" "$base/api/ask" \
     -X POST -H "Origin: $base" -H 'Content-Type: application/json' --data "$DUMMY_BODY"
