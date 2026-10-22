@@ -33,6 +33,7 @@ import schoolofarts from '../assets/projects/schoolofarts.webp';
 import secondBrain from '../assets/projects/second-brain.webp';
 import slovandisponea from '../assets/projects/slovandisponea.webp';
 import tatranskyprofil from '../assets/projects/tatranskyprofil.webp';
+import teamonline from '../assets/projects/teamonline.webp';
 import tomaflora from '../assets/projects/tomaflora.webp';
 import vibration from '../assets/projects/vibration.webp';
 import vonavydomov from '../assets/projects/vonavydomov.webp';
@@ -84,6 +85,7 @@ const IMAGES: Readonly<Record<string, string>> = {
   'second-brain': secondBrain,
   slovandisponea,
   tatranskyprofil,
+  teamonline,
   tomaflora,
   vibration,
   vonavydomov,
