@@ -5,15 +5,17 @@ import type { ProjectDetailsBySlug } from './projects';
 // Every scope item is backed by the project's source code; keep it that way when editing.
 export const PROJECT_DETAILS_SK: ProjectDetailsBySlug = {
   'second-brain': {
-    summary: 'Osobný systém, ktorý zbiera poznámky, e-maily, články, hlasové správy aj fotky, triedi ich cez Claude a robí z nich prehľadávateľnú znalostnú bázu. Beží na dvoch miestach: riadiaca vrstva na Hetzner VPS, prepis reči, OCR a agenti na stále zapnutom Macu, prepojené cez Tailscale.',
+    summary: 'Osobný systém, ktorý zbiera poznámky, e-maily, články, hlasové správy aj fotky do prehľadávateľnej znalostnej bázy a postupne sa mení na autonómnu vývojovú platformu: agenti prevezmú úlohu s akceptačnými kritériami, naplánujú ju, implementujú a overia, človek schvaľuje len kľúčové kroky. Beží na Hetzner VPS a stále zapnutom Mac mini, prepojených cez Tailscale.',
     scope: [
       'RAG nad PostgreSQL 17 a pgvector: embeddingy bge-m3 v HNSW indexe, hybridné vyhľadávanie (vektory, fulltext a trigramy) spojené cez reciprocal rank fusion a reranker bge-reranker-v2-m3',
-      'Odpovede s citovanými zdrojmi a vlastný MCP server s nástrojmi na vyhľadávanie, otázky, zachytávanie poznámok a úlohy',
-      'Telegram bot na zachytávanie obsahu, rozhovor s asistentom a schvaľovanie krokov agentov',
-      'Coding agent nad Claude Agent SDK v oddelených git worktrees, v sandboxe bez prístupových údajov, s plánom na schválenie v Telegrame a pull requestom cez GitHub App',
-      'Na Apple Silicon: prepis reči cez mlx-whisper (aj v slovenčine) a OCR cez Apple Vision',
-      'Plánované joby vo fronte pg-boss: denné súhrny, kompilácia stránok znalostnej bázy, údržba a samoopravné úlohy',
-      'Docker Compose, Caddy a Cloudflare Access, deploy so zálohou databázy, health checkom a automatickým rollbackom, nočné zálohy s týždenným testom obnovy',
+      'Odpovede s citovanými zdrojmi, vlastný MCP server a Telegram bot na zachytávanie obsahu a rozhovor s asistentom',
+      'Úlohy s akceptačnými kritériami, ktoré sa pri schválení plánu zmrazia, a pravidlá autonómie pre každú organizáciu a projekt',
+      'Agent runner s piatimi paralelnými slotmi: každý beží ako samostatný systémový používateľ s vlastnými pravidlami firewallu a úlohy sa po páde obnovia',
+      'Schvaľovanie v dashboarde po overení passkey, Telegram posiela len odkaz na rozhodnutie',
+      'Znalosti v obyčajných súboroch verzovaných v gite, rozhodnutia zachytené na konci každej session a Command Center v SwiftUI s frontou toho, čo čaká na rozhodnutie',
+      'Na Apple Silicon: prepis reči cez mlx-whisper (aj v slovenčine) a OCR cez Apple Vision, plánované joby vo fronte pg-boss',
+      'Docker Compose a Caddy, deploy so zálohou databázy, health checkom a automatickým rollbackom, nočné zálohy s testom obnovy',
+      'Vo vývoji: merge gate a nasadenie na staging bez zásahu človeka, do produkcie až po schválení',
     ],
   },
   narodnyfutbalovystadion: {
@@ -50,13 +52,15 @@ export const PROJECT_DETAILS_SK: ProjectDetailsBySlug = {
     ],
   },
   routie: {
-    summary: 'Vlastný e-shop, kde si zákazník nahrá GPX trasu z behu, bicykla alebo túry a hneď vidí, ako bude vyzerať na mape. Ďalšia generácia s 3D reliéfom terénu a exportom pre 3D tlač je vo vývoji.',
+    summary: 'Vlastný produkt: obrazy z nahratých trás, kde je trasa vytlačená na 3D tlačiarni ako reliéf a nalepená na skle nad mapou v ráme. E-shop aj konfigurátor stoja na vlastnej platforme postavenej od nuly, ktorá od 7. 11. 2026 nahradila pôvodný WooCommerce obchod na routie.sk a routie.eu.',
     scope: [
-      'Nahratie GPX cez AJAX s overením typu a súkromným úložiskom, súbor putuje ďalej s objednávkou',
-      'Parsovanie GPX v prehliadači a vykreslenie trasy na mape MapLibre GL',
-      'Personalizácia: nadpis, podnadpis, popis a až 4 vlastné štatistiky, ktoré prechádzajú do košíka, objednávky, administrácie aj e-mailov',
-      'WooCommerce so Stripe, Packetou, PDF faktúrami a WPML',
-      'Vo vývoji: Next.js 16 a React 19 platforma s Postgres a Drizzle, 3D konfigurátor v three.js s reliéfom terénu a exportom STL v milimetroch, tlačové PDF a e2e testy',
+      'Vlastná commerce platforma: Next.js s App Routerom, TypeScript v strict režime, PostgreSQL a Drizzle; jadro je oddelené od Routie vrstvy a CI to overuje pokladňou syntetického obchodu bez jediného Routie balíka',
+      '3D konfigurátor v three.js a react-three-fiber: GPX, TCX alebo KML rozpoznané podľa obsahu súboru, 25 šablón, 3 formáty, 2 rámy a 17 mapových štýlov',
+      'Z jedného renderovacieho priechodu vznikne tlačové PDF v 300 dpi, náhľad pre zákazníka aj binárne STL v milimetroch, takže náhľad a výroba nemôžu opisovať dva rôzne obrazy',
+      'Kontrola pred výrobou: náhľad sa porovná s tlačovým súborom a pri odchýlke sa tlač zastaví, kým ju operátor neodomkne s dôvodom; render beží izolovane bez prístupu k databáze a sieti',
+      'Vlastné mapové dlaždice PMTiles (vyše 600 GB z OpenFreeMap a Mapterhorn), v žiadnej mapovej požiadavke nie je cudzí API kľúč',
+      'Stripe Payment Element s kartou, Apple Pay a Google Pay, Packeta do 26 krajín EÚ, slovenčina a angličtina na dvoch doménach',
+      'Prechod z WooCommerce so 129 presmerovaniami, všetky overené naživo',
     ],
   },
   monkeystudios: {
