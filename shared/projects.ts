@@ -42,10 +42,10 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     slug: 'second-brain',
     context: 'own',
     featured: true,
-    kind: { sk: 'Osobný AI systém', en: 'Personal AI system' },
+    kind: { sk: 'Osobný AI systém a vývojová platforma', en: 'Personal AI system and dev platform' },
     desc: {
-      sk: 'Súkromný AI mozog: RAG nad pgvector, MCP server, Telegram bot a coding agent',
-      en: 'A private AI brain: RAG on pgvector, an MCP server, a Telegram bot and a coding agent',
+      sk: 'Znalostná báza s RAG nad pgvector a agenti, ktorí prevedú úlohu od zadania po pull request',
+      en: 'A RAG knowledge base on pgvector and agents that take a ticket from brief to pull request',
     },
   },
   {
@@ -91,10 +91,10 @@ export const PROJECT_INFO: readonly ProjectInfo[] = [
     slug: 'routie',
     context: 'own',
     featured: true,
-    kind: { sk: 'E-shop s mapovými artworkmi', en: 'Map artwork store' },
+    kind: { sk: 'E-shop s 3D konfigurátorom obrazov', en: 'Store with a 3D print configurator' },
     desc: {
-      sk: 'Vlastný e-shop: z nahratej GPX trasy živý náhľad mapy a personalizovaný obraz',
-      en: 'Own e-shop: a live map preview and a personalised print from an uploaded GPX route',
+      sk: 'Vlastná platforma na Next.js: z nahratej trasy 3D konfigurátor, tlačové PDF aj STL pre 3D tlačiareň',
+      en: 'Own Next.js platform: a 3D configurator that turns an uploaded route into a print PDF and an STL',
     },
   },
   {

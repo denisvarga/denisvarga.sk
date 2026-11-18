@@ -5,15 +5,17 @@ import type { ProjectDetailsBySlug } from './projects';
 // Every scope item is backed by the project's source code; keep it that way when editing.
 export const PROJECT_DETAILS_EN: ProjectDetailsBySlug = {
   'second-brain': {
-    summary: 'A personal system that collects notes, emails, articles, voice messages and photos, classifies them with Claude and turns them into a searchable knowledge base. It runs in two places: the control plane on a Hetzner VPS, speech to text, OCR and agents on an always-on Mac, connected over Tailscale.',
+    summary: 'A personal system that collects notes, emails, articles, voice messages and photos into a searchable knowledge base, and is turning into an autonomous development platform: agents take a ticket with acceptance criteria, plan it, implement it and verify it, while a human approves only the key steps. It runs on a Hetzner VPS and an always-on Mac mini, connected over Tailscale.',
     scope: [
       'RAG on PostgreSQL 17 and pgvector: bge-m3 embeddings in an HNSW index, hybrid search (vectors, full text and trigrams) merged with reciprocal rank fusion and a bge-reranker-v2-m3 reranker',
-      'Answers with cited sources and its own MCP server with tools for search, questions, note capture and tasks',
-      'Telegram bot for capturing content, chatting with the assistant and approving agent steps',
-      'Coding agent on the Claude Agent SDK in separate git worktrees, sandboxed without credentials, with plans approved in Telegram and pull requests opened by a GitHub App',
-      'On Apple Silicon: speech to text with mlx-whisper (Slovak included) and OCR with Apple Vision',
-      'Scheduled jobs on a pg-boss queue: daily digests, knowledge base page compilation, maintenance and self-healing tasks',
-      'Docker Compose, Caddy and Cloudflare Access, deploys with a database backup, health check and automatic rollback, nightly backups with a weekly restore test',
+      'Answers with cited sources, its own MCP server and a Telegram bot for capturing content and chatting with the assistant',
+      'Tickets with acceptance criteria that freeze when the plan is approved, and autonomy rules per organisation and project',
+      'An agent runner with five parallel slots: each runs as a separate OS user with its own firewall rules, and work is recovered after a crash',
+      'Approvals in the dashboard behind a passkey check, Telegram only sends a link to the decision',
+      'Knowledge in plain files versioned in git, decisions captured at the end of every session, and a SwiftUI Command Center with a queue of what waits for a decision',
+      'On Apple Silicon: speech to text with mlx-whisper (Slovak included) and OCR with Apple Vision, scheduled jobs on a pg-boss queue',
+      'Docker Compose and Caddy, deploys with a database backup, health check and automatic rollback, nightly backups with a restore test',
+      'In development: a merge gate and staging deploys with no human in the loop, production only after approval',
     ],
   },
   narodnyfutbalovystadion: {
@@ -50,13 +52,15 @@ export const PROJECT_DETAILS_EN: ProjectDetailsBySlug = {
     ],
   },
   routie: {
-    summary: 'Own online store where customers upload a GPX route from a run, ride or hike and instantly see it on a map. The next generation, with 3D terrain relief and export for 3D printing, is in development.',
+    summary: 'Own product: prints of uploaded routes, where the route is 3D printed as a relief and glued onto glass above a map inside a frame. The shop and the configurator run on a custom platform built from scratch, which replaced the original WooCommerce store on routie.sk and routie.eu on 7 November 2026.',
     scope: [
-      'GPX upload over AJAX with a type check and private storage, the file travels with the order',
-      'GPX parsed in the browser and drawn as a route on a MapLibre GL map',
-      'Personalisation: headline, subtitle, description and up to 4 custom stats carried into the cart, order, admin and emails',
-      'WooCommerce with Stripe, Packeta, PDF invoices and WPML',
-      'In development: a Next.js 16 and React 19 platform with Postgres and Drizzle, a three.js 3D configurator with terrain relief and STL export in millimetres, print PDFs and e2e tests',
+      'Custom commerce platform: Next.js with the App Router, strict TypeScript, PostgreSQL and Drizzle; the core is separated from the Routie layer and CI proves it with a synthetic shop that checks out without loading a single Routie package',
+      'A 3D configurator in three.js and react-three-fiber: GPX, TCX or KML detected from the file contents, 25 templates, 3 formats, 2 frames and 17 map styles',
+      'One render pass produces the 300 dpi print PDF, the customer proof and a binary STL in millimetres, so the proof and the production files cannot describe two different prints',
+      'A check before production: the proof is compared with the print file and a mismatch blocks printing until an operator clears it with a reason; the render runs isolated, with no access to the database or the network',
+      'Self-hosted PMTiles map tiles (over 600 GB from OpenFreeMap and Mapterhorn), with no third-party API key in any map request',
+      'Stripe Payment Element with card, Apple Pay and Google Pay, Packeta to 26 EU countries, Slovak and English on two domains',
+      'The move off WooCommerce with 129 redirects, all verified on the live host',
     ],
   },
   monkeystudios: {

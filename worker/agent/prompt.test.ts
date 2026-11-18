@@ -6,7 +6,7 @@ import { CONTACT_TOOL } from '../ask/openai';
 import { buildInstructions, PROMPT_VERSION, promptVersion } from './prompt';
 
 /** Update both together whenever the prompt text changes; the test below says when. */
-const PINNED = { version: '2026-10-22.2', hash: '23eea8b0514d' };
+const PINNED = { version: '2026-11-18.1', hash: '88ce4cf2c043' };
 
 async function promptHash(): Promise<string> {
   const year = 2026;
@@ -89,7 +89,7 @@ describe('buildInstructions', () => {
     expect(text).toContain(
       '- Projekt Národný futbalový štadión (narodnyfutbalovystadion.sk, web národného štadióna): robil ho na voľnej nohe pod značkou Denva (denva.studio).',
     );
-    expect(text).toContain('- Projekt Routie (routie.sk, e-shop s mapovými artworkmi): je to jeho vlastný projekt.');
+    expect(text).toContain('- Projekt Routie (routie.sk, e-shop s 3D konfigurátorom obrazov): je to jeho vlastný projekt.');
     expect(text).toContain(`- Portfólio: spolu ${PROJECT_INFO.length} projektov: ${PROJECT_INFO.map((p) => p.name).join(', ')}.`);
     expect(text).toContain('celý zoznam je v sekcii "Všetky projekty"');
     expect(text).not.toContain('(Ticketportal)');
